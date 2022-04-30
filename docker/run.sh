@@ -13,20 +13,6 @@ attach_to_container()
     exec docker exec -it $CONTAINER_NAME bash -c /home/mcav/mcav_ws/src/sd_vehicle_interface/docker/tmux-start.sh
 }
 
-run_with_gpu()
-{
-    docker run -e DISPLAY -e TERM \
-        --privileged \
-        -v "/dev:/dev:rw" \
-        -v "$(pwd):/home/mcav/mcav_ws/src/sd_vehicle_interface:rw" \
-        -v "/tmp/.X11-unix:/tmp/.X11-unix:rw" \
-        --runtime=nvidia \
-        --net=host \
-        --name $CONTAINER_NAME \
-        --gpus all \
-        --entrypoint /ros_entrypoint.sh \
-        -d $IMAGE_NAME /usr/bin/tail -f /dev/null
-}
 run_without_gpu()
 {
     docker run -e DISPLAY -e TERM \
@@ -48,7 +34,7 @@ build_image()
 
 CONTAINER_NAME=sd_vehicle_interface_cpu
 IMAGE_NAME=sd_vehicle_interface_cpu
-DOCKER_FILE=docker/Dockerfile.cpu
+DOCKER_FILE=docker/Dockerfile
 
 case "$1" in
 "build")
@@ -71,7 +57,7 @@ Available commands:
         Show this help message    
     "
     ;;
-*) # Attach a new terminal to the container (pulling, creating and starting it if necessary)
+*) # Attach a new terminal to the container (building, creating and starting it if necessary)
     if [ -z "$(docker images -f reference=$IMAGE_NAME -q)" ]; then # if the image does not yet exist, pull it
         build_image
     fi
