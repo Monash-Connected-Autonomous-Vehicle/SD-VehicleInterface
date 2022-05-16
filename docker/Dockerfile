@@ -48,6 +48,8 @@ RUN echo "export PS1='\[\e]0;\u@docker: \w\a\]${debian_chroot:+($debian_chroot)}
 # Add tmux configuration file
 COPY docker/.tmux.conf /home/${USERNAME}/.tmux.conf
 
+RUN echo "127.0.0.1	`hostname`.localdomain	`hostname`" >> /etc/hosts
+
 WORKDIR ${SOURCE_DIR}
 CMD /bin/bash
 USER $USERNAME
