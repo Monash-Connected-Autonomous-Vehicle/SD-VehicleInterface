@@ -56,7 +56,7 @@ class SocketCANToTopic
     void stateCallback(const can::State & s);
 };
 
-void convertSocketCANToMessage(const can::Frame& f, can_msgs::Frame& m)
+void convertSocketCANToMessage(const can::Frame& f, can_msgs::msg::Frame& m)
 {
   m.id = f.id;
   m.dlc = f.dlc;

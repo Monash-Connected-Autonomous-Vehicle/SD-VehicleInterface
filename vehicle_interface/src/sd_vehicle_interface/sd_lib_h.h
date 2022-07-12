@@ -30,7 +30,7 @@
  */
 
 
-#include <can_msgs/Frame.h>
+#include <can_msgs/msg/frame.h>
 
 namespace sd{
 	//**************************************************
@@ -40,9 +40,9 @@ namespace sd{
 	
 	/*ParseRxCanDataSDCan
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
-    void ParseRxCANDataSDCan(can_msgs::Frame&, double& , bool& , bool&);
+    void ParseRxCANDataSDCan(can_msgs::msg::Frame&, double& , bool& , bool&);
 	/*Inputs
-	can_msgs::Frame& ReceivedFrameCAN : Raw socketcan frame in format of can_msgs/Frame.h, this is the RX can stream
+	can_msgs::msg::Frame& ReceivedFrameCAN : Raw socketcan frame in format of can_msgs/Frame.h, this is the RX can stream
 	double& CurrentLinearVelocity_Mps The function shall update this variable with the latest Linear Velocity as read from the CAN bus in Mps
 	bool& AutomationGranted_B,  This function shall set this variable to TRUE if the latest received can data condirms vehicle is in Automated Mode
 	bool& AutomationArmed_B  This function shall set this variable to TRIE if the latest received CAN data confirms that the vehicle is armed for autonomous mode*/
@@ -57,40 +57,40 @@ namespace sd{
 	They should be run on a socketcan frame in format of can_msgs/Frame.h
 	Perform these function on initialisation before main loop
 	The Feedback message is optional*/
-    void InitSDInterfaceControl(can_msgs::Frame&);
-	void InitSDInterfaceFeedback(can_msgs::Frame&);
+    void InitSDInterfaceControl(can_msgs::msg::Frame&);
+	void InitSDInterfaceFeedback(can_msgs::msg::Frame&);
 	/*Inputs
-	can_msgs::Frame& CustomerControlCANTx/CustomerFeedbackCANTx to be initialised*/
+	can_msgs::msg::Frame& CustomerControlCANTx/CustomerFeedbackCANTx to be initialised*/
 	
 	//Request Autonomous Control of the Vehicle
-    void RequestAutonomousControl(can_msgs::Frame&,  uint8_t);
+    void RequestAutonomousControl(can_msgs::msg::Frame&,  uint8_t);
 	/*inputs
-	can_msgs::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
+	can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
 	uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
 	//ResetControlCanData
 	//This function resets all but the alive counter to 0
 	//This will handback control to the safety driver
-    void ResetControlCanData(can_msgs::Frame&, uint8_t);
-	void UpdateControlAlive(can_msgs::Frame&, uint8_t);
+    void ResetControlCanData(can_msgs::msg::Frame&, uint8_t);
+	void UpdateControlAlive(can_msgs::msg::Frame&, uint8_t);
 
 	/*Inputs
-	can_msgs::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
+	can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
 	uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
 	//PopControlCANData
 	//Populates the Control Tx message to the vehicle
-    void PopControlCANData(can_msgs::Frame&, int8_t, int8_t, uint8_t);
+    void PopControlCANData(can_msgs::msg::Frame&, int8_t, int8_t, uint8_t);
 	/*Inputs
-	can_msgs::Frame& CustomerControlCANTx  The SD Interface Control Message after initialisation
+	can_msgs::msg::Frame& CustomerControlCANTx  The SD Interface Control Message after initialisation
 	int8_t FinalDBWTorqueRequest_Pc:The Torque percentage requested of the vehicle
 	int8_t FinalDBWSteerRequest_Pc: The Steer Percentage requested of the vehicle
 	uint8_t AliveCounter_Z  : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 	
 	//Populates the Feedback CAN message (Optional)
-    void PopFeedbackCANData(can_msgs::Frame&, int, int, int, int, double, double);
+    void PopFeedbackCANData(can_msgs::msg::Frame&, int, int, int, int, double, double);
 	/*Inputs
-	void can_msgs::Frame& ControllerFeedbackCANTx
+	void can_msgs::msg::Frame& ControllerFeedbackCANTx
 	int P_Contribution_Pc :The Contribution to final torque by the P term
 	int I_Contribution_Pc :The Contribution to final torque by the I term
 	int D_Contribution_Pc :The Contribution to final torque by the D term

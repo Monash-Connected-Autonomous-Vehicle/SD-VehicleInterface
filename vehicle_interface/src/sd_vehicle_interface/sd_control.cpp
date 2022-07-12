@@ -32,6 +32,8 @@
 #include "sd_control.h"
 
 namespace speedcontroller{
+
+	static double PreviousLinearVelocityError_Mps = 0;		//The linear velocity error from the last cycle. Initialised as 0
 	
 	uint8_t steer_map[YAW_YAXIS][V_XAXIS] =	
 	{//0m/s	<1m/s	<2m/s	<3m/s	<4m/s	<5m/s	<6m/s	<7m/s	<8m/s	<9m/s

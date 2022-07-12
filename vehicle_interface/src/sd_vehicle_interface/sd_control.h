@@ -37,8 +37,6 @@ using namespace std;
 namespace speedcontroller{
 
 
-	static double PreviousLinearVelocityError_Mps = 0;		//The linear velocity error from the last cycle
-
 	//Calibrations
 	//The Proportional, Integral and Derivative gains of the linear velocity feedback loop are set here. 
 	//It is possible to set different gains for occasions where the vehicle is braking to a stop, braking and accellerating

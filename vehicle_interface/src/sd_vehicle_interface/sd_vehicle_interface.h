@@ -75,15 +75,15 @@ int D_Contribution_Pc = 0; 									//The torque contributed by derivative gain
 int FF_Contribution_Pc = 0; 								//The torque contributed by feedforward gain
 
 //Ros variables
-can_msgs::Frame ReceivedFrameCANRx;  		//Create the can frame that will be store received can messages
-can_msgs::Frame CustomerControlCANTx; 		//Create the can frame that will be outputted onto the canbus
-can_msgs::Frame ControllerFeedbackCANTx; 	//Create the frame that will supply feedback data to engineers tuning controller
+can_msgs::msg::Frame ReceivedFrameCANRx;  		//Create the can frame that will be store received can messages
+can_msgs::msg::Frame CustomerControlCANTx; 		//Create the can frame that will be outputted onto the canbus
+can_msgs::msg::Frame ControllerFeedbackCANTx; 	//Create the frame that will supply feedback data to engineers tuning controller
 
-ros::Publisher sent_msgs_pub;
-ros::Publisher current_twist_pub;
-ros::Publisher current_GPS_pub;
-ros::Publisher current_IMU_pub;
-ros::Publisher sd_control_pub;
+// ros::Publisher sent_msgs_pub;
+// ros::Publisher current_twist_pub;
+// ros::Publisher current_GPS_pub;
+// ros::Publisher current_IMU_pub;
+// ros::Publisher sd_control_pub;
 
 
 static string _sd_vehicle;

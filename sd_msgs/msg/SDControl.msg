@@ -1,4 +1,4 @@
-Header header
+std_msgs/Header header
 
 # Range -100 to 100, -100 is max brake, +100 is max throttle
 float64 torque

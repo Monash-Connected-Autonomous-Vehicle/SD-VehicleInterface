@@ -29,12 +29,12 @@
  */
 
   
-#include <can_msgs/Frame.h>
+#include "can_msgs/msg/frame.hpp"
 #include "sd_typedefs.h"
-#include "sensor_msgs/NavSatFix.h"
-#include "sensor_msgs/Imu.h"
-#include "geometry_msgs/Quaternion.h"
-#include "geometry_msgs/Vector3.h"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
+#include "sensor_msgs/msg/imu.hpp"
+#include "geometry_msgs/msg/quaternion.hpp"
+#include "geometry_msgs/msg/vector3.hpp"
 
 //Constants
 
@@ -71,7 +71,7 @@ namespace sd{
 
 
 
-	void ParseRxCANDataOXTSCan(can_msgs::Frame&,
+	void ParseRxCANDataOXTSCan(can_msgs::msg::Frame&,
 													double&,
 													double&, double&, 
 													double&,  double&,  double&,
@@ -79,7 +79,7 @@ namespace sd{
 													double&, double&, double&);
 														
 		
-	void ParseRxCANDataPEAKCan(can_msgs::Frame&,
+	void ParseRxCANDataPEAKCan(can_msgs::msg::Frame&,
 													double&,
 													double&, double&, 
 													double&,  double&,  double&,
@@ -87,7 +87,7 @@ namespace sd{
 													double&, double&, double&);
 														
 		
-	void PackImuMessage(bool, sensor_msgs::Imu&, double, double, double, double, double, double, double, double, double);
+	void PackImuMessage(bool, sensor_msgs::msg::Imu&, double, double, double, double, double, double, double, double, double);
 
 
 }

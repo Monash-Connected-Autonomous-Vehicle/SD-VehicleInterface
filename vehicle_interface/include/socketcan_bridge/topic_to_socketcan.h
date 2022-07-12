@@ -46,11 +46,11 @@ class TopicToSocketCAN
 
     can::StateListenerConstSharedPtr state_listener_;
 
-    void msgCallback(const can_msgs::Frame::ConstPtr& msg);
+    void msgCallback(const can_msgs::msg::Frame::ConstPtr& msg);
     void stateCallback(const can::State & s);
 };
 
-void convertMessageToSocketCAN(const can_msgs::Frame& m, can::Frame& f)
+void convertMessageToSocketCAN(const can_msgs::msg::Frame& m, can::Frame& f)
 {
   f.id = m.id;
   f.dlc = m.dlc;

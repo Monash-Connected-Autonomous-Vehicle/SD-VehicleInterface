@@ -34,7 +34,7 @@ We strongly suggest that you adhere to the following guideline in conjuction wit
 #### Node Architecture
 socketcan_bridge: This node comes from the default ROS package [socketcan_bridge](http://wiki.ros.org/socketcan_bridge). The package provides functionality to expose CAN frames from SocketCAN to a ROS Topic. Internally it uses the socketcan_interface from the ros_canopen package, as such, it is capable of dealing with both normal and extended CAN frames. 
 
-sd_vehicle_interface: The vehicle interface node for the StreetDrone (SD) Twizy and ENV200. This node translates the output messages from a ROS based software stack (geometry_msgs::TwistStamped) to SocketCAN messages (can_msgs::Frame) and vice versa. The node integrates a twist to ackermann function for controlling the steering of the vehicle and a PID controller with vehicle speed feedback corresponding to the output twist message.  
+sd_vehicle_interface: The vehicle interface node for the StreetDrone (SD) Twizy and ENV200. This node translates the output messages from a ROS based software stack (geometry_msgs::TwistStamped) to SocketCAN messages (can_msgs::msg::Frame) and vice versa. The node integrates a twist to ackermann function for controlling the steering of the vehicle and a PID controller with vehicle speed feedback corresponding to the output twist message.  
 
 #### Limitations:
 * limited to 20 Mph

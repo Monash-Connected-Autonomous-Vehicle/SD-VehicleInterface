@@ -57,7 +57,7 @@ namespace sd{
 		return q;
 	}
 
-	void ParseRxCANDataOXTSCan(	can_msgs::Frame& ReceivedFrameCAN,
+	void ParseRxCANDataOXTSCan(	can_msgs::msg::Frame& ReceivedFrameCAN,
 														double& CurrentLinearVelocity_Mps,
 														double& GPS_longitude, double& GPS_latitude, 
 														double& IMU_Angle_X,  double& IMU_Angle_Y,  double& IMU_Angle_Z,
@@ -120,7 +120,7 @@ namespace sd{
 		}
 		
 		
-	void ParseRxCANDataPEAKCan(	can_msgs::Frame& ReceivedFrameCAN,
+	void ParseRxCANDataPEAKCan(	can_msgs::msg::Frame& ReceivedFrameCAN,
 														double& CurrentLinearVelocity_Mps,
 														double& GPS_longitude, double& GPS_latitude, 
 														double& IMU_Angle_X,  double& IMU_Angle_Y,  double& IMU_Angle_Z,
@@ -216,11 +216,11 @@ namespace sd{
 		}
 	
 		
-	void PackImuMessage(bool IMUVarianceKnown_B, sensor_msgs::Imu& current_IMU, double IMU_Angle_X, double  IMU_Angle_Y, double  IMU_Angle_Z, double  IMU_Rate_X, double  IMU_Rate_Y, double  IMU_Rate_Z, double  IMU_Accel_X, double  IMU_Accel_Y, double  IMU_Accel_Z)
+	void PackImuMessage(bool IMUVarianceKnown_B, sensor_msgs::msg::Imu& current_IMU, double IMU_Angle_X, double  IMU_Angle_Y, double  IMU_Angle_Z, double  IMU_Rate_X, double  IMU_Rate_Y, double  IMU_Rate_Z, double  IMU_Accel_X, double  IMU_Accel_Y, double  IMU_Accel_Z)
 	{
-		geometry_msgs::Quaternion  Orientation_Quaternion;
-		geometry_msgs::Vector3 AngularVelocity3D;
-		geometry_msgs::Vector3 LinearAccel3D;
+		geometry_msgs::msg::Quaternion  Orientation_Quaternion;
+		geometry_msgs::msg::Vector3 AngularVelocity3D;
+		geometry_msgs::msg::Vector3 LinearAccel3D;
 		
 		Quaternion ConvertedQuaternion = ToQuaternion(IMU_Angle_X*DEG_to_RAD, IMU_Angle_Y*DEG_to_RAD, IMU_Angle_Z*DEG_to_RAD); //Covert angles to quaternion, uses rad/s
 		Orientation_Quaternion.x = ConvertedQuaternion.x;
