@@ -94,14 +94,15 @@ namespace sd{
 	
 	/*ParseRxCanDataSDCan
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
-    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationGranted_B, bool& AutomationArmed_B) {
+    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B) {
 		// Check which kind of frame we have received and update data accordingly
+		// Took most of these values from StreetDrone User Manual, but wasn't correct for xx_automation_available so got from experimentation.
 		if (frame.id == 0x100) { // StreetDrone_Control_1
-			bool steer_automation_available = frame.data[7] & 0x80; // bit 56
+			bool steer_automation_available = frame.data[7] & 0x01; // bit 56
 			bool steer_automation_granted = frame.data[7] & 0x40; // bit 57
-			bool torque_automation_available = frame.data[7] & 0x8l; // bit 60
+			bool torque_automation_available = frame.data[7] & 0x10; // bit 60
 			bool torque_automation_granted = frame.data[7] & 0x4; // bit 61
-			AutomationArmed_B = steer_automation_available && torque_automation_available; // I am only assuming this is the calculation, could be good to double check
+			AutomationArmed_B = steer_automation_available && torque_automation_available;
 			AutomationGranted_B = steer_automation_granted && torque_automation_granted;
 		} else if (frame.id == 0x102) { // StreetDrone_Data_1
 			uint8_t speed_actual = frame.data[0]; // (byte 1) speed in km/h
