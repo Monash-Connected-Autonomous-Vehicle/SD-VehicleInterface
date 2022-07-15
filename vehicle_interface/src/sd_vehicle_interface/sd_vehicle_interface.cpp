@@ -40,6 +40,7 @@ using namespace std;
 #include "geometry_msgs/msg/vector3.hpp"
 #include <can_msgs/msg/frame.hpp>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include "sd_vehicle_interface.h"
 #include "sd_lib_mcav.h"
