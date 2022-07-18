@@ -32,6 +32,8 @@
 #include <stdlib.h>
 #include <can_msgs/msg/frame.hpp>
 
+#define KPH_TO_MPS = (0.277778)
+
 /*
 This file contains the functions originally declared in sd_lib_h.h, but actually includes
 implementations that were created based on information found in the StreetDrone User Manual V1.6,
@@ -96,17 +98,28 @@ namespace sd{
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
     void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B) {
 		// Check which kind of frame we have received and update data accordingly
-		// Took most of these values from StreetDrone User Manual, but wasn't correct for xx_automation_available so got from experimentation.
 		if (frame.id == 0x100) { // StreetDrone_Control_1
-			bool steer_automation_available = frame.data[7] & 0x01; // bit 56
-			bool steer_automation_granted = frame.data[7] & 0x40; // bit 57
-			bool torque_automation_available = frame.data[7] & 0x10; // bit 60
-			bool torque_automation_granted = frame.data[7] & 0x4; // bit 61
+			bool steer_automation_available = frame.data[7] & 0x01; // bit 56 (0b0000 0001)
+			bool steer_automation_granted = frame.data[7] & 0x40; // bit 57 (0b0100 0000)
+			bool torque_automation_available = frame.data[7] & 0x10; // bit 60 (0b0001 0000)
+			bool torque_automation_granted = frame.data[7] & 0x4; // bit 61 (0b0000 0100)
 			AutomationArmed_B = steer_automation_available && torque_automation_available;
 			AutomationGranted_B = steer_automation_granted && torque_automation_granted;
 		} else if (frame.id == 0x102) { // StreetDrone_Data_1
-			uint8_t speed_actual = frame.data[0]; // (byte 1) speed in km/h
-			CurrentLinearVelocity_Mps = ((double) speed_actual) / 3.6; // convert to m/s
+			//Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
+			uint8_t CurrentVelocity8bit = ReceivedFrameCAN.data[0]; //Speed Actual kph low resolution
+
+			uint8_t speed_HR_B1 = ReceivedFrameCAN.data[6];
+			uint8_t speed_HR_B2 = ReceivedFrameCAN.data[7];
+			uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2; ////Speed Actual kph high resolution
+
+			//To support older versions of XCU firmware which do not output high resolution speed. If high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
+			if(CurrentVelocity16bit == 0){
+				CurrentLinearVelocity_Mps = (CurrentVelocity8bit*KPH_to_MPS);
+			}
+			else{
+				CurrentLinearVelocity_Mps = (CurrentVelocity16bit*KPH_to_MPS);
+			}
 		}
 	}
 	/*Inputs
@@ -149,7 +162,7 @@ namespace sd{
 		frame.data[6] = 0; // Reserved (byte 6)
 		frame.data[7] = 0x11; // sets SteerAutomationRequest and TorqueAutomationRequest to 1.
 		// (byte 7 contains two bit flags that set SteerAutomationRequest and TorqueAutomationRequest to true or false)
-		// 0x11 in binary is 0b10001, so it sets bit 56 and bit 60 from the start of the CAN frame
+		// 0x11 in binary is 0b00010001, so it sets bit 56 and bit 60 from the start of the CAN frame (seems to read right to left?)
 
 		sd::SetCRC(frame, aliveCount); // 
 	}
