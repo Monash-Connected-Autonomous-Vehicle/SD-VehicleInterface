@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <can_msgs/msg/frame.hpp>
 
-#define KPH_TO_MPS = (0.277778)
+#define KPH_TO_MPS (0.277778)
 
 /*
 This file contains the functions originally declared in sd_lib_h.h, but actually includes
@@ -107,18 +107,18 @@ namespace sd{
 			AutomationGranted_B = steer_automation_granted && torque_automation_granted;
 		} else if (frame.id == 0x102) { // StreetDrone_Data_1
 			//Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
-			uint8_t CurrentVelocity8bit = ReceivedFrameCAN.data[0]; //Speed Actual kph low resolution
+			uint8_t CurrentVelocity8bit = frame.data[0]; //Speed Actual kph low resolution
 
-			uint8_t speed_HR_B1 = ReceivedFrameCAN.data[6];
-			uint8_t speed_HR_B2 = ReceivedFrameCAN.data[7];
+			uint8_t speed_HR_B1 = frame.data[6];
+			uint8_t speed_HR_B2 = frame.data[7];
 			uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2; ////Speed Actual kph high resolution
 
 			//To support older versions of XCU firmware which do not output high resolution speed. If high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
 			if(CurrentVelocity16bit == 0){
-				CurrentLinearVelocity_Mps = (CurrentVelocity8bit*KPH_to_MPS);
+				CurrentLinearVelocity_Mps = (CurrentVelocity8bit*KPH_TO_MPS);
 			}
 			else{
-				CurrentLinearVelocity_Mps = (CurrentVelocity16bit*KPH_to_MPS);
+				CurrentLinearVelocity_Mps = (CurrentVelocity16bit*KPH_TO_MPS);
 			}
 		}
 	}
