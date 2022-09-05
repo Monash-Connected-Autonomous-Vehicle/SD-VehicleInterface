@@ -1,5 +1,5 @@
 <launch>
-  <arg name="sd_vehicle" default="env200" description="the vehicle under control, env200 or twizy"/>
+  <arg name="sd_vehicle" default="twizy" description="the vehicle under control, env200 or twizy"/>
   <arg name="sd_gps_imu" default="oxts" description="The Gps or IMU, oxts or peak"/>
   <arg name="sd_speed_source" default="vehicle_can_speed" description="The source of vehicle speed used to close the control loop, vehicle_can_speed, imu_speed or ndt_speed"/>
   <arg name="sd_simulation_mode" default="false" description="Choose to launch the VI for control of a real vehicle or simulated vehicle, true for simulation (e.g Gazebo)"/>

@@ -105,6 +105,7 @@ namespace sd{
 			bool torque_automation_granted = frame.data[7] & 0x4; // bit 61 (0b0000 0100)
 			AutomationArmed_B = steer_automation_available && torque_automation_available;
 			AutomationGranted_B = steer_automation_granted && torque_automation_granted;
+			AutomationGranted_B = frame.data[7] & 0b00100010;
 		} else if (frame.id == 0x102) { // StreetDrone_Data_1
 			//Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
 			uint8_t CurrentVelocity8bit = frame.data[0]; //Speed Actual kph low resolution
