@@ -69,7 +69,7 @@ namespace speedcontroller{
 
 
 	//Other control calibratables
-	#define BRAKE_HOLD_TORQUE_TWIZY (-10) //Torque needed to hold the vehicle still
+	#define BRAKE_HOLD_TORQUE_TWIZY (0) //Torque needed to hold the vehicle still
 	//*****
 	//*****ENV200 CALIBRATIONS
 		//Gains for increasing speed
