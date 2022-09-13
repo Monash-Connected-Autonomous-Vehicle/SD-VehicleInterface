@@ -116,7 +116,9 @@ namespace sd{
 
 			//To support older versions of XCU firmware which do not output high resolution speed. If high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
 			if(CurrentVelocity16bit == 0){
-				CurrentLinearVelocity_Mps = (CurrentVelocity8bit*KPH_TO_MPS);
+				CurrentLinearVelocity_Mps = (CurrentVelocity8bit*KPH_TO_MPS)/100.0;
+				// MCAV note: not sure why the speeds are scaled by 1/100. This is also missing the scaling factor of 0.5 present in CAN definition.
+				// Actual meters per second speed would be ((double)frame.data[0])*0.5*KPH_TO_MPS
 			}
 			else{
 				CurrentLinearVelocity_Mps = (CurrentVelocity16bit*KPH_TO_MPS);

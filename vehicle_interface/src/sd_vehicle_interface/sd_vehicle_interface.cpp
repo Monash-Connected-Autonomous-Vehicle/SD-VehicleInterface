@@ -74,7 +74,7 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
 void TwistCommand_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
 {
 	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
-    TargetTwistAngular_Degps= (msg->twist.angular.z) * RAD_to_DEG; 
+    TargetTwistAngular_Degps= (msg->twist.angular.z) * RAD_to_DEG;
     TargetTwistLinear_Mps = msg->twist.linear.x;
 }
 
@@ -122,95 +122,99 @@ int main(int argc, char **argv)
 
     rclcpp::Rate loop_rate(ROS_LOOP);
 	rclcpp::Time autonomous_entry;
+
+	auto main_loop = [&node, &autonomous_entry, &sent_msgs_pub, &current_twist_pub, &current_GPS_pub, &current_IMU_pub, &sd_control_pub,
+					  &current_Twist, &current_GPS, &current_IMU, &SD_Current_Control]() -> void
+	{
+		//Choose the vehicle speed source as specified at launch
+		if(ndt_speed_string==_sd_speed_source){
+			CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearNDT_Mps; //Use the speed source as reported by NDT
+		}
+		else if (imu_speed_string==_sd_speed_source) {
+			CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearCANImu_Mps;
+		} //Use the IMU speed source
+		else if (vehicle_can_speed_string==_sd_speed_source)  {
+			const double UNDO_STREETDRONE_SCALING_FACTOR = 100.0/0.5; // MCAV note: this converts the reported speed to actually be in meters per second
+			CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearCANSD_Mps*UNDO_STREETDRONE_SCALING_FACTOR;
+		}else{
+			RCLCPP_WARN(node->get_logger(), "SD_Vehicle_Interface parameter for sd_speed_source is not valid\n");
+		}
+
+		current_Twist.twist.angular.z = IMU_Rate_Z*DEG_to_RAD;
+		current_Twist.twist.linear.z = CurrentTwistLinearSD_Mps_Final;
+		//Prepare the GPS message with latest data
+		current_GPS.longitude = GPS_Longitude;
+		current_GPS.latitude = GPS_Latitude;
+
+		//Prepare the IMU message with latest data
+		sd::PackImuMessage(IMUVarianceKnown_B, current_IMU, IMU_Angle_X, IMU_Angle_Y, IMU_Angle_Z, IMU_Rate_X, IMU_Rate_Y, IMU_Rate_Z, IMU_Accel_X, IMU_Accel_Y, IMU_Accel_Z);
+
+		//Prepare the sd TX CAN messages with latest data
+		AliveCounter_Z++; //Increment the alive counter
+		//Check Errors
+
+		sd::UpdateControlAlive(CustomerControlCANTx, AliveCounter_Z); //Otherwise, populate the can frame with 0's
+
+		if (0 ==(AliveCounter_Z % CONTROL_LOOP)){ //We only run as per calibrated frequency
+
+			if (AutomationArmed_B){
+				sd::RequestAutonomousControl(CustomerControlCANTx, AliveCounter_Z); //If the safety driver has armed the vehicle for autonomous, request autonomous control of torque and steer
+			}else{
+				sd::ResetControlCanData(CustomerControlCANTx, AliveCounter_Z); //Otherwise, populate the can frame with 0's
+			}
+		}
+			
+		if (AutomationGranted_B || _sd_simulation_mode){
+
+			if (0 ==(AliveCounter_Z % CONTROL_LOOP) && ((node->now() - autonomous_entry) >= rclcpp::Duration::from_seconds(0.1)) ){ //We only run as per calibrated frequency, with additional delay
+			
+				//Calculate Steer and torque values, as well as controll feedback (PID and FeedForward Contributions to Torque Controller)
+				FinalDBWSteerRequest_Pc   = speedcontroller::CalculateSteerRequest  (TargetTwistAngular_Degps, CurrentTwistLinearSD_Mps_Final);
+
+				if(twizy_string==_sd_vehicle){
+					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestTwizy(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
+				}else{
+					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestEnv200(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
+				}
+
+				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargetTwistAngular_Degps << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
+				// cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
+
+				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
+				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
+				sd_control_pub->publish(SD_Current_Control);
+
+			}
+			
+			//Populate the Can frames with calculated data
+			sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
+			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargetTwistAngular_Degps);
+		} else{
+			autonomous_entry = node->now();
+		}
+			
+		if(!_sd_simulation_mode){ //If we are not in simulation mode, output on the CANbus the Control and Feedback Messages
+			//Publish prepared messages
+			
+			sent_msgs_pub->publish(CustomerControlCANTx); //Publish the output CAN data
+			sent_msgs_pub->publish(ControllerFeedbackCANTx);
+
+		}
+
+		current_twist_pub->publish(current_Twist);
+		current_GPS_pub->publish(current_GPS);
+
+
+		if(no_imu_string !=_sd_gps_imu){ //If we have specified an IMU is present, publish an IMU message
+			current_IMU_pub->publish(current_IMU);
+		}
+	};
+
+	auto timer = node->create_wall_timer(5ms, main_loop); // 5ms gives loop rate of 200Hz
+
 	try
 	{
-		while(rclcpp::ok())
-		{		
-			//Choose the vehicle speed source as specified at launch 
-			if(ndt_speed_string==_sd_speed_source){
-				CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearNDT_Mps; //Use the speed source as reported by NDT
-			}
-			else if (imu_speed_string==_sd_speed_source) {
-				CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearCANImu_Mps;
-			} //Use the IMU speed source
-			else if (vehicle_can_speed_string==_sd_speed_source)  {
-				CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearCANSD_Mps;
-			}else{
-				RCLCPP_WARN(node->get_logger(), "SD_Vehicle_Interface parameter for sd_speed_source is not valid\n");
-			}
-			
-			current_Twist.twist.angular.z = IMU_Rate_Z*DEG_to_RAD;
-			current_Twist.twist.linear.z = CurrentTwistLinearSD_Mps_Final;
-			//Prepare the GPS message with latest data
-			current_GPS.longitude = GPS_Longitude;
-			current_GPS.latitude = GPS_Latitude;
-			
-			//Prepare the IMU message with latest data
-			sd::PackImuMessage(IMUVarianceKnown_B, current_IMU, IMU_Angle_X, IMU_Angle_Y, IMU_Angle_Z, IMU_Rate_X, IMU_Rate_Y, IMU_Rate_Z, IMU_Accel_X, IMU_Accel_Y, IMU_Accel_Z);
-			
-			//Prepare the sd TX CAN messages with latest data 
-			AliveCounter_Z++; //Increment the alive counter
-			//Check Errors
-
-			sd::UpdateControlAlive(CustomerControlCANTx, AliveCounter_Z); //Otherwise, populate the can frame with 0's
-			
-			if (0 ==(AliveCounter_Z % CONTROL_LOOP)){ //We only run as per calibrated frequency 
-
-				if (AutomationArmed_B){ 
-					sd::RequestAutonomousControl(CustomerControlCANTx, AliveCounter_Z); //If the safety driver has armed the vehicle for autonomous, request autonomous control of torque and steer
-				}else{
-					sd::ResetControlCanData(CustomerControlCANTx, AliveCounter_Z); //Otherwise, populate the can frame with 0's
-				}
-			}
-				
-			if (AutomationGranted_B || _sd_simulation_mode){
-
-				if (0 ==(AliveCounter_Z % CONTROL_LOOP) && ((node->now() - autonomous_entry) >= rclcpp::Duration::from_seconds(0.1)) ){ //We only run as per calibrated frequency, with additional delay 
-				
-					//Calculate Steer and torque values, as well as controll feedback (PID and FeedForward Contributions to Torque Controller)
-					FinalDBWSteerRequest_Pc   = speedcontroller::CalculateSteerRequest  (TargetTwistAngular_Degps, CurrentTwistLinearSD_Mps_Final);
-					
-					if(twizy_string==_sd_vehicle){
-						FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestTwizy(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
-					}else{
-						FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestEnv200(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
-					}
-				
-					// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargetTwistAngular_Degps << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
-					cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
-
-					SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
-					SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
-					sd_control_pub->publish(SD_Current_Control);
-
-				}
-				
-				//Populate the Can frames with calculated data
-				sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
-				// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargetTwistAngular_Degps);
-			} else{
-				autonomous_entry = node->now();
-			}
-				
-			if(!_sd_simulation_mode){ //If we are not in simulation mode, output on the CANbus the Control and Feedback Messages
-				//Publish prepared messages
-				
-				sent_msgs_pub->publish(CustomerControlCANTx); //Publish the output CAN data
-				sent_msgs_pub->publish(ControllerFeedbackCANTx);
-			
-			}
-			
-			current_twist_pub->publish(current_Twist);			
-			current_GPS_pub->publish(current_GPS);	
-
-			
-			if(no_imu_string !=_sd_gps_imu){ //If we have specified an IMU is present, publish an IMU message
-				current_IMU_pub->publish(current_IMU);
-			}
-			
-			rclcpp::spin(node);
-			loop_rate.sleep(); //And loop
-		}
+		rclcpp::spin(node);
 	}
 	catch (rclcpp::exceptions::RCLError & e)
 	{
