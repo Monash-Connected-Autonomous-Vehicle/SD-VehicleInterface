@@ -139,13 +139,12 @@ namespace sd{
 			ReceivedFrameUnion.byte[6] = ReceivedFrameCAN.data[6];
 			ReceivedFrameUnion.byte[7] = ReceivedFrameCAN.data[7];
 			
-			
 		switch (ReceivedFrameCAN.id){
 			case 1536: //0x600
 				{				
-					IMU_Accel_X = ReceivedFrameUnion.word[1]*0.038344002; //*3.91 = mG, then conversion to m/s^2
-					IMU_Accel_Y = ReceivedFrameUnion.word[1]*0.038344002;
-					IMU_Accel_Z = ReceivedFrameUnion.word[2]*0.038344002;
+					IMU_Accel_X = ReceivedFrameUnion.word[0]*3.91*0.001*9.80665; // 0.038344002; //*3.91 = mG, then conversion to m/s^2
+					IMU_Accel_Y = ReceivedFrameUnion.word[1]*3.91*0.001*9.80665; //
+					IMU_Accel_Z = ReceivedFrameUnion.word[2]*3.91*0.001*9.80665; //
 
 					break;
 				}			
@@ -157,7 +156,7 @@ namespace sd{
 					IMU_Rate_X_fbc.integer_can = ReceivedFrameUnion.dword[0];
 					IMU_Rate_Y_fbc.integer_can = ReceivedFrameUnion.dword[1];
 					IMU_Rate_X = IMU_Rate_X_fbc.float_can;
-					IMU_Rate_Y = IMU_Rate_X_fbc.float_can;
+					IMU_Rate_Y = IMU_Rate_Y_fbc.float_can;
 					
 					IMU_Angle_X += IMU_Rate_X*0.05; //Angle achieved by integrating rate over time (50 ms rate)
 					IMU_Angle_Y += IMU_Rate_Y*0.05; //Angle achieved by integrating rate over time (50 ms rate)
@@ -199,18 +198,20 @@ namespace sd{
 					if (ReceivedFrameUnion.byte[6] == 83){
 						GPS_latitude *= -1;
 					}
+					break;
 				}
 			case 1570: //0x623
 				{
 					float_bits_converter GPS_Longitude_Minutes_fbc;
 					GPS_Longitude_Minutes_fbc.integer_can =  ReceivedFrameUnion.dword[0];
 
-					GPS_latitude = (GPS_Longitude_Minutes_fbc.float_can/60) + ReceivedFrameUnion.word[2];
+					GPS_longitude = (GPS_Longitude_Minutes_fbc.float_can/60) + ReceivedFrameUnion.word[2];
 
 					//As per PEAK CAN GPS .dbc, 87 represents west.
 					if (ReceivedFrameUnion.byte[6] == 87){
-						GPS_latitude *= -1;
+						GPS_longitude *= -1;
 					}
+					break;
 				}
 			}
 		}
@@ -232,9 +233,9 @@ namespace sd{
 		AngularVelocity3D.y = IMU_Rate_Y*DEG_to_RAD;
 		AngularVelocity3D.z = IMU_Rate_Z*DEG_to_RAD;
 			
-		LinearAccel3D.x = IMU_Accel_X*DEG_to_RAD;
-		LinearAccel3D.y = IMU_Accel_Y*DEG_to_RAD;
-		LinearAccel3D.z = IMU_Accel_Z*DEG_to_RAD;
+		LinearAccel3D.x = IMU_Accel_X;
+		LinearAccel3D.y = IMU_Accel_Y;
+		LinearAccel3D.z = IMU_Accel_Z;
 		
 		if(IMUVarianceKnown_B){
 		
