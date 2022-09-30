@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 
 
     rclcpp::Rate loop_rate(ROS_LOOP);
-	rclcpp::Time autonomous_entry;
+	rclcpp::Time autonomous_entry(0, 0, RCL_ROS_TIME);
 
 	auto main_loop = [&node, &autonomous_entry, &sent_msgs_pub, &current_twist_pub, &current_GPS_pub, &current_IMU_pub, &sd_control_pub,
 					  &current_Twist, &current_GPS, &current_IMU, &SD_Current_Control]() -> void
