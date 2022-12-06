@@ -148,6 +148,8 @@ int main(int argc, char **argv)
 
 		//Prepare the IMU message with latest data
 		sd::PackImuMessage(IMUVarianceKnown_B, current_IMU, IMU_Angle_X, IMU_Angle_Y, IMU_Angle_Z, IMU_Rate_X, IMU_Rate_Y, IMU_Rate_Z, IMU_Accel_X, IMU_Accel_Y, IMU_Accel_Z);
+		current_IMU.header.stamp = node->get_clock()->now();
+		current_IMU.header.frame_id = "imu";
 
 		//Prepare the sd TX CAN messages with latest data
 		AliveCounter_Z++; //Increment the alive counter
