@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 		} //Use the IMU speed source
 		else if (vehicle_can_speed_string==_sd_speed_source)  {
 			const double UNDO_STREETDRONE_SCALING_FACTOR = 100.0/0.5; // MCAV note: this converts the reported speed to actually be in meters per second
-			CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearCANSD_Mps*UNDO_STREETDRONE_SCALING_FACTOR;
+			// CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearCANSD_Mps*UNDO_STREETDRONE_SCALING_FACTOR;
 		}else{
 			RCLCPP_WARN(node->get_logger(), "SD_Vehicle_Interface parameter for sd_speed_source is not valid\n");
 		}
