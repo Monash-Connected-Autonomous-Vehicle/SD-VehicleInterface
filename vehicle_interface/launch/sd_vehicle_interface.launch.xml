@@ -3,6 +3,9 @@
   <arg name="sd_gps_imu" default="peak" description="The Gps or IMU, oxts or peak"/>
   <arg name="sd_speed_source" default="vehicle_can_speed" description="The source of vehicle speed used to close the control loop, (vehicle_can_speed, imu_speed or ndt_speed)"/>
   <arg name="sd_simulation_mode" default="false" description="Choose to launch the VI for control of a real vehicle or simulated vehicle, true for simulation (e.g Gazebo)"/>
+  <arg name="twist_linear_x" default="false" description="Choose to launch the VI for control of a real vehicle or simulated vehicle, true for simulation (e.g Gazebo)"/>
+
+  <executable cmd="ros2 bag record /twist_cmd /sd_current_twist" output="screen" />
 
   <node pkg="sd_vehicle_interface" exec="sd_vehicle_interface_node" name="sd_vehicle_interface_node" output = "screen">
     	<param name="sd_vehicle" value="$(var sd_vehicle)" />
