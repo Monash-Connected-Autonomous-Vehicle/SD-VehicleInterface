@@ -207,7 +207,7 @@ namespace speedcontroller{
 			
 		//Impose limits on the torque if greater than or less than maximum and minimum values
 		if (FinalDBWTorqueRequest_Pc > MAX_TORQUE_TWIZY){
-			FinalDBWTorqueRequest_Pc = MAX_TORQUE_TWIZY / 2;
+			FinalDBWTorqueRequest_Pc = MAX_TORQUE_TWIZY * 0.1;
 		} else if(FinalDBWTorqueRequest_Pc < MIN_TORQUE_TWIZY){
 			FinalDBWTorqueRequest_Pc = MIN_TORQUE_TWIZY;
 		}
