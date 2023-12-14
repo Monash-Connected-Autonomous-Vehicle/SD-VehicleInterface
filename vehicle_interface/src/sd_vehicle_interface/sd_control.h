@@ -48,7 +48,8 @@ namespace speedcontroller{
 	#define Kd_Speed_Twizy                    (0)
 
 	//Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
-	#define ANTI_FUSSINESS_TWIZY (0.1)
+	//#define ANTI_FUSSINESS_TWIZY (0.1)
+	#define ANTI_FUSSINESS_TWIZY (0.00175)
 
 	//Gains for braking to a stop only
 	#define Kp_Speed_FullStop_Braking_Twizy            (65)

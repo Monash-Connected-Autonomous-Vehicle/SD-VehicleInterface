@@ -145,7 +145,8 @@ namespace speedcontroller{
 			FF_Contribution_Pc = 0;
 		}else{
 			//Calculate Feedforward contribution
-			FF_Contribution_Pc  = (1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] + speed_index_remainder*feedforward_torque_map_twizy[speed_index+1];
+			//FF_Contribution_Pc  = (1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] + speed_index_remainder*feedforward_torque_map_twizy[speed_index+1];
+			FF_Contribution_Pc  = 0.8 * ((1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] + speed_index_remainder*feedforward_torque_map_twizy[speed_index+1]);
 		}
 					
 		LinearVelocityError_Mps = TargetLinearVelocity_Mps - CurrentLinearVelocity_Mps; 				//The error between current speed and target speed
@@ -161,10 +162,14 @@ namespace speedcontroller{
 			
 		}  else if (abs(LinearVelocityError_Mps) < ANTI_FUSSINESS_TWIZY){
 			
+			////PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
+			//LinearVelocityIntegratedError = 0;
+			//I_Contribution_Pc = 0;
+			////P, D and FF fails maintain last value
 			//PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
-			LinearVelocityIntegratedError = 0;
-			I_Contribution_Pc = 0;
-			//P, D and FF fails maintain last value
+                        LinearVelocityIntegratedError = 0.975 * LinearVelocityIntegratedError;
+                        I_Contribution_Pc = 0.975 * I_Contribution_Pc;
+                        //P, D and FF fails maintain last value
 			
 		} else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)){ //Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop). 
 		   
