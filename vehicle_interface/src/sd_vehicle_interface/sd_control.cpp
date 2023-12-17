@@ -162,14 +162,13 @@ namespace speedcontroller{
 			
 		}  else if (abs(LinearVelocityError_Mps) < ANTI_FUSSINESS_TWIZY){
 			
-			////PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
-			//LinearVelocityIntegratedError = 0;
-			//I_Contribution_Pc = 0;
-			////P, D and FF fails maintain last value
-			//PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
-                        LinearVelocityIntegratedError = 0.975 * LinearVelocityIntegratedError;
-                        I_Contribution_Pc = 0.975 * I_Contribution_Pc;
-                        //P, D and FF fails maintain last value
+			// //PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
+			// LinearVelocityIntegratedError = 0;
+			// I_Contribution_Pc = 0;
+			// //P, D and FF fails maintain last value
+
+			LinearVelocityIntegratedError = 0.975 * LinearVelocityIntegratedError;
+			I_Contribution_Pc = 0.975 * I_Contribution_Pc;
 			
 		} else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)){ //Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop). 
 		   

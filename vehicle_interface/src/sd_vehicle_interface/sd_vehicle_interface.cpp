@@ -75,8 +75,7 @@ void TwistCommand_callback(const std::shared_ptr<geometry_msgs::msg::TwistStampe
 {
 	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
     TargetTwistAngular_Degps= (msg->twist.angular.z) * RAD_to_DEG;
-    //TargetTwistLinear_Mps = msg->twist.linear.x / UNDO_STREETDRONE_SCALING_FACTOR;
-    TargetTwistLinear_Mps = msg->twist.linear.x / NEW_SCALE_FACTOR;
+    TargetTwistLinear_Mps = msg->twist.linear.x / UNDO_STREETDRONE_SCALING_FACTOR;
 }
 
 void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
@@ -141,8 +140,7 @@ int main(int argc, char **argv)
 		}
 
 		current_Twist.twist.angular.z = IMU_Rate_Z*DEG_to_RAD;
-		//current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
-		current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final * NEW_SCALE_FACTOR;
+		current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
 		//Prepare the GPS message with latest data
 		current_GPS.longitude = GPS_Longitude;
 		current_GPS.latitude = GPS_Latitude;
