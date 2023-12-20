@@ -102,9 +102,9 @@ namespace speedcontroller{
 	#define BRAKE_HOLD_TORQUE_ENV200 (-50) //Initial torque needed to get the vehicle moving
 	//******
 	//*****SHARED CALIBRATIONS
-	//Max and min steer angle as percentage
-	#define MAX_STEER_ANG   (100)
-	#define MIN_STEER_ANG    (-100)
+	//Max and min steer angle in radians (positive = left steer, negative = right steer)
+	#define MAX_STEER_ANG   (0.69813)
+	#define MIN_STEER_ANG    (-0.69813)
 	
 	//Yaw Map Calibrations
 	#define V_XAXIS    (10) //If extending map, increase these constants to match

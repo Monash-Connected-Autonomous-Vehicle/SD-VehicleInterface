@@ -67,7 +67,7 @@ namespace speedcontroller{
 
 	//This function calculates the steer angle that will achieve a given angular velocity at a given speed
     int8_t CalculateSteerRequest(double TargetAngularVelocity_Dps, double CurrentTwistLinear_Mps){
-		
+		/*
 		//For velocitys inbetween match points e.g 1.5 m/s, both the steer angles from the 1m/s and 2m/s
 		//column are calculated, the final steer linearly interpolated between them. 
 		double SteeringAngleTable_Pc_Speed_1; 
@@ -111,6 +111,8 @@ namespace speedcontroller{
 		} else if (CurrentTwistLinear_Mps <= 0){
 			CalculatedSteeringAngle_Pc = 0;
 		}
+		*/
+		int CalculatedSteeringAngle_Pc;
 
 			//Saturate to Min/Max value
 		if (CalculatedSteeringAngle_Pc > MAX_STEER_ANG){
@@ -119,7 +121,7 @@ namespace speedcontroller{
 			CalculatedSteeringAngle_Pc = MIN_STEER_ANG;
 		}
 
-		return CalculatedSteeringAngle_Pc;
+		return (CalculatedSteeringAngle_Pc / MAX_STEER_ANG) * 100;
     }
 
 	int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps, double CurrentLinearVelocity_Mps, int& P_Contribution_Pc, int& I_Contribution_Pc, int& D_Contribution_Pc, int& FF_Contribution_Pc){

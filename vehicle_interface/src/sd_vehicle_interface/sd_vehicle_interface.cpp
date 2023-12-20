@@ -33,7 +33,7 @@ using namespace std;
 
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
-#include "geometry_msgs/msg/twist_stamped.hpp"
+#include "autoware_auto_control_msgs/msg/AckermannLateralCommand.idl"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
@@ -71,11 +71,11 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
 }
 
 
-void TwistCommand_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
+void TwistCommand_callback(const std::shared_ptr<autoware_auto_control_msgs::msg::AckermannLateralCommand> msg)
 {
 	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
-    TargetTwistAngular_Degps= (msg->twist.angular.z) * RAD_to_DEG;
-    TargetTwistLinear_Mps = msg->twist.linear.x / UNDO_STREETDRONE_SCALING_FACTOR;
+    TargetTwistAngular_Degps= msg->lateral.steering_tire_angle; //Radians
+    TargetTwistLinear_Mps = msg->longitudinal.speed / UNDO_STREETDRONE_SCALING_FACTOR; //still Mps
 }
 
 void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
     auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
-    auto twist_cmd_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("twist_cmd", 100, TwistCommand_callback);
+    auto twist_cmd_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("ackermann_cmd", 100, TwistCommand_callback);
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
@@ -179,7 +179,7 @@ int main(int argc, char **argv)
 				}
 
 				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargetTwistAngular_Degps << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
-				cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
+				cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
 
 				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
 				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
