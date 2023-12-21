@@ -127,10 +127,9 @@ namespace speedcontroller{
 
 
 	//This function calculates the steer angle that will achieve a given angular velocity at a given speed
-    int8_t CalculateSteerRequest(double, double);
+    int8_t CalculateSteerRequest(double);
 	/*Inputs
 	double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
-	double CurrentTwistLinear_Mps: The current linear velocity in Metres per Second
 	Outputs
 	int8_t FinalDBWSteerRequest_Pc: The steer angle request, expressed as a percentage from full lock left/right (+/- 100%). 0 being centred steering. */
 	
