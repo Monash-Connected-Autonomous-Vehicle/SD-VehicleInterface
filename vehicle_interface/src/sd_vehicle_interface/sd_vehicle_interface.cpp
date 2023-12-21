@@ -33,9 +33,10 @@ using namespace std;
 
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
-#include "autoware_auto_msgs/autoware_auto_control_msgs/msg/AckermannLateralCommand.idl"
+#include "autoware_auto_control_msgs/msg/ackermann_control_command.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
 #include <can_msgs/msg/frame.hpp>
@@ -110,7 +111,7 @@ int main(int argc, char **argv)
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
     auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
-    auto twist_cmd_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("ackermann_cmd", 100, TwistCommand_callback);
+    auto twist_cmd_sub = node->create_subscription<autoware_auto_control_msgs::msg::AckermannLateralCommand>("ackermann_cmd", 100, TwistCommand_callback);
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);

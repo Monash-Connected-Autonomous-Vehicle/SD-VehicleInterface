@@ -15,12 +15,13 @@ find_package(sd_msgs REQUIRED)
 find_package(can_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(autoware_auto_control_msgs REQUIRED)
 
 add_executable(sd_vehicle_interface_node src/sd_vehicle_interface/sd_vehicle_interface.cpp
 		src/sd_vehicle_interface/sd_control.cpp
 		src/sd_vehicle_interface/sd_gps_imu.cpp)
 
-ament_target_dependencies(sd_vehicle_interface_node rclcpp sensor_msgs std_msgs sd_msgs can_msgs)
+ament_target_dependencies(sd_vehicle_interface_node rclcpp sensor_msgs std_msgs sd_msgs can_msgs autoware_auto_control_msgs)
 
 install(TARGETS
 sd_vehicle_interface_node
