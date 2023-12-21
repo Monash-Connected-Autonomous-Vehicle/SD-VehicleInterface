@@ -33,7 +33,7 @@ using namespace std;
 
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
-#include "autoware_auto_control_msgs/msg/AckermannLateralCommand.idl"
+#include "autoware_auto_msgs/autoware_auto_control_msgs/msg/AckermannLateralCommand.idl"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"

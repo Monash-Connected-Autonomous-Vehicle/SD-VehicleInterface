@@ -30,6 +30,7 @@
  */
 
 #include "sd_control.h"
+#include <iostream>
 
 namespace speedcontroller{
 
@@ -112,7 +113,9 @@ namespace speedcontroller{
 			CalculatedSteeringAngle_Pc = 0;
 		}
 		*/
-		int CalculatedSteeringAngle_Pc;
+
+		std::cout << CurrentTwistLinear_Mps;
+		int CalculatedSteeringAngle_Pc = TargetAngularVelocity_Dps;
 
 			//Saturate to Min/Max value
 		if (CalculatedSteeringAngle_Pc > MAX_STEER_ANG){
