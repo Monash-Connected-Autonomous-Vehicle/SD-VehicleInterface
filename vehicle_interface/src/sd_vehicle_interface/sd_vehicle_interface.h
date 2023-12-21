@@ -61,7 +61,7 @@ double IMU_Accel_X =0;
 double IMU_Accel_Y =0;
 double IMU_Accel_Z = 0;
 double TargetTwistLinear_Mps; 							//Target Twist linear in m/s
-double TargetTwistAngular_Degps;						//Target Twist angular in deg/s
+double TargeTireAngle_Rad;						//Target Twist angular in deg/s
 uint8_t AliveCounter_Z = 0;								//Alive Counter, increments every cycle
 bool AutomationArmed_B = false;						//Boolean, true if safety driver turns mode switch to autonomous mode
 bool AutomationGranted_B = false; 					//Boolean, true if vehicle grants autonomous mode request

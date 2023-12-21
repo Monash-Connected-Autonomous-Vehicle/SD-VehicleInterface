@@ -66,55 +66,9 @@ namespace speedcontroller{
 	{-5,	0,	2,	6,	7,	8,	10,	12,	13,	15};
 
 
-	//This function calculates the steer angle that will achieve a given angular velocity at a given speed
-    int8_t CalculateSteerRequest(double TargetAngularVelocity_Dps){
-		/*
-		//For velocitys inbetween match points e.g 1.5 m/s, both the steer angles from the 1m/s and 2m/s
-		//column are calculated, the final steer linearly interpolated between them. 
-		double SteeringAngleTable_Pc_Speed_1; 
-		double SteeringAngleTable_Pc_Speed_2;
-		int CalculatedSteeringAngle_Pc; //Final Output steer 
-
-
-		//Yaw index and remainder used to interpolate between different yaw values of the steer table
-		int yaw_index = floor(abs((TargetAngularVelocity_Dps)/YAW_STEPS));
-		double yaw_index_remainder=abs((TargetAngularVelocity_Dps)/YAW_STEPS) - yaw_index;
-		
-		//Speed index and remainder used to interpolate between different speed values of the steer table
-		int speed_index = floor(CurrentTwistLinear_Mps);
-		double speed_index_remainder=abs(CurrentTwistLinear_Mps) - speed_index;
-					
-		//handles inputs outside calibrated map size (high speeds and high yaw request)
-		if(speed_index > V_XAXIS -2){
-			speed_index = V_XAXIS -2;
-		}
-		if(yaw_index > YAW_YAXIS -2){
-			yaw_index = YAW_YAXIS -2;
-		}
-
-		//yaw interpolation handled below
-		SteeringAngleTable_Pc_Speed_1 = (1-yaw_index_remainder)*steer_map[yaw_index][speed_index] + yaw_index_remainder*steer_map[yaw_index+1][speed_index];
-		SteeringAngleTable_Pc_Speed_2 = (1-yaw_index_remainder)*steer_map[yaw_index][speed_index+1] + yaw_index_remainder*steer_map[yaw_index+1][speed_index+1];
-		
-		//Interpolate for speed
-		CalculatedSteeringAngle_Pc = (1-speed_index_remainder)*SteeringAngleTable_Pc_Speed_1 +  speed_index_remainder*(SteeringAngleTable_Pc_Speed_2);
-		
-		//Flip sign convention (Positive Yaw request achieved by negative steering Angle in StreetDrone protocol)
-		if(TargetAngularVelocity_Dps <= 0){
-			CalculatedSteeringAngle_Pc = CalculatedSteeringAngle_Pc*-1;
-		}
-
-		//If there is not angular velocity request, steering angle is set to 0
-		if (0 == TargetAngularVelocity_Dps){
-			CalculatedSteeringAngle_Pc = 0;
-			
-		//If there is no linear velocity request, steering angle is set to 0
-		} else if (CurrentTwistLinear_Mps <= 0){
-			CalculatedSteeringAngle_Pc = 0;
-		}
-		*/
-
-		float angle_request_rad = TargetAngularVelocity_Dps;
+	//This function calculates the steer angle (%) given the request
+    int8_t CalculateSteerRequest(double TargetSteerAngle_Rad){
+		float angle_request_rad = TargetSteerAngle_Rad;
 
 			//Saturate to Min/Max value
 		if (angle_request_rad > MAX_STEER_ANG){
