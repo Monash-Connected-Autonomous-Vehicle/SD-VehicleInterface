@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 				}
 
 				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargetTwistAngular_Degps << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
-				cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
+				cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<NEW_SCALE_FACTOR * TargetTwistLinear_Mps << " Current_V "<<  setw(4)  <<NEW_SCALE_FACTOR *  CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
 
 				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
 				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;

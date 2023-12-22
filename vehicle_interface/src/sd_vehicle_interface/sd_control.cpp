@@ -30,6 +30,7 @@
  */
 
 #include "sd_control.h"
+#include <iostream>
 
 namespace speedcontroller{
 
@@ -122,7 +123,7 @@ namespace speedcontroller{
 		return CalculatedSteeringAngle_Pc;
     }
 
-	int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps, double CurrentLinearVelocity_Mps, int& P_Contribution_Pc, int& I_Contribution_Pc, int& D_Contribution_Pc, int& FF_Contribution_Pc){
+	int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps, double CurrentLinearVelocity_Mps, double P_Contribution_Pc, double I_Contribution_Pc, double D_Contribution_Pc, double FF_Contribution_Pc){
         
 		//Calculate PID Errors
 		static double LinearVelocityError_Mps;
@@ -189,21 +190,22 @@ namespace speedcontroller{
 			I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
 			D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
 		}
-				
+		/////////////////////////////////TEST
 		//I gain Anti windup Strategy
-		if (I_Contribution_Pc > MAX_ABS_I_CONTRIBUTION_TWIZY){  //I Gain saturation
-			I_Contribution_Pc = MAX_ABS_I_CONTRIBUTION_TWIZY;
-		} else if (I_Contribution_Pc < -MAX_ABS_I_CONTRIBUTION_TWIZY){
-			I_Contribution_Pc = - MAX_ABS_I_CONTRIBUTION_TWIZY;
-		}
+		//if (I_Contribution_Pc > MAX_ABS_I_CONTRIBUTION_TWIZY){  //I Gain saturation
+		//	I_Contribution_Pc = MAX_ABS_I_CONTRIBUTION_TWIZY;
+		//} else if (I_Contribution_Pc < -MAX_ABS_I_CONTRIBUTION_TWIZY){
+		//	I_Contribution_Pc = - MAX_ABS_I_CONTRIBUTION_TWIZY;
+		//}
 		
 		if(CurrentLinearVelocity_Mps < ANTI_FUSSINESS_TWIZY){ //Prevents I gain winding up when sitting still with handbrake on
-		I_Contribution_Pc = 0;
+		//I_Contribution_Pc = 0;
+		////////////////
 		}
 		
 		if(abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_TWIZY){ //I Gain should only influence the system in a band about the setpoint. 
-			LinearVelocityIntegratedError = 0;
-			I_Contribution_Pc = 0;
+			//LinearVelocityIntegratedError = 0;
+			//I_Contribution_Pc = 0;
 		}
 		
 		
@@ -212,6 +214,7 @@ namespace speedcontroller{
 			
 		//Impose limits on the torque if greater than or less than maximum and minimum values
 		if (FinalDBWTorqueRequest_Pc > MAX_TORQUE_TWIZY){
+			cout << "Final Torque Request" << FinalDBWTorqueRequest_Pc << endl;
 			FinalDBWTorqueRequest_Pc = MAX_TORQUE_TWIZY;
 		} else if(FinalDBWTorqueRequest_Pc < MIN_TORQUE_TWIZY){
 			FinalDBWTorqueRequest_Pc = MIN_TORQUE_TWIZY;
@@ -219,7 +222,7 @@ namespace speedcontroller{
 		
 		//Remember previous variables for next cycle
 		PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
-		
+		std::cout << "Linear Velocity Integrated Error: "<< LinearVelocityIntegratedError << "I Contribution" << I_Contribution_Pc <<  endl; 
 		return (int8_t)FinalDBWTorqueRequest_Pc;
 
     }
@@ -316,7 +319,6 @@ namespace speedcontroller{
 		
 		//Remember previous variables for next cycle
 		PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
-		
 		return (int8_t)FinalDBWTorqueRequest_Pc;
 
     }

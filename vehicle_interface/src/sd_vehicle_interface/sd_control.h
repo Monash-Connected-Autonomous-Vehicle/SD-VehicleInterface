@@ -49,7 +49,7 @@ namespace speedcontroller{
 
 	//Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
 	//#define ANTI_FUSSINESS_TWIZY (0.1)
-	#define ANTI_FUSSINESS_TWIZY (0.00175)
+	#define ANTI_FUSSINESS_TWIZY (0)
 
 	//Gains for braking to a stop only
 	#define Kp_Speed_FullStop_Braking_Twizy            (65)
@@ -135,16 +135,16 @@ namespace speedcontroller{
 	int8_t FinalDBWSteerRequest_Pc: The steer angle request, expressed as a percentage from full lock left/right (+/- 100%). 0 being centred steering. */
 	
 	//This function calculates the torque using PID and feedforward control
-	int8_t CalculateTorqueRequestTwizy(double, double, int&, int&, int&, int&);
+	int8_t CalculateTorqueRequestTwizy(double, double, double, double, double, double);
     /*Inputs
 	string _sd_vehicle: The StreetDrone vehicle under control, 'twizy' or 'env200'
 	double TargetLinearVelocity_Mps: The target linear velocity in Metres per Second
 	double CurrentTwistLinear_Mps: The current linear velocity in Metres per Second
 	double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
-	int P_Contribution_Pc: The contribution to final torque given by the P term, used for user feedback for tuning
-	int I_Contribution_Pc: The contribution to final torque given by the I term, used for user feedback for tuning
-	int D_Contribution_Pc: The contribution to final torque given by the D term, used for user feedback for tuning
-	int FF_Contribution_Pc: The contribution to final torque given by the feedforward calculation, used for user feedback for tuning
+	double P_Contribution_Pc: The contribution to final torque given by the P term, used for user feedback for tuning
+	double I_Contribution_Pc: The contribution to final torque given by the I term, used for user feedback for tuning
+	double  D_Contribution_Pc: The contribution to final torque given by the D term, used for user feedback for tuning
+	double FF_Contribution_Pc: The contribution to final torque given by the feedforward calculation, used for user feedback for tuning
 
 	Outputs
 	int8_t FinalDBWTorqueRequest_Pc: The torque request, expressed as a percentage of full braking vs full throttle (+/- 100%). 0 being no torque request.*/
