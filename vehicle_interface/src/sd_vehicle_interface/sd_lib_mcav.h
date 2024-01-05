@@ -109,6 +109,11 @@ namespace sd{
 		} else if (frame.id == 0x102) { // StreetDrone_Data_1
 			//Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
 			uint8_t CurrentVelocity8bit = frame.data[0]; //Speed Actual kph low resolution
+			/*
+			Steer_Actual is frame.data[2]
+			Pedal_Actual is frame.data[4]
+			Brake_Actual is frame.data[5]
+			*/
 
 			uint8_t speed_HR_B1 = frame.data[6];
 			uint8_t speed_HR_B2 = frame.data[7];

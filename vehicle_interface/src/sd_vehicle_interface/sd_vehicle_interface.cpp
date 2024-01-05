@@ -33,9 +33,10 @@ using namespace std;
 
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
-#include "geometry_msgs/msg/twist_stamped.hpp"
+#include "autoware_auto_control_msgs/msg/ackermann_control_command.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
 #include <can_msgs/msg/frame.hpp>
@@ -71,12 +72,11 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
 }
 
 
-void TwistCommand_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
+void AckermannCommand_callback(const std::shared_ptr<autoware_auto_control_msgs::msg::AckermannControlCommand> msg)
 {
 	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
-    TargetTwistAngular_Degps= (msg->twist.angular.z) * RAD_to_DEG;
-    //TargetTwistLinear_Mps = msg->twist.linear.x / UNDO_STREETDRONE_SCALING_FACTOR;
-    TargetTwistLinear_Mps = msg->twist.linear.x / NEW_SCALE_FACTOR;
+    TargeTireAngle_Rad= msg->lateral.steering_tire_angle; //Radians
+    TargetTwistLinear_Mps = msg->longitudinal.speed / UNDO_STREETDRONE_SCALING_FACTOR; //still Mps
 }
 
 void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
@@ -111,7 +111,7 @@ int main(int argc, char **argv)
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
     auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
-    auto twist_cmd_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("twist_cmd", 100, TwistCommand_callback);
+    auto ackermann_cmd_sub = node->create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>("ackermann_cmd", 100, AckermannCommand_callback);
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
@@ -141,8 +141,7 @@ int main(int argc, char **argv)
 		}
 
 		current_Twist.twist.angular.z = IMU_Rate_Z*DEG_to_RAD;
-		//current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
-		current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final * NEW_SCALE_FACTOR;
+		current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
 		//Prepare the GPS message with latest data
 		current_GPS.longitude = GPS_Longitude;
 		current_GPS.latitude = GPS_Latitude;
@@ -172,7 +171,7 @@ int main(int argc, char **argv)
 			if (0 ==(AliveCounter_Z % CONTROL_LOOP) && ((node->now() - autonomous_entry) >= rclcpp::Duration::from_seconds(0.1)) ){ //We only run as per calibrated frequency, with additional delay
 
 				//Calculate Steer and torque values, as well as controll feedback (PID and FeedForward Contributions to Torque Controller)
-				FinalDBWSteerRequest_Pc   = speedcontroller::CalculateSteerRequest  (TargetTwistAngular_Degps, CurrentTwistLinearSD_Mps_Final);
+				FinalDBWSteerRequest_Pc   = speedcontroller::CalculateSteerRequest(TargeTireAngle_Rad);
 
 				if(twizy_string==_sd_vehicle){
 					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestTwizy(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
@@ -191,7 +190,7 @@ int main(int argc, char **argv)
 			
 			//Populate the Can frames with calculated data
 			sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
-			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargetTwistAngular_Degps);
+			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargeTireAngle_Rad);
 		} else{
 			autonomous_entry = node->now();
 		}
