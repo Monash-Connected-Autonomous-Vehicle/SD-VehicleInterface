@@ -31,6 +31,7 @@
 
 #include "sd_control.h"
 #include <iostream>
+using namespace std;
 
 namespace speedcontroller{
 
@@ -83,6 +84,9 @@ namespace speedcontroller{
 
 	int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps, double CurrentLinearVelocity_Mps, double P_Contribution_Pc, double I_Contribution_Pc, double D_Contribution_Pc, double FF_Contribution_Pc){
         
+		//Scaling the velocities, probably better to do it somewhere else later on
+		TargetLinearVelocity_Mps = TargetLinearVelocity_Mps*50;
+		CurrentLinearVelocity_Mps = CurrentLinearVelocity_Mps*50;
 		//Calculate PID Errors
 		static double LinearVelocityError_Mps;
 		static double LinearVelocityIntegratedError;
@@ -169,17 +173,23 @@ namespace speedcontroller{
 		FinalDBWTorqueRequest_Pc = P_Contribution_Pc + I_Contribution_Pc + D_Contribution_Pc + FF_Contribution_Pc;
 
 			
-		//Impose limits on the torque if greater than or less than maximum and minimum values
+		//Impose limits on the torque if greater than or less than maximum and minimum value
+		// AKA ANTI-WINDUP STRATEGY
 		if (FinalDBWTorqueRequest_Pc > MAX_TORQUE_TWIZY){
-			cout << "Final Torque Request" << FinalDBWTorqueRequest_Pc << endl;
-			FinalDBWTorqueRequest_Pc = MAX_TORQUE_TWIZY;
+        		I_Contribution_Pc = I_Contribution_Pc + (MAX_TORQUE_TWIZY-FinalDBWTorqueRequest_Pc)*Kt_Speed_Twizy;
+        		LinearVelocityIntegratedError = LinearVelocityIntegratedError + (MAX_TORQUE_TWIZY-FinalDBWTorqueRequest_Pc)*Kt_Speed_Twizy/Ki_Speed_Twizy;
+			FinalDBWTorqueRequest_Pc =P_Contribution_Pc + I_Contribution_Pc + D_Contribution_Pc;
+			
 		} else if(FinalDBWTorqueRequest_Pc < MIN_TORQUE_TWIZY){
-			FinalDBWTorqueRequest_Pc = MIN_TORQUE_TWIZY;
+			I_Contribution_Pc = I_Contribution_Pc + (MIN_TORQUE_TWIZY-FinalDBWTorqueRequest_Pc)*Kt_Speed_Twizy;
+			LinearVelocityIntegratedError = LinearVelocityIntegratedError + (MIN_TORQUE_TWIZY-FinalDBWTorqueRequest_Pc)*Kt_Speed_Twizy/Ki_Speed_Twizy;
+			FinalDBWTorqueRequest_Pc =P_Contribution_Pc + I_Contribution_Pc + D_Contribution_Pc;
 		}
 		
 		//Remember previous variables for next cycle
 		PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
-		std::cout << "Linear Velocity Integrated Error: "<< LinearVelocityIntegratedError << "I Contribution" << I_Contribution_Pc <<  endl; 
+		//std::cout << "Linear Velocity Integrated Error: "<< LinearVelocityIntegratedError << "I Contribution" << I_Contribution_Pc <<  endl; 
+		cout << "Torque : " << FinalDBWTorqueRequest_Pc << endl;
 		return (int8_t)FinalDBWTorqueRequest_Pc;
 
     }

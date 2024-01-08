@@ -44,8 +44,9 @@ namespace speedcontroller{
 	//*****TWIZY CALIBRATIONS*****
 	//Gains for increasing speed
 	#define Kp_Speed_Twizy                    (23)
-	#define Ki_Speed_Twizy                    (1)
+	#define Ki_Speed_Twizy                    (0.1)
 	#define Kd_Speed_Twizy                    (0)
+	#define Kt_Speed_Twizy			  (1) //ANTI WIND-UP GAIN
 
 	//Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
 	//#define ANTI_FUSSINESS_TWIZY (0.1)
@@ -57,14 +58,14 @@ namespace speedcontroller{
 	#define Kd_Speed_FullStop_Braking_Twizy            (0)
 
 	//Gains for reducing speed, not to a stop
-	#define Kp_Speed_Retd_Twizy          (40)
-	#define Ki_Speed_Retd_Twizy           (1)
+	#define Kp_Speed_Retd_Twizy          (30)
+	#define Ki_Speed_Retd_Twizy           (0.1)
 	#define Kd_Speed_Retd_Twizy          (0)
 
 
 	//Maximum and minimum torque requests
-	#define MAX_TORQUE_TWIZY  (100)
-	#define MIN_TORQUE_TWIZY    (-100)
+	#define MAX_TORQUE_TWIZY  (60) //The actual maximum torque is about 70, this is just a safety measure, and is subject to change
+	#define MIN_TORQUE_TWIZY    (-60)
 	#define MAX_ABS_I_CONTRIBUTION_TWIZY  (15)
 	#define I_GAIN_ERROR_BAND_TWIZY (2) //The absolute error about a setpoint where I gain is allowed to accumulate. 
 
