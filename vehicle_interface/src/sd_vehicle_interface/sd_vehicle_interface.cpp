@@ -111,7 +111,7 @@ int main(int argc, char **argv)
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
     auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
-    auto ackermann_cmd_sub = node->create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>("ackermann_cmd", 100, AckermannCommand_callback);
+    auto ackermann_cmd_sub = node->create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>("/control/command/control_cmd", 100, AckermannCommand_callback);
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
