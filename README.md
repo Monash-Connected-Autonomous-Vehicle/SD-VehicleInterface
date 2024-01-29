@@ -1,6 +1,6 @@
 
 ## The StreetDrone Vehicle Interface
-This package is responsible for the communication between the [StreetDrone](https://streetdrone.com/) vehicles and ROS based self-driving software stacks.
+This package is responsible for the communication between the [StreetDrone](https://streetdrone.com/) vehicles and ROS2 based self-driving software stacks.
 
 The interface bridges the gap between ROS kinetic and the OpenCAN vehicle interface of the StreetDrone Xenos Control Unit (XCU) integrated into the SD Twizy R&D and SD ENV200 vehicles.
 
@@ -11,7 +11,7 @@ We strongly suggest that you adhere to the following guideline in conjuction wit
 * You are responsible for complying with the local laws and regulations.
 
 #### In this release:
-* A tunable PID and FeedForward Linear Velocity Control loop has been implemened with a mature calibration at speeds of up to 20mph. 
+* A tunable PID and FeedForward Linear Velocity Control loop has been implemented with a mature calibration at speeds of up to 20mph. 
 * Support has been extended to the ENV200, the latest vehicle in the StreetDrone fleet
 * An intuitive yaw to steering map has been included
 * Support for Localization, CAN and IMU speed source selection
@@ -34,16 +34,15 @@ We strongly suggest that you adhere to the following guideline in conjuction wit
 #### Node Architecture
 socketcan_bridge: This node comes from the default ROS package [socketcan_bridge](http://wiki.ros.org/socketcan_bridge). The package provides functionality to expose CAN frames from SocketCAN to a ROS Topic. Internally it uses the socketcan_interface from the ros_canopen package, as such, it is capable of dealing with both normal and extended CAN frames. 
 
-sd_vehicle_interface: The vehicle interface node for the StreetDrone (SD) Twizy and ENV200. This node translates the output messages from a ROS based software stack (geometry_msgs::TwistStamped) to SocketCAN messages (can_msgs::msg::Frame) and vice versa. The node integrates a twist to ackermann function for controlling the steering of the vehicle and a PID controller with vehicle speed feedback corresponding to the output twist message.  
+sd_vehicle_interface: The vehicle interface node for the StreetDrone (SD) Twizy and ENV200. This node translates the output messages from a ROS2 based software stack (geometry_msgs::msg::TwistStamped) to SocketCAN messages (can_msgs::msg::Frame) and vice versa. The node integrates a twist to ackermann function for controlling the steering of the vehicle and a PID controller with vehicle speed feedback corresponding to the output twist message.  
 
 #### Limitations:
 * limited to 20 Mph
 
 ## Requirements
 
-##### - Ubuntu 16.04 LTS
-##### - ROS Kinetic [ros-kinetic-desktop-full](http://wiki.ros.org/kinetic/Installation/Ubuntu)
-##### - Catkin Command Line Tools [catkin_tools](https://catkin-tools.readthedocs.io/en/latest/installing.html)
+##### - Ubuntu 22.04
+##### - [ROS2 Humble](https://docs.ros.org/en/humble/Installation.html)
 
 ## Building
 
@@ -52,16 +51,14 @@ If you haven't previously created a catkin workspace, please visit [wiki.ros.org
 
 2. Install the ROS packages: [socketcan_interface](http://wiki.ros.org/socketcan_interface) and [can_msgs](http://wiki.ros.org/can_msgs)
 ```
-sudo apt-get install ros-kinetic-socketcan-interface ros-kinetic-can-msgs
+sudo apt-get install ros-${ROS_DISTRO}-socketcan-interface ros-${ROS_DISTRO}-can-msgs
 ```
 
 3. Build the package
 ```
 # from the root of your workspace build only this package
-catkin build sd_vehicle_interface
+colcon build sd_vehicle_interface
 ```
-
-If you previously built your workspace with `catkin_make`, do `catkin_make --only-pkg-with-deps sd_vehicle_interface`.    
 
 Launch
 ------
@@ -78,8 +75,8 @@ sudo ip link add dev can0 type vcan
 ```
 After CAN is initialised, go to the root of your workspace and launch the vehicle interface using the following command:
 ```
-source devel/setup.bash
-roslaunch sd_vehicle_interface sd_vehicle_interface.launch sd_vehicle:=env200 sd_gps_imu:=oxts
+source install/setup.bash
+ros2 launch sd_vehicle_interface sd_vehicle_interface.launch sd_vehicle:=env200 sd_gps_imu:=oxts
 # adjust the launch parameters to your vehicle setup, as described below
 ```
 
