@@ -31,6 +31,7 @@
 
 #include <stdlib.h>
 #include <can_msgs/msg/frame.hpp>
+#include <iostream>
 
 #define KPH_TO_MPS (0.277778)
 
@@ -127,6 +128,24 @@ namespace sd{
 			}
 			else{
 				CurrentLinearVelocity_Mps = (CurrentVelocity16bit*KPH_TO_MPS);
+			}
+		} else if (frame.id == 0x117) { // StreetDrone_Data_2
+			uint8_t byte0 = frame.data[0];
+			uint8_t byte1 = frame.data[1];
+
+			int TwizyHornB = byte0 & (1 << 7);
+			int TwizyBrakeLightB = byte0 & (1 << 6);
+			int TwizyReverseLightB = byte0 & (1 << 5);
+			int TwizyLeftIndicatorB = byte0 & (1 << 4);
+			int TwizyRightIndicatorB = byte0 & (1 << 3);
+			int TwizySideLightsB = byte0 & (1 << 2);
+			int TwizyDippedLightsB = byte0 & (1 << 1);
+			int TwizyMainBeamB = byte0 & (1 << 0);
+
+			int RemoteAutoModeAckB = = byte1 & (1 << 3);
+
+			if (Twizy_Right_Indicator_B) {
+				std::cout << "right indicator: " << Twizy_Right_Indicator_B << std::endl;
 			}
 		}
 	}
