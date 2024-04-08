@@ -154,6 +154,10 @@ namespace sd{
 		frame.dlc = 8; // each frame has 8 bytes of data
 		frame.id = 0x103; // customer Feedback frame id
 	}
+	void InitSDInterfaceControl2(can_msgs::msg::Frame& frame) {
+		frame.dlc = 8; // each frame has 8 bytes of data
+		frame.id = 0x104; // customer Control frame id constant
+	}
 	/*Inputs
 	can_msgs::msg::Frame& CustomerControlCANTx/CustomerFeedbackCANTx to be initialised*/
 	
@@ -172,7 +176,7 @@ namespace sd{
 		// (byte 7 contains two bit flags that set SteerAutomationRequest and TorqueAutomationRequest to true or false)
 		// 0x11 in binary is 0b00010001, so it sets bit 56 and bit 60 from the start of the CAN frame (seems to read right to left?)
 
-		sd::SetCRC(frame, aliveCount); // 
+		sd::SetCRC(frame, aliveCount); 
 	}
 	/*inputs
 	can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
@@ -216,6 +220,19 @@ namespace sd{
 	int8_t FinalDBWTorqueRequest_Pc:The Torque percentage requested of the vehicle
 	int8_t FinalDBWSteerRequest_Pc: The Steer Percentage requested of the vehicle
 	uint8_t AliveCounter_Z  : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
+
+	// PopControl2CANData
+	// Populates the Control Tx message to the vehicle
+    void PopControl2CANData(can_msgs::msg::Frame& frame, bool right_indicator_command) {
+		int8_t bit_ric = (right_indicator_command ? 1 : 0) << 3;
+		frame.data[5] = bit_ric;
+	}
+	/*Inputs
+	can_msgs::msg::Frame& CustomerControl2CANTx  The SD Interface Customer Control 2 Message
+	bool right_indicator_command: represents whether or not to set left indicator
+	*/
+
+
 	
 	//Populates the Feedback CAN message (Optional)
     void PopFeedbackCANData(can_msgs::msg::Frame&, int, int, int, int, double, double);

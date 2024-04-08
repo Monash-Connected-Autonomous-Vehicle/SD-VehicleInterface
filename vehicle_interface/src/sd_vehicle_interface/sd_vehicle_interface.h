@@ -79,6 +79,7 @@ int FF_Contribution_Pc = 0; 								//The torque contributed by feedforward gain
 //Ros variables
 can_msgs::msg::Frame ReceivedFrameCANRx;  		//Create the can frame that will be store received can messages
 can_msgs::msg::Frame CustomerControlCANTx; 		//Create the can frame that will be outputted onto the canbus
+can_msgs::msg::Frame CustomerControl2CANTx; 		//Create the can frame that will be outputted onto the canbus
 can_msgs::msg::Frame ControllerFeedbackCANTx; 	//Create the frame that will supply feedback data to engineers tuning controller
 
 // ros::Publisher sent_msgs_pub;

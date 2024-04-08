@@ -101,6 +101,7 @@ int main(int argc, char **argv)
 
 	//initialise the StreetDrone Output Can variables
 	sd::InitSDInterfaceControl(CustomerControlCANTx);
+	sd::InitSDInterfaceControl2(CustomerControl2CANTx);
 	sd::InitSDInterfaceFeedback(ControllerFeedbackCANTx);
 
 	geometry_msgs::msg::TwistStamped current_Twist;
@@ -155,7 +156,7 @@ int main(int argc, char **argv)
 		AliveCounter_Z++; //Increment the alive counter
 		//Check Errors
 
-		sd::UpdateControlAlive(CustomerControlCANTx, AliveCounter_Z); //Otherwise, populate the can frame with 0's
+		sd::UpdateControlAlive(CustomerControlCANTx, AliveCounter_Z); //Otherwise, populate the can frame with 0's, not required for Customer_Control_2
 
 		if (0 ==(AliveCounter_Z % CONTROL_LOOP)){ //We only run as per calibrated frequency
 
@@ -189,6 +190,7 @@ int main(int argc, char **argv)
 			
 			//Populate the Can frames with calculated data
 			sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
+			sd::PopControl2CANData(CustomerControl2CANTx, true);
 			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargeTireAngle_Rad);
 		} else{
 			autonomous_entry = node->now();
@@ -198,6 +200,7 @@ int main(int argc, char **argv)
 			//Publish prepared messages
 			
 			sent_msgs_pub->publish(CustomerControlCANTx); //Publish the output CAN data
+			sent_msgs_pub->publish(CustomerControl2CANTx); //Publish the output CAN data
 			sent_msgs_pub->publish(ControllerFeedbackCANTx);
 
 		}
