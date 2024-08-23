@@ -76,6 +76,7 @@ void TwistCommand_callback(const std::shared_ptr<geometry_msgs::msg::TwistStampe
 	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
     TargetTwistAngular_Degps= (msg->twist.angular.z) * RAD_to_DEG;
     TargetTwistLinear_Mps = msg->twist.linear.x / UNDO_STREETDRONE_SCALING_FACTOR;
+	cout << "Obtaining next target twist linear \n";
 }
 
 void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
@@ -174,12 +175,14 @@ int main(int argc, char **argv)
 
 				if(twizy_string==_sd_vehicle){
 					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestTwizy(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
+					cout << "Twizy" << endl;
 				}else{
 					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestEnv200(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
+					cout << "ENV200" << endl;
 				}
 
 				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargetTwistAngular_Degps << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
-				// cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
+				cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
 
 				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
 				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
@@ -187,15 +190,19 @@ int main(int argc, char **argv)
 
 			}
 			
-			//Populate the Can frames with calculated data
+			//Populate the Can frames with calculated 
+			cout << "Popping torque: " << FinalDBWTorqueRequest_Pc << " steering: " << FinalDBWSteerRequest_Pc << endl;
 			sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
 			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargetTwistAngular_Degps);
 		} else{
+			cout << "Autonomous not granted yet, attempting now" << endl;
 			autonomous_entry = node->now();
+			cout << "Attempted" << endl;
 		}
 			
 		if(!_sd_simulation_mode){ //If we are not in simulation mode, output on the CANbus the Control and Feedback Messages
 			//Publish prepared messages
+			cout << "Sending msgs" << endl;
 			
 			sent_msgs_pub->publish(CustomerControlCANTx); //Publish the output CAN data
 			sent_msgs_pub->publish(ControllerFeedbackCANTx);
