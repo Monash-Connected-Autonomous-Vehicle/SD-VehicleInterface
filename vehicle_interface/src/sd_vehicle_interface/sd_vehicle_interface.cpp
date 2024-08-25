@@ -159,7 +159,7 @@ int main(int argc, char **argv)
 
 		if (0 ==(AliveCounter_Z % CONTROL_LOOP)){ //We only run as per calibrated frequency
 
-			if (AutomationArmed_B){
+			if (!AutomationGranted_B){
 				sd::RequestAutonomousControl(CustomerControlCANTx, AliveCounter_Z); //If the safety driver has armed the vehicle for autonomous, request autonomous control of torque and steer
 				cout << "Requesting Automation" << endl;
 			}else{
