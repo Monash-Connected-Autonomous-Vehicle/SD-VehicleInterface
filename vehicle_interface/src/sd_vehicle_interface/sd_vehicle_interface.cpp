@@ -161,12 +161,15 @@ int main(int argc, char **argv)
 
 			if (AutomationArmed_B){
 				sd::RequestAutonomousControl(CustomerControlCANTx, AliveCounter_Z); //If the safety driver has armed the vehicle for autonomous, request autonomous control of torque and steer
+				cout << "Requesting Automation" << endl;
 			}else{
 				sd::ResetControlCanData(CustomerControlCANTx, AliveCounter_Z); //Otherwise, populate the can frame with 0's
+				cout << "Reseting request for Automation" << endl;
 			}
 		}
 			
 		if (AutomationGranted_B || _sd_simulation_mode){
+			cout << "Automation Granted" << endl;
 
 			if (0 ==(AliveCounter_Z % CONTROL_LOOP) && ((node->now() - autonomous_entry) >= rclcpp::Duration::from_seconds(0.1)) ){ //We only run as per calibrated frequency, with additional delay
 			
@@ -182,7 +185,7 @@ int main(int argc, char **argv)
 				}
 
 				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargetTwistAngular_Degps << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
-				cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
+				// cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
 
 				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
 				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
@@ -191,13 +194,12 @@ int main(int argc, char **argv)
 			}
 			
 			//Populate the Can frames with calculated 
-			cout << "Popping torque: " << FinalDBWTorqueRequest_Pc << " steering: " << FinalDBWSteerRequest_Pc << endl;
+			// cout << "Popping torque: " << FinalDBWTorqueRequest_Pc << " steering: " << FinalDBWSteerRequest_Pc << endl;
 			sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
 			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargetTwistAngular_Degps);
 		} else{
 			cout << "Autonomous not granted yet, attempting now" << endl;
 			autonomous_entry = node->now();
-			cout << "Attempted" << endl;
 		}
 			
 		if(!_sd_simulation_mode){ //If we are not in simulation mode, output on the CANbus the Control and Feedback Messages
