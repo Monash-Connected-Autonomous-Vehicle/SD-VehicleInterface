@@ -226,5 +226,24 @@ namespace sd{
 	double TargetLinearVelocity_Mps :The Target speed (feedback only)
 	double TargetAngularVelocity_Degps: The Target Angular velocity (Feedback Only)*/
 
-}
+	/*
+	1) Turn Indicators Status is a topic that needs to be published to (from AVP projects page)
+	2) StreetDRoneTwizy User Manual End of Page 25: Frame ID that contains Bit information on is 0x104
+	3) 0x104 is not present on in sd_lib_mcav inside other functions (i.e. if (frame.id == 0x100) in ParseRxCANDataSDCan)
+	4) Page 26: Right_Indicator_Command_B and Left_Indicator_Command_B are boolean values that seemingly relate to this topic
+		and are not present in this c++ file as well
+	
+	What Our Function Needs To Do:
+	- Only create 2 Boolean variables, because right/left indicator are Boolean values
+	- Hexadecimal bitwise operation to assign variables Boolean truth values
+	- Create a function with this? Based on SteeringReport.idl from SteeringReport message?
+	*/
+    void turn_indicators_status(can_msgs::msg::Frame& frame) {
+		// Check which kind of frame we have received and update data accordingly
+		if (frame.id == 0x104) { 
+			bool Left_Indicator_Command_B = frame.data[5] & 0x08; // bit 44 (0b0000 1000)
+			bool Right_Indicator_Command_B = frame.data[5] & 0x10; // bit 43 (0b0001 0000)
 
+			}
+		}
+	}
