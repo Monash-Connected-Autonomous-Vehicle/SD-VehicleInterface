@@ -33,8 +33,11 @@ using namespace std;
 
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
-#include "autoware_auto_control_msgs/msg/ackermann_control_command.hpp"
-#include "autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp"
+#include "autoware_control_msgs/msg/control.hpp"
+<<<<<<< HEAD
+#include "autoware_vehicle_msgs/msg/turn_indicators_report.hpp"
+=======
+>>>>>>> 7ee4887 (Update according to renamed autoware topics)
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
@@ -73,11 +76,15 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
 }
 
 
-void AckermannCommand_callback(const std::shared_ptr<autoware_auto_control_msgs::msg::AckermannControlCommand> msg)
+<<<<<<< HEAD
+void AckermannCommand_callback(const std::shared_ptr<autoware_control_msgs::msg::AckermannControlCommand> msg)
+=======
+void AckermannCommand_callback(const std::shared_ptr<autoware_control_msgs::msg::Control> msg)
+>>>>>>> 7ee4887 (Update according to renamed autoware topics)
 {
 	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
     TargeTireAngle_Rad= msg->lateral.steering_tire_angle; //Radians
-    TargetTwistLinear_Mps = msg->longitudinal.speed / UNDO_STREETDRONE_SCALING_FACTOR; //still Mps
+    TargetTwistLinear_Mps = msg->longitudinal.velocity / UNDO_STREETDRONE_SCALING_FACTOR; //still Mps
 }
 
 void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
@@ -108,12 +115,16 @@ int main(int argc, char **argv)
 	sensor_msgs::msg::NavSatFix current_GPS;
 	sensor_msgs::msg::Imu current_IMU;
 	sd_msgs::msg::SDControl SD_Current_Control;
-	autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport current_indicator_status;
+	autoware_vehicle_msgs::msg::TurnIndicatorsReport current_indicator_status;
 	
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
     auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
-    auto ackermann_cmd_sub = node->create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>("/control/command/control_cmd", 100, AckermannCommand_callback);
+<<<<<<< HEAD
+    auto ackermann_cmd_sub = node->create_subscription<autoware_control_msgs::msg::AckermannControlCommand>("/control/command/control_cmd", 100, AckermannCommand_callback);
+=======
+    auto ackermann_cmd_sub = node->create_subscription<autoware_control_msgs::msg::Control>("/control/command/control_cmd", 100, AckermannCommand_callback);
+>>>>>>> 7ee4887 (Update according to renamed autoware topics)
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
@@ -121,7 +132,7 @@ int main(int argc, char **argv)
     auto current_GPS_pub = node->create_publisher<sensor_msgs::msg::NavSatFix>("sd_current_GPS", 100);
 	auto current_IMU_pub = node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw",100);
     auto sd_control_pub = node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1); // in the original ROS1 interface from StreetDrone, this topic was latched.
-    auto turn_indicators_report_pub = node->create_publisher<autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport>("/vehicle/status/turn_indicators_status", 100); // in the original ROS1 interface from StreetDrone, this topic was latched.
+    auto turn_indicators_report_pub = node->create_publisher<autoware_vehicle_msgs::msg::TurnIndicatorsReport>("/vehicle/status/turn_indicators_status", 100); // in the original ROS1 interface from StreetDrone, this topic was latched.
 
 
     rclcpp::Rate loop_rate(ROS_LOOP);
