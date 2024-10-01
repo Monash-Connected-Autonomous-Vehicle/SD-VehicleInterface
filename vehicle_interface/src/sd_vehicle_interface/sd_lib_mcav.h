@@ -96,7 +96,7 @@ namespace sd{
 	
 	/*ParseRxCanDataSDCan
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
-    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B, bool& Left_Indicator_Command, bool& Right_Indicator_Command, bool& Disabled) {
+    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B, bool& Left_Indicator_Command_B, bool& Right_Indicator_Command_B, bool& Disabled) {
 		// Check which kind of frame we have received and update data accordingly
 		if (frame.id == 0x104) { 
 			Left_Indicator_Command = frame.data[5] & 0x08; // bit 44 (0b0000 1000)

@@ -67,6 +67,11 @@ bool AutomationArmed_B = false;						//Boolean, true if safety driver turns mode
 bool AutomationGranted_B = false; 					//Boolean, true if vehicle grants autonomous mode request
 bool IMUVarianceKnown_B = false; 					//Boolean, true if the inout GPS has known variance (OXTS YES, PEAK NO)
 
+// Autoware-related parameters
+bool Left_Indicator_Command = false;
+bool Right_Indicator_Command = false;
+bool Disabled = false;
+
 
 //Speed Control
 int8_t FinalDBWTorqueRequest_Pc = 0; 				//The Final Drive-By-Wire torque request, expressed from -100% (full brake) to 100% (full throttle)

@@ -40,7 +40,7 @@ namespace sd{
 	
 	/*ParseRxCanDataSDCan
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
-    void ParseRxCANDataSDCan(can_msgs::msg::Frame&, double& , bool& , bool&);
+    void ParseRxCANDataSDCan(can_msgs::msg::Frame&, double&, bool&, bool&, bool&, bool&, bool& );
 	/*Inputs
 	can_msgs::msg::Frame& ReceivedFrameCAN : Raw socketcan frame in format of can_msgs/Frame.h, this is the RX can stream
 	double& CurrentLinearVelocity_Mps The function shall update this variable with the latest Linear Velocity as read from the CAN bus in Mps

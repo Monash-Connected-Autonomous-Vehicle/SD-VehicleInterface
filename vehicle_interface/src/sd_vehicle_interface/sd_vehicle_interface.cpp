@@ -57,7 +57,7 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
 {
 	// Populates into ReceivedFrameCANRx the latest can message
     ReceivedFrameCANRx = *msg.get();
-	sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, AutomationArmed_B, AutomationGranted_B);
+	sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, AutomationArmed_B, AutomationGranted_B, Left_Indicator_Command, Right_Indicator_Command, Disabled);
 	
 	if(oxts_string==_sd_gps_imu){
 		
@@ -220,8 +220,7 @@ int main(int argc, char **argv)
 		current_GPS_pub->publish(current_GPS);
 
 		// move to autonomous mode on if condition
-		uint8 disable_const = 1;
-		current_indicator_status->report = disable_const;
+		current_indicator_status.report = autoware_vehicle_msgs::msg::TurnIndicatorsReport::DISABLE;
 		turn_indicators_report_pub->publish(current_indicator_status);
 
 		if(no_imu_string !=_sd_gps_imu){ //If we have specified an IMU is present, publish an IMU message
