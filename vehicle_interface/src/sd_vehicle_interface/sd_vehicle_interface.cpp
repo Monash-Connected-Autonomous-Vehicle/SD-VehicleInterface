@@ -191,6 +191,7 @@ int main(int argc, char **argv)
 			//Populate the Can frames with calculated data
 			sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
 			sd::PopControl2CANData(CustomerControl2CANTx, true);
+			cout << CustomerControl2CANTx.data[5] << endl;
 			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargeTireAngle_Rad);
 		} else{
 			autonomous_entry = node->now();
