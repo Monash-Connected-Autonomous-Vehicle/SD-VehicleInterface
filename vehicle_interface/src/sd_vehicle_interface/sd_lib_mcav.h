@@ -98,7 +98,10 @@ namespace sd{
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
     void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B) {
 		// Check which kind of frame we have received and update data accordingly
-		if (frame.id == 0x100) { // StreetDrone_Control_1
+		if (frame.id == 0x104) { 
+			bool Left_Indicator_Command_B = frame.data[5] & 0x08; // bit 44 (0b0000 1000)
+			bool Right_Indicator_Command_B = frame.data[5] & 0x10;
+		} if (frame.id == 0x100) { // StreetDrone_Control_1
 			bool steer_automation_available = frame.data[7] & 0x01; // bit 56 (0b0000 0001)
 			bool steer_automation_granted = frame.data[7] & 0x40; // bit 57 (0b0100 0000)
 			bool torque_automation_available = frame.data[7] & 0x10; // bit 60 (0b0001 0000)
@@ -238,12 +241,4 @@ namespace sd{
 	- Hexadecimal bitwise operation to assign variables Boolean truth values
 	- Create a function with this? Based on SteeringReport.idl from SteeringReport message?
 	*/
-    void turn_indicators_status(can_msgs::msg::Frame& frame) {
-		// Check which kind of frame we have received and update data accordingly
-		if (frame.id == 0x104) { 
-			bool Left_Indicator_Command_B = frame.data[5] & 0x08; // bit 44 (0b0000 1000)
-			bool Right_Indicator_Command_B = frame.data[5] & 0x10; // bit 43 (0b0001 0000)
-
-			}
-		}
 	}
