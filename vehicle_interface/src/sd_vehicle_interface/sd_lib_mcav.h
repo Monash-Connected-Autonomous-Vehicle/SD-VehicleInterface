@@ -96,11 +96,17 @@ namespace sd{
 	
 	/*ParseRxCanDataSDCan
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
-    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B) {
+    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B, bool& Left_Indicator_Command, bool& Right_Indicator_Command, bool& Disabled) {
 		// Check which kind of frame we have received and update data accordingly
-		if (frame.id == 0x104) { // StreetDrone_Control_1
-			bool Left_Indicator_Command = frame.data[5] & 0x01; // bit 56 (0b0000 0001)
-			bool Right_Indicator_Command = frame.data[5] & 0x40; // bit 57 (0b0100 0000)
+		if (frame.id == 0x104) { 
+			Left_Indicator_Command = frame.data[5] & 0x08; // bit 44 (0b0000 1000)
+			Right_Indicator_Command = frame.data[5] & 0x10; // bit 43 (0b0001 0000)
+
+			if (Left_Indicator_Command_B == false && Right_Indicator_Command_B == false) {
+				Disabled = true;
+			} else {
+				Disabled = false;
+			}
 		}
 		if (frame.id == 0x100) { // StreetDrone_Control_1
 			bool steer_automation_available = frame.data[7] & 0x01; // bit 56 (0b0000 0001)
