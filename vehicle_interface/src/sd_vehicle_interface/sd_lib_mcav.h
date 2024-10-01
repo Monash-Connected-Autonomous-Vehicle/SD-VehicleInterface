@@ -130,8 +130,9 @@ namespace sd{
 				CurrentLinearVelocity_Mps = (CurrentVelocity16bit*KPH_TO_MPS);
 			}
 		} else if (frame.id == 0x117) { // StreetDrone_Data_2
+			// Refer to page 39 for more info
 			uint8_t byte0 = frame.data[0];
-			uint8_t byte1 = frame.data[1];
+			// uint8_t byte1 = frame.data[1];
 
 			int TwizyHornB = byte0 & (1 << 7);
 			int TwizyBrakeLightB = byte0 & (1 << 6);
@@ -142,11 +143,20 @@ namespace sd{
 			int TwizyDippedLightsB = byte0 & (1 << 1);
 			int TwizyMainBeamB = byte0 & (1 << 0);
 
-			int RemoteAutoModeAckB = = byte1 & (1 << 3);
+			// int RemoteAutoModeAckB = byte1 & (1 << 3);
 
-			if (Twizy_Right_Indicator_B) {
-				std::cout << "right indicator: " << Twizy_Right_Indicator_B << std::endl;
-			}
+			// std::cout << "here in " << std::endl;
+			// if (TwizyHornB || 
+			// 	TwizyBrakeLightB || 
+			// 	TwizyReverseLightB || 
+			// 	TwizyLeftIndicatorB || 
+			// 	TwizyRightIndicatorB || 
+			// 	TwizySideLightsB || 
+			// 	TwizyDippedLightsB || 
+			// 	TwizyMainBeamB || 
+			// 	RemoteAutoModeAckB) {
+			// 	std::cout << "right indicator: " << TwizyRightIndicatorB << std::endl;
+			// }
 		}
 	}
 	/*Inputs

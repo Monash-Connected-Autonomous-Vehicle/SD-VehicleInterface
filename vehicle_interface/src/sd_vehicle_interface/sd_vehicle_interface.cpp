@@ -85,9 +85,28 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
     CurrentTwistLinearNDT_Mps = msg->twist.linear.x; //mps to kph
 }
 
+void GearCommandControl_callback(const std::shared_ptr<autoware_auto_control_msgs::msg::GearCommand> msg){
+
+	//Wtf do I put here, bruh. Needs more investigation, will leave it for now. 
+	GearPositionCommand = msg
+};
+
+void HazardLightsCommand_callback(const std::shared_ptr<autoware_auto_control_msgs::msg::HazardLightsCommand> msg){
+
+};
+
+void TurnIndicatorsCommand_callback(const std::shared_ptr<autoware_auto_control_msgs::msg::TurnIndicatorsCommand> msg){
+
+}
+
+void ActuationCommand_callback(const std::shared_ptr<autoware_auto_control_msgs::msg::ActuationCommandStamped> msg){
+	
+}
+
+
 int main(int argc, char **argv)
 {
-
+	
 	rclcpp::init(argc, argv);
     auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
 	node->declare_parameter<std::string>("sd_vehicle", "env200");
@@ -108,10 +127,17 @@ int main(int argc, char **argv)
 	sensor_msgs::msg::Imu current_IMU;
 	sd_msgs::msg::SDControl SD_Current_Control;
 	
+	
 	//Subscriber
-    auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
-    auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
-    auto ackermann_cmd_sub = node->create_subscription<autoware_control_msgs::msg::Control>("/control/command/control_cmd", 100, AckermannCommand_callback);
+    auto ReceivedFrameCANRx_sub = node -> create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
+    auto current_velocity_sub = node -> create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
+    auto ackermann_cmd_sub = node -> create_subscription<autoware_auto_control_msgs::msg::AckermannControlCommand>("/control/command/control_cmd", 100, AckermannCommand_callback);
+	auto gear_cmd_sub = node -> create_subscription<autoware_auto_control_msgs::msg::GearControlCommand>("/control/command/gear_cmd", 100 , GearCommandControl_callback);
+	auto hazard_lights_cmd_sub = node -> create_subscription<autoware_auto_control_msgs::msg::HazardLightsCommand>("/control/command/hazard_lights_cmd", 100, HazardLightsCommand_callback); 
+	auto turn_indicators_cmd_sub = node -> create_subscription<autoware_auto_control_msgs::msg::TurnIndicatorsCommand>("/control/command/turn_indicators_cmd", 100, TurnIndicatorsCommand_callback);
+	auto actuation_cmd_pub = node -> create_subscription<autoware_auto_control_msgs::msg::ActuationCommandStamped>("/control/command/actuation_cmd", 100, ActuationCommand_callback);
+	
+	//include emergency
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
@@ -119,6 +145,7 @@ int main(int argc, char **argv)
     auto current_GPS_pub = node->create_publisher<sensor_msgs::msg::NavSatFix>("sd_current_GPS", 100);
 	auto current_IMU_pub = node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw",100);
     auto sd_control_pub = node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1); // in the original ROS1 interface from StreetDrone, this topic was latched.
+
 
 
     rclcpp::Rate loop_rate(ROS_LOOP);
