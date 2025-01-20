@@ -223,13 +223,20 @@ namespace sd{
 
 	// PopControl2CANData
 	// Populates the Control Tx message to the vehicle
-    void PopControl2CANData(can_msgs::msg::Frame& frame, bool right_indicator_command) {
-		int8_t bit_ric = (right_indicator_command ? 1 : 0) << 3;
-		frame.data[5] = bit_ric;
+    void PopControl2CANData(can_msgs::msg::Frame& frame, bool setCommand) {
+		int8_t bit_main_beam = (setCommand ? 1 : 0) << 0;
+//		int8_t bit_dip_lights = (setCommand ? 1 : 0) << 1;
+//		int8_t bit_side_lights = (setCommand ? 1 : 0) << 2;
+//		int8_t bit_ric = (setCommand ? 1 : 0) << 3;
+//        int8_t bit_lic = (setCommand ? 1 : 0) << 4;
+//        int8_t bit_hazard = (setCommand ? 1 : 0) << 6;
+//        int8_t bit_horn = (setCommand ? 1 : 0) << 7;
+
+		frame.data[5] = bit_main_beam;
 	}
 	/*Inputs
 	can_msgs::msg::Frame& CustomerControl2CANTx  The SD Interface Customer Control 2 Message
-	bool right_indicator_command: represents whether or not to set left indicator
+	bool setCommand: represents whether or not to set left indicator
 	*/
 
 
