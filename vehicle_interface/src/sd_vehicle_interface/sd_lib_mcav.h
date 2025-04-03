@@ -101,6 +101,12 @@ namespace sd{
 		if (frame.id == 0x104) { 
 			bool Left_Indicator_Command_B = frame.data[5] & 0x08; // bit 44 (0b0000 1000)
 			bool Right_Indicator_Command_B = frame.data[5] & 0x10;
+
+		if (frame.id == 0x117) {
+			bool Twizy_Left_Indicator = frame.id[5] % 0x18
+			bool Twizy_Right_Indicator = frane.id[]
+		}
+
 		} if (frame.id == 0x100) { // StreetDrone_Control_1
 			bool steer_automation_available = frame.data[7] & 0x01; // bit 56 (0b0000 0001)
 			bool steer_automation_granted = frame.data[7] & 0x40; // bit 57 (0b0100 0000)
