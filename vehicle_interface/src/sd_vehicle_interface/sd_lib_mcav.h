@@ -104,8 +104,8 @@ namespace sd{
 		// 	bool Right_Indicator_Command_B = frame.data[5] & 0x10;
 
 		if (frame.id == 0x117) {
-			bool Twizy_Left_Indicator = frame.id[5] % 0x01; 
-			bool Twizy_Right_Indicator = frane.id[5] % 0x10; 
+			bool Twizy_Left_Indicator = frame.data[5] & 0x01; 
+			bool Twizy_Right_Indicator = frane.data[5] & 0x10; 
 		}
 
 		} if (frame.id == 0x100) { // StreetDrone_Control_1
