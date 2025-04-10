@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2020 StreetDrone Limited - All rights reserved
- * 
+ *
  * Author: Fionán O'Sullivan
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,17 +28,16 @@
  *
  */
 
-  
 #include "can_msgs/msg/frame.hpp"
-#include "sd_typedefs.h"
-#include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
+#include "sd_typedefs.h"
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
 
-//Constants
+// Constants
 
-//Variances calcualted from standard deviation in OXTS Manual
+// Variances calcualted from standard deviation in OXTS Manual
 #define Orientation_X_Variance (2.74155703e-7)
 #define Orientation_Y_Variance (2.74155703e-7)
 #define Orientation_Z_Variance (0.00000304617)
@@ -48,46 +47,31 @@
 #define Accel_X_Variance (2.4059025e-10)
 #define Accel_Y_Variance (2.4059025e-10)
 #define Accel_Z_Variance (2.4059025e-10)
-#define Variance_Unkown (0) //Variance for PEAK not currently known
+#define Variance_Unkown (0) // Variance for PEAK not currently known
 
-#define  DEG_to_RAD  (0.0174533)		//Conversion constant from deg to rad
+#define DEG_to_RAD (0.0174533) // Conversion constant from deg to rad
 
+namespace sd {
+// Structs
+// Used for storing Quaternion
+struct Quaternion {
+  double w, x, y, z;
+};
 
+// Functions
 
-using namespace std;
+// Converts from Euler to Quaternion format.
+Quaternion ToQuaternion(double, double, double); // yaw (Z), pitch (Y), roll (X)
 
-namespace sd{
-	//Structs
-	//Used for storing Quaternion
-	struct Quaternion
-	{
-		double w, x, y, z;
-	};
+void ParseRxCANDataOXTSCan(can_msgs::msg::Frame &, double &, double &, double &,
+                           double &, double &, double &, double &, double &,
+                           double &, double &, double &, double &);
 
-	//Functions
+void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &, double &, double &, double &,
+                           double &, double &, double &, double &, double &,
+                           double &, double &, double &, double &);
 
-	//Converts from Euler to Quaternion format. 
-	Quaternion ToQuaternion(double, double, double); // yaw (Z), pitch (Y), roll (X)
+void PackImuMessage(bool, sensor_msgs::msg::Imu &, double, double, double,
+                    double, double, double, double, double, double);
 
-
-
-	void ParseRxCANDataOXTSCan(can_msgs::msg::Frame&,
-													double&,
-													double&, double&, 
-													double&,  double&,  double&,
-													double&, double&, double&,
-													double&, double&, double&);
-														
-		
-	void ParseRxCANDataPEAKCan(can_msgs::msg::Frame&,
-													double&,
-													double&, double&, 
-													double&,  double&,  double&,
-													double&, double&, double&,
-													double&, double&, double&);
-														
-		
-	void PackImuMessage(bool, sensor_msgs::msg::Imu&, double, double, double, double, double, double, double, double, double);
-
-
-}
+} // namespace sd
