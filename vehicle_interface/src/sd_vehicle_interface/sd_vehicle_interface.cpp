@@ -34,6 +34,7 @@ using namespace std;
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
 #include "autoware_control_msgs/msg/control.hpp"
+#include "autoware_vehicle_msgs/msg/control_mode_report.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
