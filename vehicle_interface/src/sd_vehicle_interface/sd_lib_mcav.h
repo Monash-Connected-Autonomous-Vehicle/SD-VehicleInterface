@@ -150,6 +150,11 @@ void InitSDInterfaceControl(can_msgs::msg::Frame &frame) {
   frame.id = 0x101; // customer Control frame id constant
 }
 
+void InitSDInterfaceControl2(can_msgs::msg::Frame &frame) {
+  frame.dlc = 8;    // length of data (bytes)
+  frame.id = 0x104; // customer Control frame id constant
+}
+
 void InitSDInterfaceFeedback(can_msgs::msg::Frame &frame) {
   frame.dlc = 8;    // length of data (bytes)
   frame.id = 0x103; // customer Feedback frame id
@@ -191,6 +196,15 @@ void PopControlCANData(can_msgs::msg::Frame &frame, int8_t torque_request_pc,
                        int8_t steer_request_pc, uint8_t aliveCount) {
   frame.data[2] = steer_request_pc;  // Steer_Request
   frame.data[3] = torque_request_pc; // Torque_Request
+  SetCRC(frame, aliveCount);
+}
+
+/**
+ * Populate the Customer_Control_2 CAN frame.
+ */
+void PopControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
+                        uint8_t aliveCount) {
+  frame.data[5] = frame.data[5] | 0x00000010;
   SetCRC(frame, aliveCount);
 }
 

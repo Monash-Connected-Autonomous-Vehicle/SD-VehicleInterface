@@ -28,10 +28,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#include <memory>
 using namespace std;
 
-#include "sd_vehicle_interface.h"
 #include "autoware_control_msgs/msg/control.hpp"
+#include "autoware_vehicle_msgs/msg/HazardLightsCommand.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
@@ -40,6 +41,7 @@ using namespace std;
 #include "sd_gps_imu.h"
 #include "sd_lib_mcav.h"
 #include "sd_msgs/msg/sd_control.hpp"
+#include "sd_vehicle_interface.h"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include <can_msgs/msg/frame.hpp>
@@ -110,6 +112,18 @@ void CurrentVelocity_callback(
   CurrentTwistLinearNDT_Mps = msg->twist.linear.x; // mps to kph
 }
 
+/**
+ * Receive hazard lights command from Ackermann and populate
+ * TargetHazardLightsCmd variable
+ */
+void AckermannHazard_callback(
+    const std::shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand>
+        msg) {
+  TargetHazardLightsCmd = msg->command;
+  // testing
+  std::cout << "TargetHazardLightsCmd: " << TargetHazardLightsCmd << "\n";
+}
+
 // ===== MAIN FUNCTION =====
 
 int main(int argc, char **argv) {
@@ -131,8 +145,10 @@ int main(int argc, char **argv) {
   _sd_simulation_mode = node->get_parameter("sd_simulation_mode").as_bool();
 
   // initialise CAN variables
-  sd::InitSDInterfaceControl(CustomerControlCANTx);     // sent to vehicle
+  sd::InitSDInterfaceControl(CustomerControlCANTx);     // Customer_Control_1
   sd::InitSDInterfaceFeedback(ControllerFeedbackCANTx); // receive feedback data
+  sd::InitSDInterfaceControl2(
+      CustomerControlAuxiliaryCANTx); // Customer_Control_2
 
   // message objects (stores incoming data)
   geometry_msgs::msg::TwistStamped current_Twist; // speed + steer
@@ -151,11 +167,16 @@ int main(int argc, char **argv) {
   auto ackermann_cmd_sub =
       node->create_subscription<autoware_control_msgs::msg::Control>(
           "/control/command/control_cmd", 100, AckermannCommand_callback);
+  // get hazard lights target from Ackermann
+  auto ackerman_hazard_sub = node->create_subscription<
+      autoware_vehicle_msgs::msg::HazardLightsCommand>(
+      "/control/command/hazard_lights_cmd", 100, AckermannHazard_callback);
 
   // Publishers
   // control commands (for ENV200)
   auto sent_msgs_pub =
       node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
+
   // current velocity
   auto current_twist_pub =
       node->create_publisher<geometry_msgs::msg::TwistStamped>(
@@ -250,22 +271,30 @@ int main(int argc, char **argv) {
                   FF_Contribution_Pc);
         }
 
+        // get hazard lights request
+        FinalHazardLightsRequest =
+            auxiliarycontroller::GetHazardLightsRequest(TargetHazardLightsCmd);
+
         // set and publish steer/torque requests
         SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
         SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
         sd_control_pub->publish(SD_Current_Control);
       }
 
-      // populate CAN frame with control values
+      // populate Customer_Control_1 CAN frame with calculated values
       sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc,
                             FinalDBWSteerRequest_Pc, AliveCounter_Z);
+      // populate Customer_Control_2
+      sd::PopControl2CANData(CustomerControlAuxiliaryCANTx,
+                             FinalHazardLightsRequest, AliveCounter_Z);
     } else { // not autonomous or simulation mode
       autonomous_entry = node->now();
     }
 
     // not simulation mode - publish control commands to vehicle
     if (!_sd_simulation_mode) {
-      sent_msgs_pub->publish(CustomerControlCANTx); // output CAN data
+      sent_msgs_pub->publish(CustomerControlCANTx);
+      sent_msgs_pub->publish(CustomerControlAuxiliaryCANTx);
       sent_msgs_pub->publish(ControllerFeedbackCANTx);
     }
 

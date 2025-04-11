@@ -71,8 +71,13 @@ double IMU_Rate_Z = 0;
 double IMU_Accel_X = 0;
 double IMU_Accel_Y = 0;
 double IMU_Accel_Z = 0;
-double TargetTwistLinear_Mps;   // Target Twist linear in m/s
-double TargeTireAngle_Rad;      // Target Twist angular in deg/s
+double TargetTwistLinear_Mps; // Target Twist linear in m/s
+double TargeTireAngle_Rad;    // Target Twist angular in deg/s
+// Auxiliary control
+uint8_t TargetHazardLightsCmd; // Hazard lights command received from autoware
+bool FinalHazardLightsRequest; // Request populated to CAN frame to vehicle
+
+//
 uint8_t AliveCounter_Z = 0;     // Alive Counter, increments every cycle
 bool AutomationArmed_B = false; // Boolean, true if safety driver turns mode
                                 // switch to autonomous mode
@@ -93,13 +98,15 @@ int D_Contribution_Pc = 0;  // The torque contributed by derivative gain
 int FF_Contribution_Pc = 0; // The torque contributed by feedforward gain
 
 // Ros variables
-can_msgs::msg::Frame ReceivedFrameCANRx;   // Create the can frame that will be
-                                           // store received can messages
-can_msgs::msg::Frame CustomerControlCANTx; // Create the can frame that will be
-                                           // outputted onto the canbus
-can_msgs::msg::Frame
-    ControllerFeedbackCANTx; // Create the frame that will supply feedback data
-                             // to engineers tuning controller
+
+// CAN frame received from vehicle
+can_msgs::msg::Frame ReceivedFrameCANRx;
+// Customer_Control_1 CAN frame (0x101), sent to CAN bus
+can_msgs::msg::Frame CustomerControlCANTx;
+// Customer_Control_2 CAN frame (0x104), sent to CAN bus
+can_msgs::msg::Frame CustomerControlAuxiliaryCANTx;
+// feedback CAN frame (0x103), supplies data to tune controller (UNUSED)
+can_msgs::msg::Frame ControllerFeedbackCANTx;
 
 // ros::Publisher sent_msgs_pub;
 // ros::Publisher current_twist_pub;
