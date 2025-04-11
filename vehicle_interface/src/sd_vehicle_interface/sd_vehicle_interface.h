@@ -29,6 +29,8 @@
  *
  */
 
+using namespace std
+
 #include <cstdint>
 #include <string>
 
@@ -37,9 +39,10 @@
 // Constants
 #define RAD_to_DEG (57.2958)   // Conversion constant from rad to deg
 #define DEG_to_RAD (0.0174533) // Conversion constant from deg to rad
-const double UNDO_STREETDRONE_SCALING_FACTOR =
-    50; // MCAV note: we create this to convert the reported speed to actually
-        // be in meters per second. Previously, the code was not correctly
+    const double UNDO_STREETDRONE_SCALING_FACTOR =
+        50; // MCAV note: we create this to convert the reported speed to
+            // actually be in meters per second. Previously, the code was not
+            // correctly
 // interpreting the CAN frames
 
 // rate at which we publish data
@@ -114,17 +117,17 @@ can_msgs::msg::Frame ControllerFeedbackCANTx;
 // ros::Publisher current_IMU_pub;
 // ros::Publisher sd_control_pub;
 
-static std::string _sd_vehicle;
-static std::string _sd_gps_imu;
-static std::string _sd_speed_source;
+static string _sd_vehicle;
+static string _sd_gps_imu;
+static string _sd_speed_source;
 static bool _sd_simulation_mode;
 
-static std::string twizy_string = "twizy";
+static string twizy_string = "twizy";
 
-static std::string oxts_string = "oxts";
-static std::string peak_string = "peak";
-static std::string no_imu_string = "none";
+static string oxts_string = "oxts";
+static string peak_string = "peak";
+static string no_imu_string = "none";
 
-static std::string vehicle_can_speed_string = "vehicle_can_speed";
-static std::string imu_speed_string = "imu_speed";
-static std::string ndt_speed_string = "ndt_speed";
+static string vehicle_can_speed_string = "vehicle_can_speed";
+static string imu_speed_string = "imu_speed";
+static string ndt_speed_string = "ndt_speed";

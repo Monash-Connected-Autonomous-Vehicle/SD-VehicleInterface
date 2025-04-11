@@ -57,8 +57,7 @@ using namespace std;
  * Inputs:
  *   - msg: shared pointer to received CAN frame
  */
-void ReceivedFrameCANRx_callback(
-    const std::shared_ptr<can_msgs::msg::Frame> msg) {
+void ReceivedFrameCANRx_callback(const shared_ptr<can_msgs::msg::Frame> msg) {
 
   // copy CAN frame into ReceivedFrameCANRx
   ReceivedFrameCANRx = *msg.get();
@@ -95,7 +94,7 @@ void ReceivedFrameCANRx_callback(
  * extract twist angular and linear commands from autoware
  */
 void AckermannCommand_callback(
-    const std::shared_ptr<autoware_control_msgs::msg::Control> msg) {
+    const shared_ptr<autoware_control_msgs::msg::Control> msg) {
   // Populate a twist angular and twist linear message with the received message
   // from Ros topic and convert to deg/s
   TargeTireAngle_Rad = msg->lateral.steering_tire_angle; // Radians
@@ -107,7 +106,7 @@ void AckermannCommand_callback(
  * extract current forward speed from NDT (speed source)
  */
 void CurrentVelocity_callback(
-    const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg) {
+    const shared_ptr<geometry_msgs::msg::TwistStamped> msg) {
   // Current Velocity Reported from NDT
   CurrentTwistLinearNDT_Mps = msg->twist.linear.x; // mps to kph
 }
@@ -117,11 +116,10 @@ void CurrentVelocity_callback(
  * TargetHazardLightsCmd variable
  */
 void AckermannHazard_callback(
-    const std::shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand>
-        msg) {
+    const shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand> msg) {
   TargetHazardLightsCmd = msg->command;
   // testing
-  std::cout << "TargetHazardLightsCmd: " << TargetHazardLightsCmd << "\n";
+  cout << "TargetHazardLightsCmd: " << TargetHazardLightsCmd << "\n";
 }
 
 // ===== MAIN FUNCTION =====
@@ -135,11 +133,11 @@ int main(int argc, char **argv) {
   // create node + declare parameters:
   //   "sd_vehicle", "sd_gps_imu", "sd_speed_source", "sd_simulation_mode"
   auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
-  node->declare_parameter<std::string>("sd_vehicle", "env200");
+  node->declare_parameter<string>("sd_vehicle", "env200");
   _sd_vehicle = node->get_parameter("sd_vehicle").as_string();
-  node->declare_parameter<std::string>("sd_gps_imu", "oxts");
+  node->declare_parameter<string>("sd_gps_imu", "oxts");
   _sd_gps_imu = node->get_parameter("sd_gps_imu").as_string();
-  node->declare_parameter<std::string>("sd_speed_source", "vehicle_can_speed");
+  node->declare_parameter<string>("sd_speed_source", "vehicle_can_speed");
   _sd_speed_source = node->get_parameter("sd_speed_source").as_string();
   node->declare_parameter<bool>("sd_simulation_mode", false);
   _sd_simulation_mode = node->get_parameter("sd_simulation_mode").as_bool();
