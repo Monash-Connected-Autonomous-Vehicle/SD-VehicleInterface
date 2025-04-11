@@ -29,7 +29,7 @@
  *
  */
 
-using namespace std
+using namespace std;
 
 #include <cstdint>
 #include <string>
@@ -39,10 +39,10 @@ using namespace std
 // Constants
 #define RAD_to_DEG (57.2958)   // Conversion constant from rad to deg
 #define DEG_to_RAD (0.0174533) // Conversion constant from deg to rad
-    const double UNDO_STREETDRONE_SCALING_FACTOR =
-        50; // MCAV note: we create this to convert the reported speed to
-            // actually be in meters per second. Previously, the code was not
-            // correctly
+const double UNDO_STREETDRONE_SCALING_FACTOR =
+    50; // MCAV note: we create this to convert the reported speed to
+        // actually be in meters per second. Previously, the code was not
+        // correctly
 // interpreting the CAN frames
 
 // rate at which we publish data
