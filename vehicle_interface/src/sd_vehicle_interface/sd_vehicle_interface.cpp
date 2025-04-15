@@ -32,11 +32,12 @@
 using namespace std;
 
 #include "autoware_control_msgs/msg/control.hpp"
-#include "autoware_vehicle_msgs/msg/HazardLightsCommand.hpp"
+#include "autoware_vehicle_msgs/msg/hazard_lights_command.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "sd_auxiliary_controller.h"
 #include "sd_control.h"
 #include "sd_gps_imu.h"
 #include "sd_lib_mcav.h"

@@ -204,7 +204,9 @@ void PopControlCANData(can_msgs::msg::Frame &frame, int8_t torque_request_pc,
  */
 void PopControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
                         uint8_t aliveCount) {
-  frame.data[5] = frame.data[5] | 0x00000010;
+  if (hazardLightsRequest) {
+    frame.data[5] = frame.data[5] | 0x00000010;
+  }
   SetCRC(frame, aliveCount);
 }
 
