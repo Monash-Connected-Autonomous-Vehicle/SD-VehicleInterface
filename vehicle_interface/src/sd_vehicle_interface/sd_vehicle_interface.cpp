@@ -32,7 +32,9 @@
 using namespace std;
 
 #include "autoware_control_msgs/msg/control.hpp"
+#include "autoware_vehicle_msgs/msg/gear_command.hpp"
 #include "autoware_vehicle_msgs/msg/hazard_lights_command.hpp"
+#include "autoware_vehicle_msgs/msg/turn_indicators_command.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
