@@ -84,6 +84,7 @@ double TargetSteeringTireRotationRate; // Steering angle rate of change (rad/s)
 // Auxiliary control
 uint8_t TargetHazardLightsCmd; // Hazard lights command received from autoware
 uint8_t TargetIndicatorsCmd;   // Indicators command received from autoware
+uint8_t TargetGearCmd;         // Gear command received from autoware
 
 // Requests populated to CAN frame to vehicle
 bool FinalHazardLightsRequest;

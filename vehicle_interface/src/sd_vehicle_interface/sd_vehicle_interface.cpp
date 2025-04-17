@@ -131,6 +131,13 @@ void AckermannIndicators_callback(
   cout << "TargetIndicatorsCmd: " << TargetHazardLightsCmd << "\n";
 }
 
+void AckermannGear_callback(
+    const shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg) {
+  TargetGearCmd = msg->command;
+  // testing
+  cout << "TargetGearCmd: " << TargetHazardLightsCmd << "\n";
+}
+
 // ===== MAIN FUNCTION =====
 
 int main(int argc, char **argv) {
@@ -183,6 +190,9 @@ int main(int argc, char **argv) {
       autoware_vehicle_msgs::msg::TurnIndicatorsCommand>(
       "/control/command/turn_indicators_cmd	", 100,
       AckermannIndicators_callback);
+  auto ackerman_gear_sub =
+      node->create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
+          "/control/command/gear_cmd", 100, AckermannGear_callback);
 
   // Publishers
   // control commands (for ENV200)
@@ -218,9 +228,8 @@ int main(int argc, char **argv) {
     } else if (vehicle_can_speed_string == _sd_speed_source) {
       CurrentTwistLinearSD_Mps_Final = CurrentTwistLinearCANSD_Mps;
     } else {
-      RCLCPP_WARN(
-          node->get_logger(),
-          "SD_Vehicle_Interface parameter for sd_speed_source is not valid\n");
+      RCLCPP_WARN(node->get_logger(), "SD_Vehicle_Interface parameter for "
+                                      "sd_speed_source is not valid\n");
     }
 
     // ===== UPDATE MESSAGES =====
@@ -246,7 +255,8 @@ int main(int argc, char **argv) {
     // request autonomous control if desired (at set frequency)
     if (0 == (AliveCounter_Z % CONTROL_LOOP)) {
       if (AutomationArmed_B) {
-        // driver armed the vehicle for autonomous, request torque/steer control
+        // driver armed the vehicle for autonomous, request torque/steer
+        // control
         sd::RequestAutonomousControl(CustomerControlCANTx, AliveCounter_Z);
       } else {
         // fill CAN frame with 0s
