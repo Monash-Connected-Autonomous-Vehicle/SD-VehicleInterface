@@ -98,9 +98,10 @@ void AckermannCommand_callback(
     const shared_ptr<autoware_control_msgs::msg::Control> msg) {
   // Populate a twist angular and twist linear message with the received message
   // from Ros topic and convert to deg/s
-  TargeTireAngle_Rad = msg->lateral.steering_tire_angle; // Radians
+  TargetTireAngle_Rad = msg->lateral.steering_tire_angle; // Radians
   TargetTwistLinear_Mps =
       msg->longitudinal.velocity / UNDO_STREETDRONE_SCALING_FACTOR; // still Mps
+  TargetSteeringTireRotationRate = msg->lateral.steering_tire_rotation_rate;
 }
 
 /**
@@ -265,7 +266,7 @@ int main(int argc, char **argv) {
         // calculate steer request
         // (PID and FeedForward Contributions to Torque Controller)
         FinalDBWSteerRequest_Pc =
-            speedcontroller::CalculateSteerRequest(TargeTireAngle_Rad);
+            speedcontroller::CalculateSteerRequest(TargetTireAngle_Rad);
 
         // calculate torque request (different per vehicle)
         if (twizy_string == _sd_vehicle) {

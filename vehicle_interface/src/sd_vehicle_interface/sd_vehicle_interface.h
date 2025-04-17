@@ -74,8 +74,12 @@ double IMU_Rate_Z = 0;
 double IMU_Accel_X = 0;
 double IMU_Accel_Y = 0;
 double IMU_Accel_Z = 0;
-double TargetTwistLinear_Mps; // Target Twist linear in m/s
-double TargeTireAngle_Rad;    // Target Twist angular in deg/s
+
+// === Ackermann Targets ===
+
+double TargetTwistLinear_Mps;          // Target Twist linear in m/s
+double TargetTireAngle_Rad;            // Target Twist angular in deg/s
+double TargetSteeringTireRotationRate; // Steering angle rate of change (rad/s)
 
 // Auxiliary control
 uint8_t TargetHazardLightsCmd; // Hazard lights command received from autoware
