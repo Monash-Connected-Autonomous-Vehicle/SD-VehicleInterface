@@ -299,8 +299,10 @@ int main(int argc, char **argv) {
         FinalHazardLightsRequest =
             auxiliarycontroller::GetHazardLightsRequest(TargetHazardLightsCmd);
 
-        [ FinalIndicatorLeftRequest, FinalIndicatorRightRequest ] =
-            auxiliarycontroller::GetIndicatorsRequest(TargetIndicatorsCmd);
+        FinalIndicatorLeftRequest =
+            auxiliarycontroller::GetIndicatorLeftRequest(TargetIndicatorsCmd);
+        FinalIndicatorRightRequest =
+            auxiliarycontroller::GetIndicatorRightRequest(TargetIndicatorsCmd);
 
         // set and publish steer/torque requests
         SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
