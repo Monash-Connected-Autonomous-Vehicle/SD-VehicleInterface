@@ -90,7 +90,7 @@ void ResetControlCanData(can_msgs::msg::Frame &, uint8_t);
 void UpdateControlAlive(can_msgs::msg::Frame &, uint8_t);
 
 /*
- * Set steer/torque request in Customer_Control_1 CAN Tx message
+ * Set steer/torque request in Customer_Control_1 CAN frame
  *
  * Inputs:
  * - can_msgs::msg::Frame& CustomerControlCANTx:  The SD Interface Control
@@ -103,6 +103,13 @@ void UpdateControlAlive(can_msgs::msg::Frame &, uint8_t);
  *   200Hz). Protects again stale CAN data*
  */
 void PopControlCANData(can_msgs::msg::Frame &, int8_t, int8_t, uint8_t);
+
+/**
+ * Set auxiliary controls in Customer_Control_2 CAN Tx frame
+ */
+void PopControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
+                        bool leftIndicatorRequest, bool rightIndicatorRequest,
+                        uint8_t aliveCount);
 
 /*
  * Populates the Feedback CAN message (optional, unimplemented)

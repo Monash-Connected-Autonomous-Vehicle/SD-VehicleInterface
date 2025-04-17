@@ -123,6 +123,13 @@ void AckermannHazard_callback(
   cout << "TargetHazardLightsCmd: " << TargetHazardLightsCmd << "\n";
 }
 
+void AckermannIndicators_callback(
+    const shared_ptr<autoware_vehicle_msgs::msg::TurnIndicatorsCommand> msg) {
+  TargetIndicatorsCmd = msg->command;
+  // testing
+  cout << "TargetIndicatorsCmd: " << TargetHazardLightsCmd << "\n";
+}
+
 // ===== MAIN FUNCTION =====
 
 int main(int argc, char **argv) {
@@ -170,6 +177,11 @@ int main(int argc, char **argv) {
   auto ackerman_hazard_sub = node->create_subscription<
       autoware_vehicle_msgs::msg::HazardLightsCommand>(
       "/control/command/hazard_lights_cmd", 100, AckermannHazard_callback);
+  // get turn indicators target from Ackermann
+  auto ackerman_indicators_sub = node->create_subscription<
+      autoware_vehicle_msgs::msg::TurnIndicatorsCommand>(
+      "/control/command/turn_indicators_cmd	", 100,
+      AckermannIndicators_callback);
 
   // Publishers
   // control commands (for ENV200)
@@ -274,6 +286,9 @@ int main(int argc, char **argv) {
         FinalHazardLightsRequest =
             auxiliarycontroller::GetHazardLightsRequest(TargetHazardLightsCmd);
 
+        [ FinalIndicatorLeftRequest, FinalIndicatorRightRequest ] =
+            auxiliarycontroller::GetIndicatorsRequest(TargetIndicatorsCmd);
+
         // set and publish steer/torque requests
         SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
         SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
@@ -285,7 +300,9 @@ int main(int argc, char **argv) {
                             FinalDBWSteerRequest_Pc, AliveCounter_Z);
       // populate Customer_Control_2
       sd::PopControl2CANData(CustomerControlAuxiliaryCANTx,
-                             FinalHazardLightsRequest, AliveCounter_Z);
+                             FinalHazardLightsRequest,
+                             FinalIndicatorLeftRequest,
+                             FinalIndicatorRightRequest, AliveCounter_Z);
     } else { // not autonomous or simulation mode
       autonomous_entry = node->now();
     }
@@ -293,7 +310,6 @@ int main(int argc, char **argv) {
     // not simulation mode - publish control commands to vehicle
     if (!_sd_simulation_mode) {
       sent_msgs_pub->publish(CustomerControlCANTx);
-      sent_msgs_pub->publish(CustomerControlAuxiliaryCANTx);
       sent_msgs_pub->publish(ControllerFeedbackCANTx);
     }
 

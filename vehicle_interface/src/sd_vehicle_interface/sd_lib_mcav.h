@@ -203,9 +203,16 @@ void PopControlCANData(can_msgs::msg::Frame &frame, int8_t torque_request_pc,
  * Populate the Customer_Control_2 CAN frame.
  */
 void PopControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
+                        bool leftIndicatorRequest, bool rightIndicatorRequest,
                         uint8_t aliveCount) {
   if (hazardLightsRequest) {
     frame.data[5] = frame.data[5] | 0x00000010;
+  }
+  if (leftIndicatorRequest) {
+    frame.data[5] = frame.data[5] | 0x00001000;
+  }
+  if (rightIndicatorRequest) {
+    frame.data[5] = frame.data[5] | 0x00010000;
   }
   SetCRC(frame, aliveCount);
 }

@@ -76,9 +76,15 @@ double IMU_Accel_Y = 0;
 double IMU_Accel_Z = 0;
 double TargetTwistLinear_Mps; // Target Twist linear in m/s
 double TargeTireAngle_Rad;    // Target Twist angular in deg/s
+
 // Auxiliary control
 uint8_t TargetHazardLightsCmd; // Hazard lights command received from autoware
-bool FinalHazardLightsRequest; // Request populated to CAN frame to vehicle
+uint8_t TargetIndicatorsCmd;   // Indicators command received from autoware
+
+// Requests populated to CAN frame to vehicle
+bool FinalHazardLightsRequest;
+bool FinalIndicatorLeftRequest;
+bool FinalIndicatorRightRequest;
 
 //
 uint8_t AliveCounter_Z = 0;     // Alive Counter, increments every cycle
