@@ -32,19 +32,19 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc
 # Set up workspace structure
 ENV WORKSPACE_DIR=/home/$USERNAME/ros2_ws
 RUN mkdir -p $WORKSPACE_DIR/src
-WORKDIR $WORKSPACE_DIR
+WORKDIR $WORKSPACE_DIR/src
 
-# Install dependencies via rosdep
-RUN rosdep init && rosdep update \
-    && rosdep install --from-paths src --ignore-src -r -y
+# Clone external repositories via build args
+ARG SD_VEHICLE_INTERFACE_REPO=https://github.com/Monash-Connected-Autonomous-Vehicle/SD-VehicleInterface.git
+ARG AUTOWARE_MSGS_REPO=https://github.com/autowarefoundation/autoware_msgs.git
 
-# Copy full source in
-COPY . src/
+RUN git clone $SD_VEHICLE_INTERFACE_REPO \
+    && git clone $AUTOWARE_MSGS_REPO
 
-# Build with colcon
-RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && colcon build --symlink-install"
+# Initialize rosdep (won't install dependencies yet)
+RUN rosdep init && rosdep update
 
-# Change ownership to user
+# Change ownership of workspace
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 
 # Switch to non-root user
