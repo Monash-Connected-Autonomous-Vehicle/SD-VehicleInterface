@@ -30,6 +30,10 @@ RUN groupadd --gid $USER_GID $USERNAME \
 ENV ROS_DISTRO=humble
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc
 
+# Add basic tmux.conf with bash as default shell
+RUN echo "set-option -g default-shell /bin/bash" > /home/$USERNAME/.tmux.conf \
+    && chown $USERNAME:$USERNAME /home/$USERNAME/.tmux.conf
+
 # Set up workspace structure
 ENV WORKSPACE_DIR=/home/$USERNAME/ros2_ws
 WORKDIR $WORKSPACE_DIR

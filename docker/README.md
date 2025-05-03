@@ -6,13 +6,13 @@ Docker is an alternative if you don't have a Ubuntu 22 VM.
 1. Install docker CLI: https://www.docker.com/get-started/
 2. In this folder, run
 ```bash
-docker build -t ros2-vehicle-inteface .
+docker build -t ros2-vehicle-interface .
 ```
 
 3. Run the docker image with the options of your choice
 Main cmd:
 ```bash
-docker run -it --name ros2-vehicle-inteface-container ros2-vehicle-inteface
+docker run -it --name ros2-vehicle-interface-container ros2-vehicle-interface
 ```
 Feel free to change the `--name`
 
@@ -36,12 +36,12 @@ docker ps
 #### Starting and attaching container
 Start container if it has been stopped (i.e. not in `docker ps`)
 ```bash
-docker start <name-of-container>     
+docker start <container_id_or_name>     
 ```
 
 Attach to container to start working in that environment.
 ```bash
-docker exec -it <name-of-container> bash    
+docker exec -it <container_id_or_name> bash    
 ```
 
 #### Container/Image Removal
