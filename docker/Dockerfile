@@ -1,7 +1,7 @@
 # Base image: ROS 2 Humble on Ubuntu 22.04
 FROM ros:humble-ros-core
 
-# Install dev tools and dependencies
+# Install dev tools and dependencies, including tmux
 RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-colcon-common-extensions \
@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     nano \
     vim \
     iputils-ping \
+    tmux \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
@@ -31,20 +32,24 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc
 
 # Set up workspace structure
 ENV WORKSPACE_DIR=/home/$USERNAME/ros2_ws
-RUN mkdir -p $WORKSPACE_DIR/src
-WORKDIR $WORKSPACE_DIR/src
+WORKDIR $WORKSPACE_DIR
+RUN mkdir -p src
 
 # Clone external repositories via build args
 ARG SD_VEHICLE_INTERFACE_REPO=https://github.com/Monash-Connected-Autonomous-Vehicle/SD-VehicleInterface.git
 ARG AUTOWARE_MSGS_REPO=https://github.com/autowarefoundation/autoware_msgs.git
-
+WORKDIR $WORKSPACE_DIR/src
 RUN git clone $SD_VEHICLE_INTERFACE_REPO \
     && git clone $AUTOWARE_MSGS_REPO
 
-# Initialize rosdep (won't install dependencies yet)
-RUN rosdep init && rosdep update
+# Initialize and run rosdep
+WORKDIR $WORKSPACE_DIR
+RUN rosdep init && rosdep update \
+    && apt-get update \
+    && rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO \
+    && apt-get clean
 
-# Change ownership of workspace
+# Change ownership to non-root user
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 
 # Switch to non-root user

@@ -33,7 +33,12 @@ docker ps
 ```
 - Use `-a` flag for all containers (running or not)
 
-#### Attaching container
+#### Starting and attaching container
+Start container if it has been stopped (i.e. not in `docker ps`)
+```bash
+docker start <name-of-container>     
+```
+
 Attach to container to start working in that environment.
 ```bash
 docker exec -it <name-of-container> bash    
@@ -64,3 +69,9 @@ docker rmi -f
 
 #### Editing docker files via VSCode from your host machine
 Don't like vim nor nano? Use VSCode dev: https://marketplace.visualstudio.com/items/?itemName=ms-vscode-remote.remote-containers
+
+#### tmux
+Don't want to open multiple terminals just for docker? Have a look at tmux: https://github.com/tmux/tmux/wiki
+
+#### Rviz2 (experimental)
+https://github.com/adeeb10abbas/ros2-docker-dev/tree/master
