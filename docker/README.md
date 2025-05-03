@@ -1,26 +1,77 @@
 # 🐋 mcav-docker
 Contains Dockerfiles and a run script.
 
-The `run.sh` script builds and runs the image and container.
+Docker is an alternative if you don't have a Ubuntu 22 VM.
 
-The `sd_vehicle_interface` directory is mounted as a volume so it can be accessed from inside and outside the container.
+1. Install docker CLI: https://www.docker.com/get-started/
+2. In this folder, run
+```bash
+docker build -t ros2-vehicle-interface .
+```
 
-Networking and GUIs should work as normal inside and outside.
+3. Run the docker image with the options of your choice
+Main cmd:
+```bash
+docker run -it --name ros2-vehicle-interface-container ros2-vehicle-interface
+```
+Feel free to change the `--name`
 
-## Requirements
-Docker: `sudo apt-get install docker.io`
+Options:
+- Remove container after running: `--rm`
+- Allow it to access USB device: `--device=<path-tod-device>`
 
-## How to use
+## Basics
+#### Exiting container
+```bash
+exit
+```
 
-### First run
-This will build the image if it doesn't exist and enter the container automatically.
+#### Listing containers
+Running containers:
+```bash
+docker ps
+```
+- Use `-a` flag for all containers (running or not)
 
-- `cd sd_vehicle_interface`
-- `docker/run.sh`
+#### Starting and attaching container
+Start container if it has been stopped (i.e. not in `docker ps`)
+```bash
+docker start <container_id_or_name>     
+```
 
-### Rebuild the image
-- `docker/run.sh build`
+Attach to container to start working in that environment.
+```bash
+docker exec -it <container_id_or_name> bash    
+```
 
-### Create a new container from the most recently built image
-- `docker/run.sh rm` (removes the existing container)
-- `docker/run.sh`
+#### Container/Image Removal
+If the container/image is taking too much space, feel free to remove it 
+
+Container:
+1. find id or name using:
+```bash
+docker ps -a
+```
+2. Remove forcefully with: 
+```bash
+docker rm -f <container_id_or_name>
+```
+
+Image:
+1. find id or name with:
+```bash
+docker images
+```
+2. Remove forcefully with: 
+```bash
+docker rmi -f
+```
+
+#### Editing docker files via VSCode from your host machine
+Don't like vim nor nano? Use VSCode dev: https://marketplace.visualstudio.com/items/?itemName=ms-vscode-remote.remote-containers
+
+#### tmux
+Don't want to open multiple terminals just for docker? Have a look at tmux: https://github.com/tmux/tmux/wiki
+
+#### Rviz2 (experimental)
+https://github.com/adeeb10abbas/ros2-docker-dev/tree/master
