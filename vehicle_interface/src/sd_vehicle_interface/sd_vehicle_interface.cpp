@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
   // get turn indicators target from Ackermann
   auto ackerman_indicators_sub = node->create_subscription<
       autoware_vehicle_msgs::msg::TurnIndicatorsCommand>(
-      "/control/command/turn_indicators_cmd	", 100,
+      "/control/command/turn_indicators_cmd", 100,
       AckermannIndicators_callback);
   auto ackerman_gear_sub =
       node->create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
