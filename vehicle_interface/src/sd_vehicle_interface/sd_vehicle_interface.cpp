@@ -123,21 +123,21 @@ void AckermannHazard_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand> msg) {
   TargetHazardLightsCmd = msg->command;
   // testing
-  cout << "TargetHazardLightsCmd: " << TargetHazardLightsCmd << "\n";
+  cout << "TargetHazardLightsCmd: " << (int)TargetHazardLightsCmd << "\n";
 }
 
 void AckermannIndicators_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::TurnIndicatorsCommand> msg) {
   TargetIndicatorsCmd = msg->command;
   // testing
-  cout << "TargetIndicatorsCmd: " << TargetHazardLightsCmd << "\n";
+  cout << "TargetIndicatorsCmd: " << (int)TargetHazardLightsCmd << "\n";
 }
 
 void AckermannGear_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg) {
   TargetGearCmd = msg->command;
   // testing
-  cout << "TargetGearCmd: " << TargetHazardLightsCmd << "\n";
+  cout << "TargetGearCmd: " << (int)TargetHazardLightsCmd << "\n";
 }
 
 // ===== MAIN FUNCTION =====
