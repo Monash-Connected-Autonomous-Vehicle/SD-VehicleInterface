@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2020 StreetDrone Limited - All rights reserved
- * 
+ *
  * Author: Fionán O'Sullivan
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,25 +29,23 @@
  */
 
 #include "rclcpp/rclcpp.hpp"
+#include <cstdint>
 #define KPH_to_MPS (0.278)
 
+typedef union CAN_frame_t {
+  uint8_t byte[8];
+  uint16_t word[4];
+  uint32_t dword[2];
+  uint64_t frame;
+} CAN_frame_t;
 
-typedef union CAN_frame_t
-{
-	uint8_t byte[8];
-	uint16_t word[4];
-	uint32_t dword [2];
-	uint64_t frame;
-}CAN_frame_t;
-
-//Used to pack CAN words (16 bit signals)
-typedef union CAN_word_t
-{
-	uint8_t bytes[2];
-	uint16_t word;
-}CAN_word_t;
+// Used to pack CAN words (16 bit signals)
+typedef union CAN_word_t {
+  uint8_t bytes[2];
+  uint16_t word;
+} CAN_word_t;
 
 typedef union float_bits_converter {
-    unsigned int integer_can;
-    float float_can;
-}float_bits_converter;
+  unsigned int integer_can;
+  float float_can;
+} float_bits_converter;
