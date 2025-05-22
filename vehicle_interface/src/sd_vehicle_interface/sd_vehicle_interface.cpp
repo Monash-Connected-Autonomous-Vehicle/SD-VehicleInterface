@@ -201,6 +201,11 @@ int main(int argc, char **argv) {
   auto sent_msgs_pub =
       node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
 
+  // to autoware: /vehicle/status/velocity_status
+  auto velocity_status_pub =
+      node->create_publisher<autoware_vehicle_msgs::msg::VelocityReport>(
+          "/vehicle/status/velocity_status", 1);
+
   // current velocity
   auto current_twist_pub =
       node->create_publisher<geometry_msgs::msg::TwistStamped>(

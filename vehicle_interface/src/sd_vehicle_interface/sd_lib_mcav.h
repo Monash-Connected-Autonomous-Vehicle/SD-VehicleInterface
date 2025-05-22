@@ -119,26 +119,37 @@ void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
     AutomationGranted_B = steer_automation_granted && torque_automation_granted;
     AutomationGranted_B = frame.data[7] & 0b00100010;
   } else if (frame.id == 0x102) { // StreetDrone_Data_1
-    // Speed is 16bit, .data is 8bit, fuse speed into a single 16bit variable.
-    // /100 to handle signal resolution
-    uint8_t CurrentVelocity8bit = frame.data[0]; // Speed_Actual kph 8-bit
-    uint8_t speed_HR_B1 = frame.data[6];         // ??
-    uint8_t speed_HR_B2 = frame.data[7];         // ?
-    // Speed Actual kph 16-bit
-    uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;
+    // speed (kph)
+    uint8_t speedActual = frame.data[0];
 
-    // To support older versions of XCU firmware which do not output high
-    // resolution speed. If high resolution speed == 0 (either standstill or
-    // does not exist) use low resolution speed.
-    if (CurrentVelocity16bit == 0) {
-      CurrentLinearVelocity_Mps = (CurrentVelocity8bit * KPH_TO_MPS) / 100.0;
-      // MCAV note: not sure why the speeds are scaled by 1/100. This is also
-      // missing the scaling factor of 0.5 present in CAN definition. Actual
-      // meters per second speed would be ((double)frame.data[0])*0.5*KPH_TO_MPS
-    } else {
-      CurrentLinearVelocity_Mps = (CurrentVelocity16bit * KPH_TO_MPS);
-    }
+    // steer (degrees)
+    int8_t steer_actual_relative = frame.data[2]; // fraction of max steer
+    float steer_actual_angle = steer_actual_relative * 40 / 128;
+
+    /* How is 16-bit speed calculated?
+     * frame.data[6] and [7] not specified in Twizy manual
+     *
+     * Speed is 16bit, .data is 8bit, fuse speed into a single 16bit variable.
+     *  /100 to handle signal resolution
+     * uint8_t speed_HR_B1 = frame.data[6];
+     * uint8_t speed_HR_B2 = frame.data[7];
+     * // Speed Actual kph 16-bit
+     * uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;
+     * To support older versions of XCU firmware which do not output high
+     * resolution speed. If high resolution speed == 0 (either standstill or
+     * does not exist) use low resolution speed.
+     * if (CurrentVelocity16bit == 0) {
+     * CurrentLinearVelocity_Mps = (speedActual * KPH_TO_MPS) / 100.0;
+     * // MCAV note: not sure why the speeds are scaled by 1/100. This is also
+     * // missing the scaling factor of 0.5 present in CAN definition. Actual
+     * // meters per second speed would be
+     * ((double)frame.data[0])*0.5*KPH_TO_MPS
+     */
+
+  } else {
+    CurrentLinearVelocity_Mps = (CurrentVelocity16bit * KPH_TO_MPS);
   }
+}
 }
 
 //**************************************************
