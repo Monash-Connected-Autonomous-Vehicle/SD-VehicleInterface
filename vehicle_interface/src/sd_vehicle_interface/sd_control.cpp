@@ -38,40 +38,37 @@ namespace speedcontroller {
 // linear velocity error from the last cycle
 static double PreviousLinearVelocityError_Mps = 0;
 
+// column units m/s, rows deg/s
+// Map should be extended if tighter turns needed above 6m/s
+
 uint8_t steer_map[YAW_YAXIS][V_XAXIS] = {
-    // 0m/s	<1m/s	<2m/s	<3m/s	<4m/s	<5m/s	<6m/s	<7m/s	<8m/s
-    // <9m/s
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},                 // 0 deg/s
-    {40, 30, 20, 18, 11, 10, 7, 7, 6, 3},           // <5 deg/s
-    {60, 50, 37, 30, 21, 13, 14, 12, 11, 7},        // <10 deg/s
-    {95, 65, 49, 43, 34, 28, 21, 16, 14, 12},       // <15 deg/s
-    {100, 97, 90, 77, 50, 35, 28, 23, 21, 17},      // <20 deg/s
-    {100, 100, 100, 90, 55, 39, 35, 28, 25, 17},    // <25 deg/s
-    {100, 100, 100, 100, 60, 50, 40, 30, 28, 17},   // <30 deg/s
-    {100, 100, 100, 100, 65, 60, 45, 35, 32, 17},   // <35 deg/s
-    {100, 100, 100, 100, 90, 70, 58, 42, 38, 17},   // <40 deg/s
-    {100, 100, 100, 100, 95, 85, 65, 48, 33, 17},   // <45 deg/s
-    {100, 100, 100, 100, 100, 90, 70, 55, 45, 17},  // <50 deg/s
-    {100, 100, 100, 100, 100, 95, 80, 60, 50, 19},  // <55 deg/s
-    {100, 100, 100, 100, 100, 100, 90, 65, 53, 20}, // <60 deg/s
-    {100, 100, 100, 100, 100, 100, 100, 70, 55,
-     45}, // >60 deg/s //Map should be extended if tighter turns needed above
-          // 6m/s
+    //0  <1   <2   <3   <4   <5   <6   <7  <8  <9
+    {0,   0,   0,   0,   0,   0,   0,   0,  0,  0},  // 0
+    {40,  30,  20,  18,  11,  10,  7,   7,  6,  3},  // <5
+    {60,  50,  37,  30,  21,  13,  14,  12, 11, 7},  // <10
+    {95,  65,  49,  43,  34,  28,  21,  16, 14, 12}, // <15
+    {100, 97,  90,  77,  50,  35,  28,  23, 21, 17}, // <20
+    {100, 100, 100, 90,  55,  39,  35,  28, 25, 17}, // <25
+    {100, 100, 100, 100, 60,  50,  40,  30, 28, 17}, // <30
+    {100, 100, 100, 100, 65,  60,  45,  35, 32, 17}, // <35
+    {100, 100, 100, 100, 90,  70,  58,  42, 38, 17}, // <40
+    {100, 100, 100, 100, 95,  85,  65,  48, 33, 17}, // <45
+    {100, 100, 100, 100, 100, 90,  70,  55, 45, 17}, // <50
+    {100, 100, 100, 100, 100, 95,  80,  60, 50, 19}, // <55
+    {100, 100, 100, 100, 100, 100, 90,  65, 53, 20}, // <60
+    {100, 100, 100, 100, 100, 100, 100, 70, 55, 45}, // >60
 };
 
 // FeedForward Calibration
 // Provide FF torque (% from 0-100) for a given speed. An additional axis
 // should be considered for gradient. Note: FF gain at 0 = BRAKE_HOLD_TORQUE
-//
-//>0m/s	<1m/s	<2m/s	<3m/s	<4m/s	<5m/s	<6m/s	<7m/s	<8m/s
-//<9m/s
-int8_t feedforward_torque_map_twizy[V_XAXIS] = {33, 33, 33, 34, 35,
-                                                38, 39, 40, 41, 42};
+int8_t feedforward_torque_map_twizy[V_XAXIS] =
+//>0m/s <1m/s <2m/s <3m/s <4m/s <5m/s <6m/s <7m/s <8m/s <9m/s
+  {33,   33,   33,   34,   35,   38,   39,   40,   41,   42};
 
-//>0m/s	<1m/s	<2m/s	<3m/s	<4m/s	<5m/s	<6m/s	<7m/s	<8m/s
-//<9m/s
-int8_t feedforward_torque_map_env200[V_XAXIS] = {-5, 0,  2,  6,  7,
-                                                 8,  10, 12, 13, 15};
+int8_t feedforward_torque_map_env200[V_XAXIS] =
+//>0m/s <1m/s <2m/s <3m/s <4m/s <5m/s <6m/s <7m/s <8m/s <9m/s
+  {-5,   0,    2,    6,    7,   8,    10,   12,   13,   15};
 
 int8_t CalculateSteerRequest(double TargetSteerAngle_Rad) {
   float angle_request_rad = TargetSteerAngle_Rad;
@@ -166,9 +163,8 @@ int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps,
     D_Contribution_Pc =
         LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
 
-  } else if (LinearVelocityError_Mps <
-             -ANTI_FUSSINESS_TWIZY) { // going too fast (account for vehicle
-                                      // overrun/coasting)
+  } else if (LinearVelocityError_Mps < -ANTI_FUSSINESS_TWIZY) { 
+    // going too fast (account for vehicle overrun/coasting)
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
