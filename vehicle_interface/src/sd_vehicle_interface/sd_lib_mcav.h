@@ -96,7 +96,8 @@ namespace sd{
 	
 	/*ParseRxCanDataSDCan
 	This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
-    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B) {
+    void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, 
+		bool& AutomationGranted_B, bool& AutomationRequested) {
 		// Check which kind of frame we have received and update data accordingly
 		
 		// if (frame.id == 0x104) { 
@@ -116,7 +117,16 @@ namespace sd{
 			AutomationArmed_B = steer_automation_available && torque_automation_available;
 			AutomationGranted_B = steer_automation_granted && torque_automation_granted;
 			AutomationGranted_B = frame.data[7] & 0b00100010;
-		} else if (frame.id == 0x102) { // StreetDrone_Data_1
+		} 
+		
+		if (frame.id == 0x101) { // Customer_Control_1
+			bool steer_automation_requested = frame.data[7] & 0x01; // bit 56 (0b0000 0001)
+			bool torque_automation_requested = frame.data[7] & 0x04; 
+			AutomationRequested = steer_automation_requested && torque_automation_requested;
+		} 
+
+		
+		else if (frame.id == 0x102) { // StreetDrone_Data_1
 			//Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
 			uint8_t CurrentVelocity8bit = frame.data[0]; //Speed Actual kph low resolution
 

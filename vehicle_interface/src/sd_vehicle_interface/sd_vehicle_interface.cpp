@@ -118,8 +118,9 @@ int main(int argc, char **argv)
     auto current_GPS_pub = node->create_publisher<sensor_msgs::msg::NavSatFix>("sd_current_GPS", 100);
 	auto current_IMU_pub = node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw",100);
     auto sd_control_pub = node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1); // in the original ROS1 interface from StreetDrone, this topic was latched.
+	auto control_mode_pub = node->create_publisher<autoware_vehicle_msgs::msg::ControlModeReport>("/vehicle/status/control_mode", 100);
 
-
+	
     rclcpp::Rate loop_rate(ROS_LOOP);
 	rclcpp::Time autonomous_entry(0, 0, RCL_ROS_TIME);
 
@@ -209,6 +210,55 @@ int main(int argc, char **argv)
 		if(no_imu_string !=_sd_gps_imu){ //If we have specified an IMU is present, publish an IMU message
 			current_IMU_pub->publish(current_IMU);
 		}
+
+		"""
+		publishing control mode of vehicle
+		"""
+		// get the can frame (this is done in the received can frame subscriber)
+		// parse the can frame (this is done in the received can frame subscriber)
+		
+		// creating message
+		autoware_vehicle_msgs::msg::ControlModeReport mode_msg;
+		mode_msg.stamp = node->get_clock()->now(); // time stamp of message
+
+		using autoware_vehicle_msgs::msg::ControlModeReport;
+
+		// using the variables taken from the can frame, create the conditions to determine the control mode
+		// control mode = no command
+		if (Steer_Autonomation_State == 0 && Torque_Autonomation_State == 0)
+			mode_msg.mode = ControlModeReport::NO_COMMAND;
+
+		// control mode = autonomous
+		else if (Steer_Autonomation_State == 7 && Torque_Autonomation_State == 7)
+			mode_msg.mode = ControlModeReport::AUTONOMOUS;
+
+		// control mode = autonomous steer only
+		else if (Steer_Autonomation_State == 7 && Torque_Autonomation_State != 7)
+			mode_msg.mode = ControlModeReport::AUTONOMOUS_STEER_ONLY;
+
+		// control mode = autonomous velocity only
+		else if (Steer_Autonomation_State != 7 && Torque_Autonomation_State == 7)
+			mode_msg.mode = ControlModeReport::AUTONOMOUS_VELOCITY_ONLY;
+
+		// control mode = manual
+		else if (Steer_Autonomation_State == 3 && Torque_Autonomation_State == 3)
+			mode_msg.mode = ControlModeReport::MANUAL;
+
+		// control mode = disengaged
+		else if ((Steer_Autonomation_State >= 4 && Steer_Autonomation_State <= 6) ||
+				(Torque_Autonomation_State >= 4 && Torque_Autonomation_State <= 6))
+			mode_msg.mode = ControlModeReport::DISENGAGED;
+		
+		// control mode = not ready
+		else if (Steer_Autonomation_State == 1 || Steer_Autonomation_State == 2 || Steer_Autonomation_State > 8 ||
+				Torque_Autonomation_State == 1 || Torque_Autonomation_State == 2 || Torque_Autonomation_State > 8)
+			mode_msg.mode = ControlModeReport::NOT_READY;
+		else
+			mode_msg.mode = ControlModeReport::NO_COMMAND;
+
+		// publish the control mode
+		control_mode_pub->publish(mode_msg);
+
 	};
 
 	auto timer = node->create_wall_timer(5ms, main_loop); // 5ms gives loop rate of 200Hz
