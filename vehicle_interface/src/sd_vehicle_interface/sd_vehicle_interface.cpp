@@ -34,6 +34,7 @@ using namespace std;
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
 #include "autoware_control_msgs/msg/control.hpp"
+#include "autoware_vehicle_msgs/msg/hazard_lights_report.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
@@ -107,6 +108,7 @@ int main(int argc, char **argv)
 	sensor_msgs::msg::NavSatFix current_GPS;
 	sensor_msgs::msg::Imu current_IMU;
 	sd_msgs::msg::SDControl SD_Current_Control;
+	autoware_vehicle_msgs::msg::HazardLightsReport current_hazard_lights_status;
 	
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
@@ -118,14 +120,15 @@ int main(int argc, char **argv)
     auto current_twist_pub = node->create_publisher<geometry_msgs::msg::TwistStamped>("sd_current_twist", 100);
     auto current_GPS_pub = node->create_publisher<sensor_msgs::msg::NavSatFix>("sd_current_GPS", 100);
 	auto current_IMU_pub = node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw",100);
-    auto sd_control_pub = node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1); // in the original ROS1 interface from StreetDrone, this topic was latched.
+	auto sd_control_pub = node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1); // in the original ROS1 interface from StreetDrone, this topic was latched.
+	auto hazard_lights_status_pub = node->create_publisher<autoware_vehicle_msgs::msg::HazardLightsReport>("/vehicle/status/hazard_lights_status", 100);
 
 
     rclcpp::Rate loop_rate(ROS_LOOP);
 	rclcpp::Time autonomous_entry(0, 0, RCL_ROS_TIME);
 
 	auto main_loop = [&node, &autonomous_entry, &sent_msgs_pub, &current_twist_pub, &current_GPS_pub, &current_IMU_pub, &sd_control_pub,
-					  &current_Twist, &current_GPS, &current_IMU, &SD_Current_Control]() -> void
+					  &current_Twist, &current_GPS, &current_IMU, &SD_Current_Control, &hazard_lights_status_pub, &current_hazard_lights_status]() -> void
 	{
 		//Choose the vehicle speed source as specified at launch
 		if(ndt_speed_string==_sd_speed_source){
@@ -205,6 +208,10 @@ int main(int argc, char **argv)
 		current_twist_pub->publish(current_Twist);
 		current_GPS_pub->publish(current_GPS);
 
+		// autoware topics 
+		current_hazard_lights_status.stamp = node->now();
+		current_hazard_lights_status.report = autoware_vehicle_msgs::msg::HazardLightsReport::DISABLE;
+		hazard_lights_status_pub->publish(current_hazard_lights_status);
 
 		if(no_imu_string !=_sd_gps_imu){ //If we have specified an IMU is present, publish an IMU message
 			current_IMU_pub->publish(current_IMU);
