@@ -34,6 +34,10 @@ using namespace std;
 #include "autoware_vehicle_msgs/msg/gear_command.hpp"
 #include "autoware_vehicle_msgs/msg/hazard_lights_command.hpp"
 #include "autoware_vehicle_msgs/msg/turn_indicators_command.hpp"
+#include "autoware_control_msgs/msg/control.hpp"
+#include "tier4_control_msgs/msg/gate_mode.hpp"
+#include "tier4_vehicle_msgs/msg/vehicle_emergency_stamped.hpp"
+#include "tier4_vehicle_msgs/msg/actuation_command_stamped.hpp"
 #include <cstdint>
 #include <string>
 
@@ -67,6 +71,15 @@ void indicators_cmd_callback(
 void gear_cmd_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg);
 
+void gate_mode_cmd_callback(
+    const shared_ptr<tier4_control_msgs::msg::GateMode> msg);
+
+void emergency_cmd_callback(
+    const shared_ptr<tier4_vehicle_msgs::msg::VehicleEmergencyStamped> msg);
+
+void actuation_cmd_callback(
+    const shared_ptr<tier4_vehicle_msgs::msg::ActuationCommandStamped> msg);
+
 // ===== VARIABLES =====
 
 // current twist (m/s), read from GPS/IMU
@@ -77,6 +90,7 @@ double CurrentTwistLinearSD_Mps_Final = 0.0;
 double CurrentTwistLinearCANSD_Mps =
     0.0; // Current Twist Linear in Mps, as read from the CAN bus from the
          // StreetDrone XCU
+int8_t CurrentSteer_pc = 0;
 double CurrentTwistLinearNDT_Mps =
     0.0; // Current Twist Linear in Mps, as reported by NDT locolisation
 double GPS_Latitude = 0.0;  // latitude, as read from the CAN bus
@@ -101,6 +115,13 @@ double TargetSteeringTireRotationRate; // Steering angle rate of change (rad/s)
 uint8_t TargetHazardLightsCmd; // Hazard lights command received from autoware
 uint8_t TargetIndicatorsCmd;   // Indicators command received from autoware
 uint8_t TargetGearCmd;         // Gear command received from autoware
+
+// Other Autwoare Control
+uint8_t TargetGateModeCmd;
+bool IsEmergency;
+double TargetAccelCmd_temp;
+double TargetBrakeCmd_temp;
+double TargetSteerCmd_temp;
 
 // Requests populated to CAN frame to vehicle
 bool FinalHazardLightsRequest;

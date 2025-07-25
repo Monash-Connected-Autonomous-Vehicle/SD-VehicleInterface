@@ -102,7 +102,7 @@ void SetCRC(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
 }
 
 void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
-                         double &CurrentLinearVelocity_Mps,
+                         double &CurrentLinearVelocity_Mps, int8_t& CurrentSteer_pc,
                          bool &AutomationArmed_B, bool &AutomationGranted_B) {
   // check type of frame and update data accordingly
   if (frame.id == 0x100) { // StreetDrone_Control_1
@@ -138,6 +138,8 @@ void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
     } else {
       CurrentLinearVelocity_Mps = (CurrentVelocity16bit * KPH_TO_MPS);
     }
+
+    CurrentSteer_pc = frame.data[2];
   }
 }
 

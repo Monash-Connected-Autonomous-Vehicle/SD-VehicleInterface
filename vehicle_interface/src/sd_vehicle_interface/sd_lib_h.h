@@ -50,7 +50,7 @@ namespace sd {
  * - bool& AutomationArmed_B: set to TRIE if the CAN data confirms vehicle is
  *   armed for autonomous mode
  */
-void ParseRxCANDataSDCan(can_msgs::msg::Frame &, double &, bool &, bool &);
+void ParseRxCANDataSDCan(can_msgs::msg::Frame &, double &, int8_t &, bool &, bool &);
 
 //**************************************************
 /*				SD TX FUNCTIONS				*/

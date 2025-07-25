@@ -31,10 +31,13 @@
 #include <memory>
 using namespace std;
 
-#include "autoware_control_msgs/msg/control.hpp"
-#include "autoware_vehicle_msgs/msg/gear_command.hpp"
-#include "autoware_vehicle_msgs/msg/hazard_lights_command.hpp"
-#include "autoware_vehicle_msgs/msg/turn_indicators_command.hpp"
+#include "autoware_vehicle_msgs/msg/control_mode_report.hpp"
+#include "tier4_vehicle_msgs/msg/battery_status.hpp"
+#include "autoware_vehicle_msgs/msg/gear_report.hpp"
+#include "autoware_vehicle_msgs/msg/hazard_lights_report.hpp"
+#include "autoware_vehicle_msgs/msg/turn_indicators_report.hpp"
+#include "autoware_vehicle_msgs/msg/steering_report.hpp"
+#include "autoware_vehicle_msgs/msg/velocity_report.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
@@ -52,6 +55,8 @@ using namespace std;
 #include <iostream>
 #include <string>
 
+using autoware_vehicle_msgs::msg::ControlModeReport;
+
 // ===== CALLBACK FUNCTIONS =====
 
 /**
@@ -66,7 +71,7 @@ void ReceivedFrameCANRx_callback(const shared_ptr<can_msgs::msg::Frame> msg) {
   ReceivedFrameCANRx = *msg.get();
 
   // get current speed and automation status flags
-  sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps,
+  sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, CurrentSteer_pc,
                           AutomationArmed_B, AutomationGranted_B);
 
   // parse data depending on IMU/GPS device used
@@ -126,6 +131,23 @@ void gear_cmd_callback(
   TargetGearCmd = msg->command;
 }
 
+void gate_mode_cmd_callback(
+    const shared_ptr<tier4_control_msgs::msg::GateMode> msg) {
+  TargetGateModeCmd = msg->data;
+}
+
+void emergency_cmd_callback(
+    const shared_ptr<tier4_vehicle_msgs::msg::VehicleEmergencyStamped> msg) {
+  IsEmergency = msg->emergency;
+}
+
+void actuation_cmd_callback(
+    const shared_ptr<tier4_vehicle_msgs::msg::ActuationCommandStamped> msg) {
+  TargetAccelCmd_temp = msg->actuation.accel_cmd;
+  TargetBrakeCmd_temp = msg->actuation.brake_cmd;
+  TargetSteerCmd_temp = msg->actuation.steer_cmd;
+}
+
 // ===== MAIN FUNCTION =====
 
 int main(int argc, char **argv) {
@@ -173,9 +195,15 @@ int main(int argc, char **argv) {
   auto gear_sub =
       node->create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
           "/control/command/gear_cmd", 100, gear_cmd_callback);
-  // auto gear_sub =
-  //     node->create_subscription<autoware_control_msgs::msg::CurrentGateMode>(
-  //         "/control/current_gate_mode", 100, gear_cmd_callback);
+  auto gate_mode_sub =
+      node->create_subscription<tier4_control_msgs::msg::GateMode>(
+          "/control/current_gate_mode", 100, gate_mode_cmd_callback);
+  auto emergency_cmd_sub =
+      node->create_subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>(
+          "//control/command/emergency_cmd", 100, emergency_cmd_callback);
+  auto actuation_cmd_sub =
+      node->create_subscription<tier4_vehicle_msgs::msg::ActuationCommandStamped>(
+          "/control/command/actuation_cmd", 100, actuation_cmd_callback);
   auto hazard_lights_sub = node->create_subscription<
       autoware_vehicle_msgs::msg::HazardLightsCommand>(
       "/control/command/hazard_lights_cmd", 100, hazard_cmd_callback);
@@ -199,6 +227,34 @@ int main(int argc, char **argv) {
       node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw", 100);
   auto sd_control_pub =
       node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1);
+  
+  // Autoware-specific publishers and message stores
+  tier4_vehicle_msgs::msg::BatteryStatus temp_BatteryStatus;
+  temp_BatteryStatus.energy_level = 100;
+  auto battery_status_pub =
+      node->create_publisher<tier4_vehicle_msgs::msg::BatteryStatus>("vehicle/status/battery_charge", 10);
+
+  autoware_vehicle_msgs::msg::ControlModeReport current_ControlModeReport;
+  current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS; 
+  auto control_mode_status_pub =
+      node->create_publisher<autoware_vehicle_msgs::msg::ControlModeReport>("vehicle/status/control_mode", 10);
+  
+  autoware_vehicle_msgs::msg::GearReport current_GearStatus;
+  auto gear_status_pub =
+      node->create_publisher<autoware_vehicle_msgs::msg::GearReport>("vehicle/status/gear_status", 10);
+  
+  autoware_vehicle_msgs::msg::HazardLightsReport current_HazardLightsStatus;
+  auto hazard_light_status_pub =
+      node->create_publisher<autoware_vehicle_msgs::msg::HazardLightsReport>("vehicle/status/hazard_lights_status", 10);
+
+  autoware_vehicle_msgs::msg::TurnIndicatorsReport current_IndicatorStatus;
+  auto indicator_status_pub =
+      node->create_publisher<autoware_vehicle_msgs::msg::TurnIndicatorsReport>("vehicle/status/turn_indicators_status", 10);
+
+  autoware_vehicle_msgs::msg::SteeringReport current_SteeringStatus;
+  auto steering_status_pub =
+      node->create_publisher<autoware_vehicle_msgs::msg::SteeringReport>("vehicle/status/steering_status", 10);
+
 
   // set frequency of main loop (Hz)
   rclcpp::Rate loop_rate(ROS_LOOP);
@@ -208,7 +264,12 @@ int main(int argc, char **argv) {
   auto main_loop = [&node, &autonomous_entry, &sent_msgs_pub,
                     &current_twist_pub, &current_GPS_pub, &current_IMU_pub,
                     &sd_control_pub, &current_Twist, &current_GPS, &current_IMU,
-                    &SD_Current_Control]() -> void {
+                    &SD_Current_Control, &battery_status_pub, &temp_BatteryStatus,
+                    &control_mode_status_pub, &current_ControlModeReport,
+                    &gear_status_pub, &current_GearStatus,
+                    &hazard_light_status_pub, &current_HazardLightsStatus,
+                    &indicator_status_pub, &current_IndicatorStatus,
+                    &steering_status_pub, &current_SteeringStatus]() -> void {
     // Set speed source (specified at launch)
     // either NDT, IMU, or CAN bus (from vehicle sensors)
     if (ndt_speed_string == _sd_speed_source) {
@@ -263,6 +324,11 @@ int main(int argc, char **argv) {
           ((node->now() - autonomous_entry) >=
            rclcpp::Duration::from_seconds(0.1))) {
 
+        if (IsEmergency) {
+          TargetTwistLinear_Mps = 0;
+          TargetTireAngle_Rad = 0;
+        }
+
         // calculate steer request
         // (PID and FeedForward Contributions to Torque Controller)
         FinalDBWSteerRequest_Pc =
@@ -309,6 +375,29 @@ int main(int argc, char **argv) {
     } else { // not autonomous or simulation mode
       autonomous_entry = node->now();
     }
+
+    // publish to autoware (regardless on weather autonomous or not)
+    temp_BatteryStatus.stamp = node->get_clock()->now();
+    battery_status_pub->publish(temp_BatteryStatus);
+    
+    current_ControlModeReport.stamp = node->get_clock()->now();
+    control_mode_status_pub->publish(current_ControlModeReport);
+
+    current_ControlModeReport.stamp = node->get_clock()->now();
+    current_GearStatus.report = TargetHazardLightsCmd;
+    gear_status_pub->publish(current_GearStatus);
+    
+    current_HazardLightsStatus.stamp = node->get_clock()->now();
+    current_HazardLightsStatus.report = TargetGearCmd;
+    hazard_light_status_pub->publish(current_HazardLightsStatus);
+    
+    current_IndicatorStatus.stamp = node->get_clock()->now();
+    current_IndicatorStatus.report = TargetIndicatorsCmd;
+    indicator_status_pub->publish(current_IndicatorStatus);
+
+    current_SteeringStatus.stamp = node->get_clock()->now();
+    current_SteeringStatus.steering_tire_angle = CurrentSteer_pc * MAX_STEER_ANG;
+    steering_status_pub->publish(current_SteeringStatus);
 
     // not simulation mode - publish control commands to vehicle
     if (!_sd_simulation_mode) {
