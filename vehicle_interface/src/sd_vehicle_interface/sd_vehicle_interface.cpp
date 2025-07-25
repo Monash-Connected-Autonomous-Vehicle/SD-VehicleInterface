@@ -94,50 +94,36 @@ void ReceivedFrameCANRx_callback(const shared_ptr<can_msgs::msg::Frame> msg) {
 }
 
 /**
- * extract twist angular and linear commands from autoware
- */
-void AckermannCommand_callback(
-    const shared_ptr<autoware_control_msgs::msg::Control> msg) {
-  // Populate a twist angular and twist linear message with the received message
-  // from Ros topic and convert to deg/s
-  TargetTireAngle_Rad = msg->lateral.steering_tire_angle; // Radians
-  TargetTwistLinear_Mps =
-      msg->longitudinal.velocity / UNDO_STREETDRONE_SCALING_FACTOR; // still Mps
-  TargetSteeringTireRotationRate = msg->lateral.steering_tire_rotation_rate;
-}
-
-/**
  * extract current forward speed from NDT (speed source)
  */
-void CurrentVelocity_callback(
+void current_velocity_callback(
     const shared_ptr<geometry_msgs::msg::TwistStamped> msg) {
   // Current Velocity Reported from NDT
   CurrentTwistLinearNDT_Mps = msg->twist.linear.x; // mps to kph
 }
 
-/**
- * Receive hazard lights command from Ackermann and populate
- * TargetHazardLightsCmd variable
- */
-void AckermannHazard_callback(
+// ===== AUTOWARE PUB/SUB =====
+void control_cmd_callback(
+    const shared_ptr<autoware_control_msgs::msg::Control> msg) {
+  TargetTireAngle_Rad = msg->lateral.steering_tire_angle;
+  TargetTwistLinear_Mps =
+      msg->longitudinal.velocity / UNDO_STREETDRONE_SCALING_FACTOR;
+  TargetSteeringTireRotationRate = msg->lateral.steering_tire_rotation_rate;
+}
+
+void hazard_cmd_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand> msg) {
   TargetHazardLightsCmd = msg->command;
-  // testing
-  cout << "TargetHazardLightsCmd: " << (int)TargetHazardLightsCmd << "\n";
 }
 
-void AckermannIndicators_callback(
+void indicators_cmd_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::TurnIndicatorsCommand> msg) {
   TargetIndicatorsCmd = msg->command;
-  // testing
-  cout << "TargetIndicatorsCmd: " << (int)TargetIndicatorsCmd << "\n";
 }
 
-void AckermannGear_callback(
+void gear_cmd_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg) {
   TargetGearCmd = msg->command;
-  // testing
-  cout << "TargetGearCmd: " << (int)TargetGearCmd << "\n";
 }
 
 // ===== MAIN FUNCTION =====
@@ -178,23 +164,25 @@ int main(int argc, char **argv) {
       "from_can_bus", 100, ReceivedFrameCANRx_callback);
   auto current_velocity_sub =
       node->create_subscription<geometry_msgs::msg::TwistStamped>(
-          "current_velocity", 1, CurrentVelocity_callback);
-  // from autoware (control commands)
-  auto ackermann_cmd_sub =
+          "current_velocity", 1, current_velocity_callback);
+  
+  // Autoware-specific subscribers
+  auto control_sub =
       node->create_subscription<autoware_control_msgs::msg::Control>(
-          "/control/command/control_cmd", 100, AckermannCommand_callback);
-  // get hazard lights target from Ackermann
-  auto ackerman_hazard_sub = node->create_subscription<
+          "/control/command/control_cmd", 100, control_cmd_callback);
+  auto gear_sub =
+      node->create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
+          "/control/command/gear_cmd", 100, gear_cmd_callback);
+  // auto gear_sub =
+  //     node->create_subscription<autoware_control_msgs::msg::CurrentGateMode>(
+  //         "/control/current_gate_mode", 100, gear_cmd_callback);
+  auto hazard_lights_sub = node->create_subscription<
       autoware_vehicle_msgs::msg::HazardLightsCommand>(
-      "/control/command/hazard_lights_cmd", 100, AckermannHazard_callback);
-  // get turn indicators target from Ackermann
-  auto ackerman_indicators_sub = node->create_subscription<
+      "/control/command/hazard_lights_cmd", 100, hazard_cmd_callback);
+  auto indicators_sub = node->create_subscription<
       autoware_vehicle_msgs::msg::TurnIndicatorsCommand>(
       "/control/command/turn_indicators_cmd", 100,
-      AckermannIndicators_callback);
-  auto ackerman_gear_sub =
-      node->create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
-          "/control/command/gear_cmd", 100, AckermannGear_callback);
+      indicators_cmd_callback);
 
   // Publishers
   // control commands (for ENV200)

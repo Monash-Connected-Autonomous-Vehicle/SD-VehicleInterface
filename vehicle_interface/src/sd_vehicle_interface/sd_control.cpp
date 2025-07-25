@@ -123,7 +123,6 @@ int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps,
     // (1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] +
     // speed_index_remainder*feedforward_torque_map_twizy[speed_index+1];
     FF_Contribution_Pc =
-        0.8 *
         ((1 - speed_index_remainder) *
              feedforward_torque_map_twizy[speed_index] +
          speed_index_remainder * feedforward_torque_map_twizy[speed_index + 1]);

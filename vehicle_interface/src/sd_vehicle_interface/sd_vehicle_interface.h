@@ -55,13 +55,16 @@ const double UNDO_STREETDRONE_SCALING_FACTOR = 50;
 
 // ===== FUNCTION SIGNATURES =====
 
-void AckermannHazard_callback(
+void control_cmd_callback(
+    const shared_ptr<autoware_control_msgs::msg::Control> msg);
+
+void hazard_cmd_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand> msg);
 
-void AckermannIndicators_callback(
+void indicators_cmd_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::TurnIndicatorsCommand> msg);
 
-void AckermannGear_callback(
+void gear_cmd_callback(
     const shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg);
 
 // ===== VARIABLES =====
