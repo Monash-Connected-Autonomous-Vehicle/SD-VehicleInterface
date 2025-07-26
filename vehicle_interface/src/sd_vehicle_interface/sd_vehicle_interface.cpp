@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
           "/control/current_gate_mode", 100, gate_mode_cmd_callback);
   auto emergency_cmd_sub =
       node->create_subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>(
-          "//control/command/emergency_cmd", 100, emergency_cmd_callback);
+          "/control/command/emergency_cmd", 100, emergency_cmd_callback);
   auto actuation_cmd_sub =
       node->create_subscription<tier4_vehicle_msgs::msg::ActuationCommandStamped>(
           "/control/command/actuation_cmd", 100, actuation_cmd_callback);
@@ -255,6 +255,10 @@ int main(int argc, char **argv) {
   auto steering_status_pub =
       node->create_publisher<autoware_vehicle_msgs::msg::SteeringReport>("vehicle/status/steering_status", 10);
 
+  autoware_vehicle_msgs::msg::VelocityReport current_VelocityStatus;
+  auto velocity_status_pub =
+      node->create_publisher<autoware_vehicle_msgs::msg::VelocityReport>("vehicle/status/velocity_status", 10);
+
 
   // set frequency of main loop (Hz)
   rclcpp::Rate loop_rate(ROS_LOOP);
@@ -269,7 +273,8 @@ int main(int argc, char **argv) {
                     &gear_status_pub, &current_GearStatus,
                     &hazard_light_status_pub, &current_HazardLightsStatus,
                     &indicator_status_pub, &current_IndicatorStatus,
-                    &steering_status_pub, &current_SteeringStatus]() -> void {
+                    &steering_status_pub, &current_SteeringStatus,
+                    &velocity_status_pub, &current_VelocityStatus]() -> void {
     // Set speed source (specified at launch)
     // either NDT, IMU, or CAN bus (from vehicle sensors)
     if (ndt_speed_string == _sd_speed_source) {
@@ -398,6 +403,10 @@ int main(int argc, char **argv) {
     current_SteeringStatus.stamp = node->get_clock()->now();
     current_SteeringStatus.steering_tire_angle = CurrentSteer_pc * MAX_STEER_ANG;
     steering_status_pub->publish(current_SteeringStatus);
+
+    current_VelocityStatus.stamp = node->get_clock()->now();
+    current_VelocityStatus.longitudinal_velocity = ;
+    velocity_status_pub->publish(current_VelocityStatus);
 
     // not simulation mode - publish control commands to vehicle
     if (!_sd_simulation_mode) {
