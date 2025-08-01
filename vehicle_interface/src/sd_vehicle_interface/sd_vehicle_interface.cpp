@@ -54,6 +54,7 @@ using namespace std;
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <cmath>
 
 using autoware_vehicle_msgs::msg::ControlModeReport;
 
@@ -147,6 +148,17 @@ void actuation_cmd_callback(
   TargetBrakeCmd_temp = msg->actuation.brake_cmd;
   TargetSteerCmd_temp = msg->actuation.steer_cmd;
 }
+
+double computeLateralVelocity(double vehicle_speed_mps,
+                              double gps_course_deg,
+                              double integrated_yaw_deg) {
+  constexpr double DEG_TO_RAD = M_PI / 180.0;
+  double course_rad = gps_course_deg * DEG_TO_RAD;
+  double yaw_rad = integrated_yaw_deg * DEG_TO_RAD;
+
+  return vehicle_speed_mps * std::sin(course_rad - yaw_rad);
+}
+
 
 // ===== MAIN FUNCTION =====
 
@@ -404,10 +416,23 @@ int main(int argc, char **argv) {
     current_SteeringStatus.steering_tire_angle = CurrentSteer_pc * MAX_STEER_ANG;
     steering_status_pub->publish(current_SteeringStatus);
 
-    current_VelocityStatus.stamp = node->get_clock()->now();
-    current_VelocityStatus.longitudinal_velocity = ;
-    velocity_status_pub->publish(current_VelocityStatus);
+    current_VelocityStatus.header.stamp = node->get_clock()->now();
+    current_VelocityStatus.header.frame_id = "base_link"; 
+    current_VelocityStatus.longitudinal_velocity = CurrentTwistLinearCANSD_Mps;
 
+    // TODO: Recheck
+    static double integrated_yaw_deg = 0.0;
+    constexpr double dt = 0.05;
+    integrated_yaw_deg += IMU_Rate_Z * dt;
+
+    current_VelocityStatus.lateral_velocity = computeLateralVelocity(
+      CurrentTwistLinearCANImu_Mps,
+      IMU_Angle_Z,          
+      integrated_yaw_deg);
+    // current_VelocityStatus.lateral_velocity = 0
+
+    velocity_status_pub->publish(current_VelocityStatus);
+    
     // not simulation mode - publish control commands to vehicle
     if (!_sd_simulation_mode) {
       sent_msgs_pub->publish(CustomerControlCANTx);
