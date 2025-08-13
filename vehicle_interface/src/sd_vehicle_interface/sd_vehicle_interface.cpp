@@ -393,6 +393,47 @@ int main(int argc, char **argv) {
       autonomous_entry = node->now();
     }
 
+
+	// ====== CONTROL MODE OF VEHICLE ======
+	using autoware_vehicle_msgs::msg::ControlModeReport;
+
+	// using the variables taken from the can frame, create the conditions to determine the control mode
+	// control mode = no command
+	if (Steer_Autonomation_State == 0 && Torque_Autonomation_State == 0)
+		current_ControlModeReport.mode = ControlModeReport::NO_COMMAND;
+
+	// control mode = autonomous
+	else if (Steer_Autonomation_State == 7 && Torque_Autonomation_State == 7)
+		current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS;
+
+	// control mode = autonomous steer only
+	else if (Steer_Autonomation_State == 7 && Torque_Autonomation_State != 7)
+		current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS_STEER_ONLY;
+
+	// control mode = autonomous velocity only
+	else if (Steer_Autonomation_State != 7 && Torque_Autonomation_State == 7)
+		current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS_VELOCITY_ONLY;
+
+	// control mode = manual
+	else if (Steer_Autonomation_State == 3 && Torque_Autonomation_State == 3)
+		current_ControlModeReport.mode = ControlModeReport::MANUAL;
+
+	// control mode = disengaged
+	else if ((Steer_Autonomation_State >= 4 && Steer_Autonomation_State <= 6) ||
+			(Torque_Autonomation_State >= 4 && Torque_Autonomation_State <= 6))
+		current_ControlModeReport.mode = ControlModeReport::DISENGAGED;
+		
+	// control mode = not ready
+	else if (Steer_Autonomation_State == 1 || Steer_Autonomation_State == 2 || Steer_Autonomation_State > 8 ||
+			Torque_Autonomation_State == 1 || Torque_Autonomation_State == 2 || Torque_Autonomation_State > 8)
+		current_ControlModeReport.mode = ControlModeReport::NOT_READY;
+	
+	// control mode = no command
+	else
+		current_ControlModeReport.mode = ControlModeReport::NO_COMMAND;
+
+
+
     // publish to autoware (regardless on weather autonomous or not)
     temp_BatteryStatus.stamp = node->get_clock()->now();
     battery_status_pub->publish(temp_BatteryStatus);
@@ -400,7 +441,7 @@ int main(int argc, char **argv) {
     current_ControlModeReport.stamp = node->get_clock()->now();
     control_mode_status_pub->publish(current_ControlModeReport);
 
-    current_ControlModeReport.stamp = node->get_clock()->now();
+    current_GearStatus.stamp = node->get_clock()->now();
     current_GearStatus.report = TargetHazardLightsCmd;
     gear_status_pub->publish(current_GearStatus);
     
