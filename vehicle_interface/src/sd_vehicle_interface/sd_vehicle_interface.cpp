@@ -52,7 +52,8 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
 {
 	// Populates into ReceivedFrameCANRx the latest can message
     ReceivedFrameCANRx = *msg.get();
-	sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, AutomationArmed_B, AutomationGranted_B);
+	sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, AutomationArmed_B, AutomationGranted_B, 
+		Steer_Autonomation_State, Torque_Autonomation_State);
 	
 	if(oxts_string==_sd_gps_imu){
 		
@@ -211,9 +212,11 @@ int main(int argc, char **argv)
 			current_IMU_pub->publish(current_IMU);
 		}
 
-		"""
-		publishing control mode of vehicle
-		"""
+		/*
+		 * publishing control mode of vehicle
+		 */
+
+
 		// get the can frame (this is done in the received can frame subscriber)
 		// parse the can frame (this is done in the received can frame subscriber)
 		
