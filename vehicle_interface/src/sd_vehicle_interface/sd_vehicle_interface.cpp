@@ -71,9 +71,9 @@ void ReceivedFrameCANRx_callback(const shared_ptr<can_msgs::msg::Frame> msg) {
   // copy CAN frame into ReceivedFrameCANRx
   ReceivedFrameCANRx = *msg.get();
 
-  // get current speed and automation status flags
+  // get current speed, automation status flags and autonomation states
   sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, CurrentSteer_pc,
-                          AutomationArmed_B, AutomationGranted_B);
+                          AutomationArmed_B, AutomationGranted_B, Steer_Autonomation_State, Torque_Autonomation_State);
 
   // parse data depending on IMU/GPS device used
   if (oxts_string == _sd_gps_imu) {
