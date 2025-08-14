@@ -30,11 +30,14 @@
  */
 
 #include "sd_control.h"
+#include "rclcpp/rclcpp.hpp"
 #include <iostream>
+
 
 namespace speedcontroller{
 
 	static double PreviousLinearVelocityError_Mps = 0;		//The linear velocity error from the last cycle. Initialised as 0
+	static rclcpp::Logger LOGGER = rclcpp::get_logger("sd_vehicle_interface"); 
 	
 	uint8_t steer_map[YAW_YAXIS][V_XAXIS] =	
 	{//0m/s	<1m/s	<2m/s	<3m/s	<4m/s	<5m/s	<6m/s	<7m/s	<8m/s	<9m/s
@@ -81,7 +84,7 @@ namespace speedcontroller{
 		return CalculatedSteeringAngle_Pc;
     }
 
-	int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps, double CurrentLinearVelocity_Mps, int& P_Contribution_Pc, int& I_Contribution_Pc, int& D_Contribution_Pc, int& FF_Contribution_Pc){
+	int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps, double CurrentLinearVelocity_Mps, int& P_Contribution_Pc, int& I_Contribution_Pc, int& D_Contribution_Pc, int& FF_Contribution_Pc, SD_PID_CTRL_PARAM &tParam){
         
 		//Calculate PID Errors
 		static double LinearVelocityError_Mps;
@@ -92,7 +95,10 @@ namespace speedcontroller{
 		//Speed index and remainder used to interpolate between different speed values of the steer table
 		int speed_index = floor(TargetLinearVelocity_Mps);
 		double speed_index_remainder=abs(TargetLinearVelocity_Mps) - speed_index;
-		
+		// RCLCPP_INFO(LOGGER, "PID PARAMETERS %d %d %d || %d %d %d || %d %d %d",
+		// 	tParam._sd_speed_kp, tParam._sd_speed_ki, tParam._sd_speed_kd,
+		// 	tParam._sd_brake_kp, tParam._sd_brake_ki, tParam._sd_brake_kd,
+		// 	tParam._sd_speed_retd_kp, tParam._sd_speed_retd_ki, tParam._sd_speed_retd_kd);
 		if(speed_index > V_XAXIS -2){
 			speed_index = V_XAXIS -2;
 		}
@@ -130,22 +136,37 @@ namespace speedcontroller{
 			I_Contribution_Pc = 0.975 * I_Contribution_Pc;
 			
 		} else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)){ //Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop). 
-		   
+#if DEBUGGING_MODE
 			P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Twizy;
 			I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Twizy;
 			D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
+#else
+			P_Contribution_Pc = LinearVelocityError_Mps * tParam._sd_brake_kp;
+			I_Contribution_Pc = LinearVelocityIntegratedError * tParam._sd_brake_ki;
+			D_Contribution_Pc = LinearVelocityDerivativeError * tParam._sd_brake_kd;
+#endif
 			
 		}else if (LinearVelocityError_Mps < - ANTI_FUSSINESS_TWIZY){ //When we are going too fast, we reduce speed with a different set of gains. (this allows us to account for vehicle overrun/coasting)
-			
+#if DEBUGGIND_MODE	
 			P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
 			I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
 			D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
+#else
+			P_Contribution_Pc = LinearVelocityError_Mps * tParam._sd_speed_retd_kp;
+			I_Contribution_Pc = LinearVelocityIntegratedError * tParam._sd_speed_retd_ki;
+			D_Contribution_Pc = LinearVelocityDerivativeError * tParam._sd_speed_retd_kd;
+#endif
 			
 		} else { //else use the calculated errors
-		
+#if DEBUGGIND_MODE
 			P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Twizy;
 			I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
 			D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
+#else
+			P_Contribution_Pc = LinearVelocityError_Mps * tParam._sd_speed_kp;
+			I_Contribution_Pc = LinearVelocityIntegratedError * tParam._sd_speed_ki;
+			D_Contribution_Pc = LinearVelocityDerivativeError * tParam._sd_speed_kd;
+#endif
 		}
 				
 		//I gain Anti windup Strategy

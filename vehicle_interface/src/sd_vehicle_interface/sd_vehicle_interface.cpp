@@ -48,6 +48,8 @@ using namespace std;
 #include "sd_gps_imu.h"
 #include "sd_control.h"
 
+// General variable
+static speedcontroller::SD_PID_CTRL_PARAM gtPidCtrlParam{};
 //Callback Functions
 void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg)
 {
@@ -99,6 +101,81 @@ int main(int argc, char **argv)
 	node->declare_parameter<bool>("sd_simulation_mode", false);
 	_sd_simulation_mode = node->get_parameter("sd_simulation_mode").as_bool();
 
+	// debugging PID parameters part
+	// speed up
+#if DEBUGGING_MODE == false
+	node->declare_parameter<std::int16_t>("sd_speed_kp", 0);
+	gtPidCtrlParam._sd_speed_kp = static_cast<int16_t>(node->get_parameter("sd_speed_kp").as_int());
+	node->declare_parameter<std::int16_t>("sd_speed_ki", 0);
+	gtPidCtrlParam._sd_speed_ki = static_cast<int16_t>(node->get_parameter("sd_speed_ki").as_int());
+	node->declare_parameter<std::int16_t>("sd_speed_kd", 0);
+	gtPidCtrlParam._sd_speed_kd = static_cast<int16_t>(node->get_parameter("sd_speed_kd").as_int());
+	// brake
+	node->declare_parameter<std::int16_t>("sd_brake_kp", 0);
+	gtPidCtrlParam._sd_brake_kd = static_cast<int16_t>(node->get_parameter("sd_brake_kp").as_int());
+	node->declare_parameter<std::int16_t>("sd_brake_ki", 0);
+	gtPidCtrlParam._sd_brake_ki = static_cast<int16_t>(node->get_parameter("sd_brake_ki").as_int());
+	node->declare_parameter<std::int16_t>("sd_brake_kd", 0);
+	gtPidCtrlParam._sd_brake_kd = static_cast<int16_t>(node->get_parameter("sd_brake_kd").as_int());
+	// reduce speed
+	node->declare_parameter<std::int16_t>("sd_speed_retd_kp", 0);
+	gtPidCtrlParam._sd_speed_retd_kp = static_cast<int16_t>(node->get_parameter("sd_speed_retd_kp").as_int());
+	node->declare_parameter<std::int16_t>("sd_speed_retd_ki", 0);
+	gtPidCtrlParam._sd_speed_retd_ki = static_cast<int16_t>(node->get_parameter("sd_speed_retd_ki").as_int());
+	node->declare_parameter<std::int16_t>("sd_speed_retd_kd", 0);
+	gtPidCtrlParam._sd_speed_retd_kd = static_cast<int16_t>(node->get_parameter("sd_speed_retd_kd").as_int());
+
+	std::mutex param_mutex;
+	auto cb_handle = node->add_on_set_parameters_callback(
+	[&, node](const std::vector<rclcpp::Parameter> & params)
+		-> rcl_interfaces::msg::SetParametersResult
+	{
+		rcl_interfaces::msg::SetParametersResult res;
+		res.successful = true;
+
+		std::lock_guard<std::mutex> lk(param_mutex);
+		for (const auto & p : params)
+		{
+			if (p.get_name() == "sd_speed_kp")
+			{
+				gtPidCtrlParam._sd_speed_kp = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_speed_ki")
+			{
+				gtPidCtrlParam._sd_speed_ki = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_speed_kd") 
+			{
+				gtPidCtrlParam._sd_speed_kd = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_brake_kp")
+			{
+				gtPidCtrlParam._sd_brake_kp = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_brake_ki")
+			{
+				gtPidCtrlParam._sd_brake_ki = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_brake_kd")
+			{
+				gtPidCtrlParam._sd_brake_kd = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_speed_retd_kp")
+			{
+				gtPidCtrlParam._sd_speed_retd_kp = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_speed_retd_ki")
+			{
+				gtPidCtrlParam._sd_speed_retd_ki = static_cast<int16_t>(p.as_int());
+			}
+			else if (p.get_name() == "sd_speed_retd_kd")
+			{
+				gtPidCtrlParam._sd_speed_retd_kd = static_cast<int16_t>(p.as_int());
+			}
+		}
+		return res;
+	});
+#endif
 	//initialise the StreetDrone Output Can variables
 	sd::InitSDInterfaceControl(CustomerControlCANTx);
 	sd::InitSDInterfaceFeedback(ControllerFeedbackCANTx);
@@ -174,7 +251,7 @@ int main(int argc, char **argv)
 				FinalDBWSteerRequest_Pc   = speedcontroller::CalculateSteerRequest(TargeTireAngle_Rad);
 
 				if(twizy_string==_sd_vehicle){
-					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestTwizy(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
+					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestTwizy(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, gtPidCtrlParam);
 				}else{
 					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestEnv200(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
 				}

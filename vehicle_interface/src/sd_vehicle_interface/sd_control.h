@@ -111,9 +111,23 @@ namespace speedcontroller{
 	
 	#define YAW_YAXIS  (14)
 	#define YAW_STEPS (5) //At which discrete steps is each point on the yaw axis, defult 5 deg/s steps
+
+	// Debugging mode
+	#define DEBUGGIND_MODE	(0) // 0 for debug , 1 for nomail mode
 	
 	//******
-
+	typedef struct
+	{
+		int16_t _sd_speed_kp;
+		int16_t _sd_speed_ki;
+		int16_t _sd_speed_kd;
+		int16_t _sd_speed_retd_kp;
+		int16_t _sd_speed_retd_ki;
+		int16_t _sd_speed_retd_kd;
+		int16_t _sd_brake_kp;
+		int16_t _sd_brake_ki;
+		int16_t _sd_brake_kd;
+	} SD_PID_CTRL_PARAM;
 	//The below table represents a feedforward control yaw to steering table, based on input yaw and velocity
 	//The variables below are fully tunable, and inbetween values of speed and yaw shall interpolate between map entries
 
@@ -134,7 +148,7 @@ namespace speedcontroller{
 	int8_t FinalDBWSteerRequest_Pc: The steer angle request, expressed as a percentage from full lock left/right (+/- 100%). 0 being centred steering. */
 	
 	//This function calculates the torque using PID and feedforward control
-	int8_t CalculateTorqueRequestTwizy(double, double, int&, int&, int&, int&);
+	int8_t CalculateTorqueRequestTwizy(double, double, int&, int&, int&, int&, SD_PID_CTRL_PARAM&);
     /*Inputs
 	string _sd_vehicle: The StreetDrone vehicle under control, 'twizy' or 'env200'
 	double TargetLinearVelocity_Mps: The target linear velocity in Metres per Second
@@ -144,6 +158,7 @@ namespace speedcontroller{
 	int I_Contribution_Pc: The contribution to final torque given by the I term, used for user feedback for tuning
 	int D_Contribution_Pc: The contribution to final torque given by the D term, used for user feedback for tuning
 	int FF_Contribution_Pc: The contribution to final torque given by the feedforward calculation, used for user feedback for tuning
+	SD_PID_CTRL_PARAM tParam: The contribution to convert three different group of PID CTRL parameters to debug
 
 	Outputs
 	int8_t FinalDBWTorqueRequest_Pc: The torque request, expressed as a percentage of full braking vs full throttle (+/- 100%). 0 being no torque request.*/
