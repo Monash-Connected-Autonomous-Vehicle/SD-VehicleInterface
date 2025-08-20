@@ -83,6 +83,14 @@ roslaunch sd_vehicle_interface sd_vehicle_interface.launch sd_vehicle:=env200 sd
 # adjust the launch parameters to your vehicle setup, as described below
 ```
 
+Debug
+------
+When we try to find out the best PID control parameters, we can use ros2 param set to change the PID paramters
+'''
+ros2 param set /sd_vehicle_interface_node sd_speed_retd_ki 4
+# adjust the launch parameters to your vehicle setup, as described below
+'''
+
 Parameters
 ------
 
@@ -92,3 +100,12 @@ Parameters
 | sd_gps_imu         | {oxts, peak, none}                        | oxts              | The GPS/IMU used                           |
 | sd_speed_source    | {vehicle_can_speed, imu_speed, ndt_speed} | vehicle_can_speed | Input vehicle speed                        |
 | sd_simulation_mode | {true, false}                             | false             | Use on the car or on the Gazebo simulation |
+| sd_speed_kp 		 | {0-100}                                   | 0                 | Kp in PID Contriol for brake 			  |
+| sd_speed_ki  		 | {0-100}        	                         | 0             	 | Ki in PID Contriol for brake 			  |
+| sd_speed_kd        | {0-100}                                   | 0             	 | Kd in PID Contriol for brake 			  |
+| sd_brake_kp 		 | {0-100}                                   | 0                 | Kp in PID Contriol for brake 			  |
+| sd_brake_ki  		 | {0-100}        	                         | 0             	 | Ki in PID Contriol for brake 			  |
+| sd_brake_kd        | {0-100}                                   | 0             	 | Kd in PID Contriol for brake 			  |
+| sd_speed_retd_kp 	 | {0-100}                                   | 0                 | Kp in PID Contriol for reducing speed      |
+| sd_speed_retd_ki   | {0-100}        	                         | 0             	 | Ki in PID Contriol for reducing speed 	  |
+| sd_speed_retd_kd   | {0-100}                                   | 0             	 | Kd in PID Contriol for reducing speed   	  |
