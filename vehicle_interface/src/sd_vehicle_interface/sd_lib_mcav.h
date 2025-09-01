@@ -103,7 +103,9 @@ void SetCRC(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
 
 void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
                          double &CurrentLinearVelocity_Mps, int8_t& CurrentSteer_pc,
-                         bool &AutomationArmed_B, bool &AutomationGranted_B) {
+                         bool &AutomationArmed_B, bool &AutomationGranted_B, 
+                         int8_t& Steer_Automation_State, int8_t& Torque_Automation_State) {
+
   // check type of frame and update data accordingly
   if (frame.id == 0x100) { // StreetDrone_Control_1
     bool steer_automation_available =
@@ -118,7 +120,15 @@ void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
         steer_automation_available && torque_automation_available;
     AutomationGranted_B = steer_automation_granted && torque_automation_granted;
     AutomationGranted_B = frame.data[7] & 0b00100010;
-  } else if (frame.id == 0x102) { // StreetDrone_Data_1
+
+    // Control mode determination
+    Torque_Automation_State = frame.data[6] & 0x0F; // bits 52 - 55
+
+    Steer_Automation_State  = (frame.data[6] >> 4) & 0x0F;  // bits 48 - 51
+    
+  } 
+  
+  else if (frame.id == 0x102) { // StreetDrone_Data_1
     // Speed is 16bit, .data is 8bit, fuse speed into a single 16bit variable.
     // /100 to handle signal resolution
     uint8_t CurrentVelocity8bit = frame.data[0]; // Speed_Actual kph 8-bit
