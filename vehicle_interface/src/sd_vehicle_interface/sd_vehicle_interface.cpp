@@ -55,8 +55,13 @@ using namespace std;
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <cstdint>
 
 using autoware_vehicle_msgs::msg::ControlModeReport;
+
+// Stating variables for automation modes
+uint8_t Steer_Automation_State  = 0;
+uint8_t Torque_Automation_State = 0;
 
 // ===== CALLBACK FUNCTIONS =====
 
