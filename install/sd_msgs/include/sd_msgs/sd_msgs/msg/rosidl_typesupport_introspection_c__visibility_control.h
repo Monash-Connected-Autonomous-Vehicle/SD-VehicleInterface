@@ -1,0 +1,1 @@
+/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs/rosidl_typesupport_introspection_c/sd_msgs/msg/rosidl_typesupport_introspection_c__visibility_control.h

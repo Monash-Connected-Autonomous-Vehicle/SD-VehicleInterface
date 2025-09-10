@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "sd_msgs__py",
+		"source" : "/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs/sd_msgs__py"
+	}
+}

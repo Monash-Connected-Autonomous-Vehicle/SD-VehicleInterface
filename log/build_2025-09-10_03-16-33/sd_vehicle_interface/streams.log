@@ -1,0 +1,64 @@
+[0.005s] Invoking command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface': AMENT_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:/home/mcav/ros2_ws/install/sd_vehicle_interface:/home/mcav/ros2_ws/install/sd_msgs:/home/mcav/ros2_ws/install/autoware_control_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/mcav/ros2_ws/src/SD-VehicleInterface/vehicle_interface -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_vehicle_interface
+[0.034s] -- The C compiler identification is GNU 11.4.0
+[0.061s] -- The CXX compiler identification is GNU 11.4.0
+[0.065s] -- Detecting C compiler ABI info
+[0.093s] -- Detecting C compiler ABI info - done
+[0.097s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.097s] -- Detecting C compile features
+[0.098s] -- Detecting C compile features - done
+[0.099s] -- Detecting CXX compiler ABI info
+[0.132s] -- Detecting CXX compiler ABI info - done
+[0.136s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.136s] -- Detecting CXX compile features
+[0.136s] -- Detecting CXX compile features - done
+[0.137s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.191s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.220s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.233s] -- Found rclcpp: 16.0.14 (/opt/ros/humble/share/rclcpp/cmake)
+[0.251s] -- Found rosidl_generator_c: 3.1.7 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.253s] -- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.257s] -- Found rosidl_generator_cpp: 3.1.7 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.263s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.270s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.300s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.302s] -- Found rmw_fastrtps_cpp: 6.2.8 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.328s] -- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[0.335s] -- Found FastRTPS: /opt/ros/humble/include  
+[0.346s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.352s] -- Looking for pthread.h
+[0.382s] -- Looking for pthread.h - found
+[0.382s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[0.410s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[0.410s] -- Found Threads: TRUE  
+[0.441s] -- Found sd_msgs: 0.0.0 (/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake)
+[0.448s] -- Found can_msgs: 2.0.0 (/opt/ros/humble/share/can_msgs/cmake)
+[0.457s] -- Found sensor_msgs: 4.9.0 (/opt/ros/humble/share/sensor_msgs/cmake)
+[0.478s] -- Found autoware_control_msgs: 1.10.0 (/home/mcav/ros2_ws/install/autoware_control_msgs/share/autoware_control_msgs/cmake)
+[0.489s] -- Found ament_lint_auto: 0.12.14 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.525s] -- Added test 'copyright' to check source files copyright and LICENSE
+[0.526s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[0.526s] -- Configured cppcheck include dirs: 
+[0.526s] -- Configured cppcheck exclude dirs and/or files: 
+[0.527s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[0.527s] -- Configured cpplint exclude dirs and/or files: 
+[0.527s] -- Added test 'lint_cmake' to check CMake code style
+[0.528s] -- Added test 'uncrustify' to check C / C++ code style
+[0.528s] -- Configured uncrustify additional arguments: 
+[0.528s] -- Added test 'xmllint' to check XML markup files
+[0.529s] -- Configuring done
+[0.536s] -- Generating done
+[0.538s] -- Build files have been written to: /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface
+[0.541s] Invoked command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface' returned '0': AMENT_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:/home/mcav/ros2_ws/install/sd_vehicle_interface:/home/mcav/ros2_ws/install/sd_msgs:/home/mcav/ros2_ws/install/autoware_control_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake /home/mcav/ros2_ws/src/SD-VehicleInterface/vehicle_interface -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_vehicle_interface
+[0.542s] Invoking command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface': AMENT_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:/home/mcav/ros2_ws/install/sd_vehicle_interface:/home/mcav/ros2_ws/install/sd_msgs:/home/mcav/ros2_ws/install/autoware_control_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface -- -j8 -l8
+[0.561s] [ 25%] [32mBuilding CXX object CMakeFiles/sd_vehicle_interface_node.dir/src/sd_vehicle_interface/sd_vehicle_interface.cpp.o[0m
+[0.561s] [ 50%] [32mBuilding CXX object CMakeFiles/sd_vehicle_interface_node.dir/src/sd_vehicle_interface/sd_control.cpp.o[0m
+[0.561s] [ 75%] [32mBuilding CXX object CMakeFiles/sd_vehicle_interface_node.dir/src/sd_vehicle_interface/sd_gps_imu.cpp.o[0m
+[0.738s] [01m[K/home/mcav/ros2_ws/src/SD-VehicleInterface/vehicle_interface/src/sd_vehicle_interface/sd_vehicle_interface.cpp:52:10:[m[K [01;31m[Kfatal error: [m[Ktier4_vehicle_msgs/msg/battery_status.hpp: No such file or directory
+[0.738s]    52 | #include [01;31m[K"tier4_vehicle_msgs/msg/battery_status.hpp"[m[K
+[0.738s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[0.738s] compilation terminated.
+[0.738s] gmake[2]: *** [CMakeFiles/sd_vehicle_interface_node.dir/build.make:76: CMakeFiles/sd_vehicle_interface_node.dir/src/sd_vehicle_interface/sd_vehicle_interface.cpp.o] Error 1
+[0.738s] gmake[2]: *** Waiting for unfinished jobs....
+[1.804s] gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/sd_vehicle_interface_node.dir/all] Error 2
+[1.804s] gmake: *** [Makefile:146: all] Error 2
+[1.805s] Invoked command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface' returned '2': AMENT_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs:/home/mcav/ros2_ws/install/sd_vehicle_interface:/home/mcav/ros2_ws/install/sd_msgs:/home/mcav/ros2_ws/install/autoware_control_msgs:/opt/ros/humble LD_LIBRARY_PATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages:${PYTHONPATH} /usr/bin/cmake --build /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface -- -j8 -l8

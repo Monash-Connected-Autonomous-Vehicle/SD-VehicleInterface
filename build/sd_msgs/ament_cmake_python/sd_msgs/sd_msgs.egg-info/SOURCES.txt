@@ -1,0 +1,8 @@
+setup.py
+sd_msgs/__init__.py
+sd_msgs.egg-info/PKG-INFO
+sd_msgs.egg-info/SOURCES.txt
+sd_msgs.egg-info/dependency_links.txt
+sd_msgs.egg-info/top_level.txt
+sd_msgs/msg/__init__.py
+sd_msgs/msg/_sd_control.py

@@ -48,6 +48,9 @@ using namespace std;
 #include "sd_gps_imu.h"
 #include "sd_control.h"
 
+#include "std_msgs/msg/float32.hpp" 
+#include "tier4_vehicle_msgs/msg/battery_status.hpp"
+
 //Callback Functions
 void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg)
 {
@@ -85,8 +88,10 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
     CurrentTwistLinearNDT_Mps = msg->twist.linear.x; //mps to kph
 }
 
+
 int main(int argc, char **argv)
 {
+	std::cout << "heelloooo" << std::endl;
 
 	rclcpp::init(argc, argv);
     auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
@@ -107,6 +112,7 @@ int main(int argc, char **argv)
 	sensor_msgs::msg::NavSatFix current_GPS;
 	sensor_msgs::msg::Imu current_IMU;
 	sd_msgs::msg::SDControl SD_Current_Control;
+	tier4_vehicle_msgs::msg::BatteryStatus full_BatteryStatus;
 	
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
@@ -120,12 +126,14 @@ int main(int argc, char **argv)
 	auto current_IMU_pub = node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw",100);
     auto sd_control_pub = node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1); // in the original ROS1 interface from StreetDrone, this topic was latched.
 
+	auto battery_pub = node->create_publisher<tier4_vehicle_msgs::msg::BatteryStatus>("vehicle/status/battery_charge", 10);
+
 
     rclcpp::Rate loop_rate(ROS_LOOP);
 	rclcpp::Time autonomous_entry(0, 0, RCL_ROS_TIME);
 
 	auto main_loop = [&node, &autonomous_entry, &sent_msgs_pub, &current_twist_pub, &current_GPS_pub, &current_IMU_pub, &sd_control_pub,
-					  &current_Twist, &current_GPS, &current_IMU, &SD_Current_Control]() -> void
+					  &current_Twist, &current_GPS, &current_IMU, &SD_Current_Control, &battery_pub, &full_BatteryStatus]() -> void
 	{
 		//Choose the vehicle speed source as specified at launch
 		if(ndt_speed_string==_sd_speed_source){
@@ -190,7 +198,7 @@ int main(int argc, char **argv)
 			//Populate the Can frames with calculated data
 			sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc, FinalDBWSteerRequest_Pc, AliveCounter_Z);
 			// sd::PopFeedbackCANData(ControllerFeedbackCANTx, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc, TargetTwistLinear_Mps, TargeTireAngle_Rad);
-		} else{
+		} else {
 			autonomous_entry = node->now();
 		}
 			
@@ -204,6 +212,11 @@ int main(int argc, char **argv)
 
 		current_twist_pub->publish(current_Twist);
 		current_GPS_pub->publish(current_GPS);
+
+		// Set full battery status
+  		full_BatteryStatus.energy_level = 100;
+		full_BatteryStatus.stamp = node->get_clock()->now();
+    	battery_pub->publish(full_BatteryStatus);
 
 
 		if(no_imu_string !=_sd_gps_imu){ //If we have specified an IMU is present, publish an IMU message

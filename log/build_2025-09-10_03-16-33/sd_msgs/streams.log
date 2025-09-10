@@ -1,0 +1,191 @@
+[0.008s] Invoking command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/mcav/ros2_ws/src/SD-VehicleInterface/sd_msgs -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs
+[0.054s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.117s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.154s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.175s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[0.178s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.182s] -- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.209s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.231s] -- Found std_msgs: 4.9.0 (/opt/ros/humble/share/std_msgs/cmake)
+[0.387s] -- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+[0.481s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.596s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.604s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") 
+[0.605s] -- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+[0.618s] -- Found PythonLibs: /usr/lib/aarch64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") 
+[0.618s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.618s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[0.618s] -- Using PYTHON_LIBRARIES: /usr/lib/aarch64-linux-gnu/libpython3.10.so
+[0.624s] -- Found PythonExtra: .so  
+[0.646s] -- Found ament_lint_auto: 0.12.14 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[0.662s] -- Added test 'copyright' to check source files copyright and LICENSE
+[0.664s] -- Added test 'lint_cmake' to check CMake code style
+[0.664s] -- Added test 'xmllint' to check XML markup files
+[0.666s] -- Configuring done
+[0.694s] -- Generating done
+[0.700s] -- Build files have been written to: /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs
+[0.705s] Invoked command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/mcav/ros2_ws/src/SD-VehicleInterface/sd_msgs -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs
+[0.706s] Invoking command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs -- -j8 -l8
+[0.723s] [  3%] [34m[1mGenerating C code for ROS interfaces[0m
+[0.727s] [  6%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[0.730s] [  6%] Built target ament_cmake_python_symlink_sd_msgs
+[0.814s] running egg_info
+[0.814s] creating sd_msgs.egg-info
+[0.815s] writing sd_msgs.egg-info/PKG-INFO
+[0.815s] writing dependency_links to sd_msgs.egg-info/dependency_links.txt
+[0.815s] writing top-level names to sd_msgs.egg-info/top_level.txt
+[0.815s] writing manifest file 'sd_msgs.egg-info/SOURCES.txt'
+[0.816s] reading manifest file 'sd_msgs.egg-info/SOURCES.txt'
+[0.817s] writing manifest file 'sd_msgs.egg-info/SOURCES.txt'
+[0.830s] [  6%] Built target ament_cmake_python_build_sd_msgs_egg
+[0.858s] [  6%] Built target sd_msgs__cpp
+[0.861s] [  9%] [32mBuilding C object CMakeFiles/sd_msgs__rosidl_generator_c.dir/rosidl_generator_c/sd_msgs/msg/detail/sd_control__functions.c.o[0m
+[0.863s] [ 12%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[0.863s] [ 16%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[0.863s] [ 19%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[0.964s] [ 22%] [32m[1mLinking C shared library libsd_msgs__rosidl_generator_c.so[0m
+[0.989s] [ 25%] [32mBuilding CXX object CMakeFiles/sd_msgs__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/sd_msgs/msg/sd_control__type_support.cpp.o[0m
+[0.993s] [ 25%] Built target sd_msgs__rosidl_generator_c
+[0.996s] [ 29%] [32mBuilding CXX object CMakeFiles/sd_msgs__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/sd_msgs/msg/detail/sd_control__type_support.cpp.o[0m
+[0.998s] [ 32%] [34m[1mGenerating C type support for eProsima Fast-RTPS[0m
+[0.998s] [ 35%] [34m[1mGenerating C type support dispatch for ROS interfaces[0m
+[0.999s] [ 38%] [34m[1mGenerating C introspection for ROS interfaces[0m
+[1.000s] [ 41%] [32mBuilding CXX object CMakeFiles/sd_msgs__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/sd_msgs/msg/detail/dds_fastrtps/sd_control__type_support.cpp.o[0m
+[1.167s] [ 45%] [32mBuilding CXX object CMakeFiles/sd_msgs__rosidl_typesupport_c.dir/rosidl_typesupport_c/sd_msgs/msg/sd_control__type_support.cpp.o[0m
+[1.176s] [ 48%] [32mBuilding C object CMakeFiles/sd_msgs__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/sd_msgs/msg/detail/sd_control__type_support.c.o[0m
+[1.176s] [ 51%] [32mBuilding CXX object CMakeFiles/sd_msgs__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/sd_msgs/msg/detail/sd_control__type_support_c.cpp.o[0m
+[1.206s] [ 54%] [32m[1mLinking CXX shared library libsd_msgs__rosidl_typesupport_c.so[0m
+[1.211s] [ 58%] [32m[1mLinking C shared library libsd_msgs__rosidl_typesupport_introspection_c.so[0m
+[1.239s] [ 58%] Built target sd_msgs__rosidl_typesupport_introspection_c
+[1.240s] [ 58%] Built target sd_msgs__rosidl_typesupport_c
+[1.264s] [ 61%] [32m[1mLinking CXX shared library libsd_msgs__rosidl_typesupport_cpp.so[0m
+[1.288s] [ 61%] Built target sd_msgs__rosidl_typesupport_cpp
+[1.321s] [ 67%] [32m[1mLinking CXX shared library libsd_msgs__rosidl_typesupport_introspection_cpp.so[0m
+[1.321s] [ 67%] [32m[1mLinking CXX shared library libsd_msgs__rosidl_typesupport_fastrtps_cpp.so[0m
+[1.353s] [ 67%] Built target sd_msgs__rosidl_typesupport_introspection_cpp
+[1.356s] [ 67%] Built target sd_msgs__rosidl_typesupport_fastrtps_cpp
+[1.361s] [ 70%] [32m[1mLinking CXX shared library libsd_msgs__rosidl_typesupport_fastrtps_c.so[0m
+[1.389s] [ 70%] Built target sd_msgs__rosidl_typesupport_fastrtps_c
+[1.396s] [ 70%] Built target sd_msgs
+[1.402s] [ 74%] [34m[1mGenerating Python code for ROS interfaces[0m
+[1.549s] [ 74%] Built target sd_msgs__py
+[1.556s] [ 77%] [32mBuilding C object CMakeFiles/sd_msgs__rosidl_generator_py.dir/rosidl_generator_py/sd_msgs/msg/_sd_control_s.c.o[0m
+[1.617s] [ 80%] [32m[1mLinking C shared library rosidl_generator_py/sd_msgs/libsd_msgs__rosidl_generator_py.so[0m
+[1.632s] [ 80%] Built target sd_msgs__rosidl_generator_py
+[1.640s] [ 87%] [32mBuilding C object CMakeFiles/sd_msgs__rosidl_typesupport_fastrtps_c__pyext.dir/rosidl_generator_py/sd_msgs/_sd_msgs_s.ep.rosidl_typesupport_fastrtps_c.c.o[0m
+[1.640s] [ 87%] [32mBuilding C object CMakeFiles/sd_msgs__rosidl_typesupport_introspection_c__pyext.dir/rosidl_generator_py/sd_msgs/_sd_msgs_s.ep.rosidl_typesupport_introspection_c.c.o[0m
+[1.640s] [ 90%] [32mBuilding C object CMakeFiles/sd_msgs__rosidl_typesupport_c__pyext.dir/rosidl_generator_py/sd_msgs/_sd_msgs_s.ep.rosidl_typesupport_c.c.o[0m
+[1.686s] [100%] [32m[1mLinking C shared library rosidl_generator_py/sd_msgs/sd_msgs_s__rosidl_typesupport_introspection_c.cpython-310-aarch64-linux-gnu.so[0m
+[1.686s] [100%] [32m[1mLinking C shared library rosidl_generator_py/sd_msgs/sd_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-aarch64-linux-gnu.so[0m
+[1.687s] [100%] [32m[1mLinking C shared library rosidl_generator_py/sd_msgs/sd_msgs_s__rosidl_typesupport_c.cpython-310-aarch64-linux-gnu.so[0m
+[1.704s] [100%] Built target sd_msgs__rosidl_typesupport_c__pyext
+[1.704s] [100%] Built target sd_msgs__rosidl_typesupport_fastrtps_c__pyext
+[1.704s] [100%] Built target sd_msgs__rosidl_typesupport_introspection_c__pyext
+[1.709s] Invoked command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs -- -j8 -l8
+[1.714s] Invoking command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs
+[1.716s] -- Install configuration: ""
+[1.716s] -- Execute custom install script
+[1.717s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/ament_index/resource_index/rosidl_interfaces/sd_msgs
+[1.720s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__functions.h
+[1.723s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__struct.h
+[1.726s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__type_support.h
+[1.728s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/rosidl_generator_c__visibility_control.h
+[1.731s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/sd_control.h
+[1.734s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/library_path.sh
+[1.737s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/library_path.dsv
+[1.740s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__rosidl_typesupport_fastrtps_c.h
+[1.743s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[1.746s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__rosidl_typesupport_introspection_c.h
+[1.748s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[1.751s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__builder.hpp
+[1.754s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__struct.hpp
+[1.757s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__traits.hpp
+[1.760s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__type_support.hpp
+[1.763s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/rosidl_generator_cpp__visibility_control.hpp
+[1.765s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/sd_control.hpp
+[1.768s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__rosidl_typesupport_fastrtps_cpp.hpp
+[1.771s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[1.774s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/include/sd_msgs/sd_msgs/msg/detail/sd_control__rosidl_typesupport_introspection_cpp.hpp
+[1.777s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/pythonpath.sh
+[1.780s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/pythonpath.dsv
+[1.783s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs-0.0.0-py3.10.egg-info/PKG-INFO
+[1.785s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs-0.0.0-py3.10.egg-info/SOURCES.txt
+[1.788s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs-0.0.0-py3.10.egg-info/dependency_links.txt
+[1.791s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs-0.0.0-py3.10.egg-info/top_level.txt
+[1.794s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/__init__.py
+[1.797s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/_sd_msgs_s.ep.rosidl_typesupport_c.c
+[1.800s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/_sd_msgs_s.ep.rosidl_typesupport_fastrtps_c.c
+[1.802s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/_sd_msgs_s.ep.rosidl_typesupport_introspection_c.c
+[1.805s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/libsd_msgs__rosidl_generator_py.so
+[1.808s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/msg/__init__.py
+[1.811s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/msg/_sd_control.py
+[1.814s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/msg/_sd_control_s.c
+[1.817s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/sd_msgs_s__rosidl_typesupport_c.cpython-310-aarch64-linux-gnu.so
+[1.820s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/sd_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-aarch64-linux-gnu.so
+[1.823s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/sd_msgs_s__rosidl_typesupport_introspection_c.cpython-310-aarch64-linux-gnu.so
+[1.826s] -- Up-to-date symlink: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/sd_msgs_s__rosidl_typesupport_fastrtps_c.cpython-310-aarch64-linux-gnu.so
+[1.826s] -- Up-to-date symlink: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/sd_msgs_s__rosidl_typesupport_introspection_c.cpython-310-aarch64-linux-gnu.so
+[1.826s] -- Up-to-date symlink: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/sd_msgs_s__rosidl_typesupport_c.cpython-310-aarch64-linux-gnu.so
+[1.826s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/msg/SDControl.idl
+[1.829s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/msg/SDControl.msg
+[1.832s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/ament_index/resource_index/package_run_dependencies/sd_msgs
+[1.835s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/ament_index/resource_index/parent_prefix_path/sd_msgs
+[1.838s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/ament_prefix_path.sh
+[1.840s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/ament_prefix_path.dsv
+[1.843s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/path.sh
+[1.846s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/environment/path.dsv
+[1.849s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/local_setup.bash
+[1.852s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/local_setup.sh
+[1.855s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/local_setup.zsh
+[1.858s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/local_setup.dsv
+[1.860s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/package.dsv
+[1.863s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/ament_index/resource_index/packages/sd_msgs
+[1.866s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/rosidl_cmake-extras.cmake
+[1.869s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/ament_cmake_export_dependencies-extras.cmake
+[1.871s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/ament_cmake_export_include_directories-extras.cmake
+[1.874s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/ament_cmake_export_libraries-extras.cmake
+[1.877s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/ament_cmake_export_targets-extras.cmake
+[1.880s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[1.883s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[1.886s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgsConfig.cmake
+[1.889s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgsConfig-version.cmake
+[1.892s] -- Symlinking: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/package.xml
+[1.894s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_generator_c.so
+[1.895s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_generator_c.so" to ""
+[1.895s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_fastrtps_c.so
+[1.895s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_fastrtps_c.so" to ""
+[1.895s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_introspection_c.so
+[1.895s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_introspection_c.so" to ""
+[1.895s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_c.so
+[1.896s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_c.so" to ""
+[1.896s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_fastrtps_cpp.so
+[1.896s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_fastrtps_cpp.so" to ""
+[1.896s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_introspection_cpp.so
+[1.896s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_introspection_cpp.so" to ""
+[1.896s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_cpp.so
+[1.896s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_typesupport_cpp.so" to ""
+[1.911s] Listing '/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs'...
+[1.911s] Compiling '/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/__init__.py'...
+[1.911s] Listing '/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/msg'...
+[1.911s] Compiling '/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/msg/__init__.py'...
+[1.911s] Compiling '/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/local/lib/python3.10/dist-packages/sd_msgs/msg/_sd_control.py'...
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_generator_py.so
+[1.914s] -- Set runtime path of "/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/lib/libsd_msgs__rosidl_generator_py.so" to ""
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_generator_cExport.cmake
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_generator_cExport-noconfig.cmake
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_typesupport_fastrtps_cExport.cmake
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_introspection_cExport.cmake
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_cExport.cmake
+[1.914s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_cExport-noconfig.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_generator_cppExport.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_typesupport_fastrtps_cppExport.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_introspection_cppExport.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_cppExport.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/sd_msgs__rosidl_typesupport_cppExport-noconfig.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_generator_pyExport.cmake
+[1.915s] -- Installing: /home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs/share/sd_msgs/cmake/export_sd_msgs__rosidl_generator_pyExport-noconfig.cmake
+[1.916s] Invoked command in '/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs

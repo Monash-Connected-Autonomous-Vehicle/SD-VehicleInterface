@@ -1,0 +1,233 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-f505e30d5629cc9460f0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				},
+				{
+					"build" : "sd_msgs__py",
+					"jsonFile" : "directory-sd_msgs__py-5fde31b91b6fcba1ba19.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.12"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs/sd_msgs__py",
+					"targetIndexes" : 
+					[
+						4
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1
+					],
+					"name" : "sd_msgs",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_build_sd_msgs_egg::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_build_sd_msgs_egg-45ff9f928bc5f174a31b.json",
+					"name" : "ament_cmake_python_build_sd_msgs_egg",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ament_cmake_python_symlink_sd_msgs::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ament_cmake_python_symlink_sd_msgs-9db51ef14fd6572a3d53.json",
+					"name" : "ament_cmake_python_symlink_sd_msgs",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs-c7c158f898dc9e43a722.json",
+					"name" : "sd_msgs",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__cpp-5ccd23f74674f6ae1167.json",
+					"name" : "sd_msgs__cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "sd_msgs__py::@97c0ad6535d5607f03d1",
+					"jsonFile" : "target-sd_msgs__py-5e2afef6d705fef889bb.json",
+					"name" : "sd_msgs__py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_generator_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_generator_c-6eda8ebccc6ef4fd6a30.json",
+					"name" : "sd_msgs__rosidl_generator_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_generator_py::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_generator_py-8ad0db4ba3af2c5015bb.json",
+					"name" : "sd_msgs__rosidl_generator_py",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_c-ec22c686d0479ec1f6ed.json",
+					"name" : "sd_msgs__rosidl_typesupport_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_c__pyext-6b430ea4280ec56c4f35.json",
+					"name" : "sd_msgs__rosidl_typesupport_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_cpp-593ea7c92cbbdca30e7e.json",
+					"name" : "sd_msgs__rosidl_typesupport_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_fastrtps_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_fastrtps_c-085b80adf0db406f455b.json",
+					"name" : "sd_msgs__rosidl_typesupport_fastrtps_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_fastrtps_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_fastrtps_c__pyext-19409c325b621dbb15f2.json",
+					"name" : "sd_msgs__rosidl_typesupport_fastrtps_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_fastrtps_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_fastrtps_cpp-6ff18254d57d80f673dd.json",
+					"name" : "sd_msgs__rosidl_typesupport_fastrtps_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_introspection_c::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_introspection_c-d59d6cf6312b6f261757.json",
+					"name" : "sd_msgs__rosidl_typesupport_introspection_c",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_introspection_c__pyext::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_introspection_c__pyext-693563f7c03c97943da2.json",
+					"name" : "sd_msgs__rosidl_typesupport_introspection_c__pyext",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs__rosidl_typesupport_introspection_cpp::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs__rosidl_typesupport_introspection_cpp-58211b4db5e59db9d3a2.json",
+					"name" : "sd_msgs__rosidl_typesupport_introspection_cpp",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sd_msgs_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sd_msgs_uninstall-4ca01fd5cee32f1e99c1.json",
+					"name" : "sd_msgs_uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-67bac9c008d795ab6a23.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs",
+		"source" : "/home/mcav/ros2_ws/src/SD-VehicleInterface/sd_msgs"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

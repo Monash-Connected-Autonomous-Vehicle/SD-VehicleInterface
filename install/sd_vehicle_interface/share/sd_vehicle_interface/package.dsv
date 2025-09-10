@@ -1,0 +1,5 @@
+source;share/sd_vehicle_interface/local_setup.bash
+source;share/sd_vehicle_interface/local_setup.dsv
+source;share/sd_vehicle_interface/local_setup.ps1
+source;share/sd_vehicle_interface/local_setup.sh
+source;share/sd_vehicle_interface/local_setup.zsh

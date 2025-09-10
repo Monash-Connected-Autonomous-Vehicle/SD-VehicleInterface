@@ -1,0 +1,8 @@
+[01m[K/home/mcav/ros2_ws/src/SD-VehicleInterface/vehicle_interface/src/sd_vehicle_interface/sd_vehicle_interface.cpp:52:10:[m[K [01;31m[Kfatal error: [m[Ktier4_vehicle_msgs/msg/battery_status.hpp: No such file or directory
+   52 | #include [01;31m[K"tier4_vehicle_msgs/msg/battery_status.hpp"[m[K
+      |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+compilation terminated.
+gmake[2]: *** [CMakeFiles/sd_vehicle_interface_node.dir/build.make:76: CMakeFiles/sd_vehicle_interface_node.dir/src/sd_vehicle_interface/sd_vehicle_interface.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+gmake[1]: *** [CMakeFiles/Makefile2:137: CMakeFiles/sd_vehicle_interface_node.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2
