@@ -91,7 +91,6 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
 
 int main(int argc, char **argv)
 {
-	std::cout << "heelloooo" << std::endl;
 
 	rclcpp::init(argc, argv);
     auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
