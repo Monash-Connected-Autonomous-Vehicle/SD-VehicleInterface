@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs/rosidl_generator_py/sd_msgs/sd_msgs_s__rosidl_typesupport_introspection_c.cpython-310-aarch64-linux-gnu.so" "TARGETS" "sd_msgs__rosidl_typesupport_introspection_c__pyext" "DESTINATION" "local/lib/python3.10/dist-packages/sd_msgs")

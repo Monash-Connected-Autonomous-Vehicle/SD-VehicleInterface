@@ -1,6 +1,0 @@
-[0.000000] (-) TimerEvent: {}
-[0.000087] (-) JobUnselected: {'identifier': 'sd_msgs'}
-[0.000109] (sd_vehicle_interface) JobQueued: {'identifier': 'sd_vehicle_interface', 'dependencies': OrderedDict([('sd_msgs', '/home/mcav/ros2_ws/src/SD-VehicleInterface/install/sd_msgs')])}
-[0.000123] (sd_vehicle_interface) JobStarted: {'identifier': 'sd_vehicle_interface'}
-[0.005669] (sd_vehicle_interface) JobEnded: {'identifier': 'sd_vehicle_interface', 'rc': 1}
-[0.017203] (-) EventReactorShutdown: {}

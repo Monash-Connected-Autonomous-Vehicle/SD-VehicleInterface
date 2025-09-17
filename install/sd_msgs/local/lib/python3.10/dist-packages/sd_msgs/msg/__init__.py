@@ -1,1 +1,0 @@
-/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs/rosidl_generator_py/sd_msgs/msg/__init__.py

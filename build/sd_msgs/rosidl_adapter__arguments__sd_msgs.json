@@ -1,6 +1,0 @@
-{
-  "package_name": "sd_msgs",
-  "non_idl_tuples": [
-    "/home/mcav/ros2_ws/src/SD-VehicleInterface/sd_msgs:msg/SDControl.msg"
-  ]
-}

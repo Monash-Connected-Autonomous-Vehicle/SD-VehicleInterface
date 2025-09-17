@@ -1,1 +1,0 @@
-/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs/rosidl_generator_py/sd_msgs/_sd_msgs_s.ep.rosidl_typesupport_c.c

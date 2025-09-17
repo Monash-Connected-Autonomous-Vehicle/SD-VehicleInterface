@@ -1,1 +1,0 @@
-/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_msgs/rosidl_typesupport_introspection_cpp/sd_msgs/msg/detail/sd_control__rosidl_typesupport_introspection_cpp.hpp

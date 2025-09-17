@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/mcav/ros2_ws/src/SD-VehicleInterface/build/sd_vehicle_interface/sd_vehicle_interface_node" "TARGETS" "sd_vehicle_interface_node" "DESTINATION" "lib/sd_vehicle_interface")
