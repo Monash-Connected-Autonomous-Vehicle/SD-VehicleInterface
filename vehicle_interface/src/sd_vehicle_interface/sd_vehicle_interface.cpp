@@ -28,36 +28,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+
+#include <cmath>
+#include <cstdint>
 #include <memory>
-// TODO refactor namespaces
-using namespace std;
+#include <string>
+
+#include "rclcpp/rclcpp.hpp"
+#include "geometry_msgs/msg/twist_stamped.hpp"
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
+#include "can_msgs/msg/frame.hpp"
 
 #include "autoware_vehicle_msgs/msg/control_mode_report.hpp"
-#include "tier4_vehicle_msgs/msg/battery_status.hpp"
 #include "autoware_vehicle_msgs/msg/gear_report.hpp"
 #include "autoware_vehicle_msgs/msg/hazard_lights_report.hpp"
-#include "autoware_vehicle_msgs/msg/turn_indicators_report.hpp"
 #include "autoware_vehicle_msgs/msg/steering_report.hpp"
+#include "autoware_vehicle_msgs/msg/turn_indicators_report.hpp"
 #include "autoware_vehicle_msgs/msg/velocity_report.hpp"
-#include "geometry_msgs/msg/quaternion.hpp"
-#include "geometry_msgs/msg/twist_stamped.hpp"
-#include "geometry_msgs/msg/vector3.hpp"
-#include "rclcpp/rclcpp.hpp"
+#include "tier4_vehicle_msgs/msg/battery_status.hpp"
+
 #include "sd_auxiliary_controller.h"
 #include "sd_control.h"
 #include "sd_gps_imu.h"
 #include "sd_lib_mcav.h"
 #include "sd_msgs/msg/sd_control.hpp"
 #include "sd_vehicle_interface.h"
-#include "sensor_msgs/msg/imu.hpp"
-#include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include <can_msgs/msg/frame.hpp>
-#include <iomanip>
-#include <iostream>
-#include <string>
-#include <cmath>
-#include <cstdint>
 
+using namespace std;
 using autoware_vehicle_msgs::msg::ControlModeReport;
 
 // Stating variables for automation modes
