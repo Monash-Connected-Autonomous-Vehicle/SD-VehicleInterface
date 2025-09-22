@@ -29,6 +29,7 @@
  *
  */
 #include <memory>
+// TODO refactor namespaces
 using namespace std;
 
 #include "autoware_vehicle_msgs/msg/control_mode_report.hpp"
