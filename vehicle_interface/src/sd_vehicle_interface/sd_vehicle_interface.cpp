@@ -70,13 +70,13 @@ uint8_t Torque_Automation_State = 0;
  * Inputs:
  *   - msg: shared pointer to received CAN frame
  */
-void ReceivedFrameCANRx_callback(const shared_ptr<can_msgs::msg::Frame> msg) {
+void on_can_rx_frame(const std::shared_ptr<can_msgs::msg::Frame> msg) {
 
   // copy CAN frame into ReceivedFrameCANRx
   ReceivedFrameCANRx = *msg.get();
 
   // get current speed, automation status flags and autonomation states
-  sd::ParseRxCANDataSDCan(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, CurrentSteer_pc,
+  sd::parse_sd_can_rx_frame(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, CurrentSteer_pc,
                           AutomationArmed_B, AutomationGranted_B, Steer_Automation_State, Torque_Automation_State);
 
   // parse data depending on IMU/GPS device used
@@ -153,7 +153,7 @@ void actuation_cmd_callback(
   TargetSteerCmd_temp = msg->actuation.steer_cmd;
 }
 
-double computeLateralVelocity(double vehicle_speed_mps,
+double compute_lateral_velocity(double vehicle_speed_mps,
                               double gps_course_deg,
                               double integrated_yaw_deg) {
   constexpr double DEG_TO_RAD = M_PI / 180.0;
@@ -185,9 +185,9 @@ int main(int argc, char **argv) {
   _sd_simulation_mode = node->get_parameter("sd_simulation_mode").as_bool();
 
   // initialise CAN variables
-  sd::InitSDInterfaceControl(CustomerControlCANTx);     // Customer_Control_1
-  sd::InitSDInterfaceFeedback(ControllerFeedbackCANTx); // receive feedback data
-  sd::InitSDInterfaceControl2(
+  sd::initialise_sd_interface_control(CustomerControlCANTx);     // Customer_Control_1
+  sd::initialise_sd_interface_feedback(ControllerFeedbackCANTx); // receive feedback data
+  sd::initialise_sd_interface_control_2(
       CustomerControlAuxiliaryCANTx); // Customer_Control_2
 
   // message objects (stores incoming data)
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
   // Subscribers
   // store messages from vehicle
   auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>(
-      "from_can_bus", 100, ReceivedFrameCANRx_callback);
+      "from_can_bus", 100, on_can_rx_frame);
   auto current_velocity_sub =
       node->create_subscription<geometry_msgs::msg::TwistStamped>(
           "current_velocity", 1, current_velocity_callback);
@@ -322,17 +322,17 @@ int main(int argc, char **argv) {
 
     // prevent stale commands from being used
     AliveCounter_Z++;
-    sd::UpdateControlAlive(CustomerControlCANTx, AliveCounter_Z);
+    sd::update_control_alive_count(CustomerControlCANTx, AliveCounter_Z);
 
     // request autonomous control if desired (at set frequency)
     if (0 == (AliveCounter_Z % CONTROL_LOOP)) {
       if (AutomationArmed_B) {
         // driver armed the vehicle for autonomous, request torque/steer
         // control
-        sd::RequestAutonomousControl(CustomerControlCANTx, AliveCounter_Z);
+        sd::request_autonomous_control(CustomerControlCANTx, AliveCounter_Z);
       } else {
         // fill CAN frame with 0s
-        sd::ResetControlCanData(CustomerControlCANTx, AliveCounter_Z);
+        sd::reset_control_can_data(CustomerControlCANTx, AliveCounter_Z);
       }
     }
 
@@ -386,10 +386,10 @@ int main(int argc, char **argv) {
       }
 
       // populate Customer_Control_1 CAN frame with calculated values
-      sd::PopControlCANData(CustomerControlCANTx, FinalDBWTorqueRequest_Pc,
+      sd::populate_control_can_data(CustomerControlCANTx, FinalDBWTorqueRequest_Pc,
                             FinalDBWSteerRequest_Pc, AliveCounter_Z);
       // populate Customer_Control_2
-      sd::PopControl2CANData(CustomerControlAuxiliaryCANTx,
+      sd::populate_control_2_can_data(CustomerControlAuxiliaryCANTx,
                              FinalHazardLightsRequest,
                              FinalIndicatorLeftRequest,
                              FinalIndicatorRightRequest, AliveCounter_Z);
@@ -470,7 +470,7 @@ int main(int argc, char **argv) {
     constexpr double dt = 0.05;
     integrated_yaw_deg += IMU_Rate_Z * dt;
 
-    current_VelocityStatus.lateral_velocity = computeLateralVelocity(
+    current_VelocityStatus.lateral_velocity = compute_lateral_velocity(
       CurrentTwistLinearCANImu_Mps,
       IMU_Angle_Z,          
       integrated_yaw_deg);
