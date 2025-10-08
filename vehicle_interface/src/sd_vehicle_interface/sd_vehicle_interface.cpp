@@ -64,21 +64,37 @@ uint8_t Torque_Automation_State = 0;
 
 // Constants
 namespace {
+  // Default values
+  constexpr int kDefaultEnergyLevel        = 100;
+
   // Math and timing
-  constexpr double kLoopCalcDelaySec    = 0.1;
-  constexpr int kMainLoopMs             = 5;
-  constexpr double kYawDtSec            = 0.05;
-  constexpr double kDegToRad            = M_PI / 180.0;
+  constexpr double kLoopCalcDelaySec       = 0.1;
+  constexpr int kMainLoopMs                = 5;
+  constexpr double kYawDtSec               = 0.05;
+  constexpr double kDegToRad               = M_PI / 180.0;
 
   // Queue depths
-  constexpr int kToCanQueueDepth        = 100;
-  constexpr int kFromCanQueueDepth      = 100; // Queue depth for incoming control e.g. CAN, commands
-  constexpr int kTwistQueueDepth        = 100;
-  constexpr int kGpsQueueDepth          = 100;
-  constexpr int kImuQueueDepth          = 100;
+  constexpr int kToCanQueueDepth           = 100;
+  constexpr int kFromCanQueueDepth         = 100; // Queue depth for incoming control e.g. CAN, commands
+  constexpr int kTwistQueueDepth           = 100;
+  constexpr int kGpsQueueDepth             = 100;
+  constexpr int kImuQueueDepth             = 100;
   constexpr int kCurrentVelocityQueueDepth = 1;
-  constexpr int kSdControlQueueDepth    = 1;
-  constexpr int kVehicleStatusQueue     = 10;
+  constexpr int kSdControlQueueDepth       = 1;
+  constexpr int kVehicleStatusQueue        = 10;
+
+  // Autonomous machine state codes
+  constexpr int kAutoModeUnknown = 0;
+  constexpr int kAutoModeInit = 1;
+  constexpr int kAutoModeNoCan2 = 2;
+  constexpr int kAutoModeManual = 3;
+  constexpr int kAutoModeAutoSetup = 4;
+  constexpr int kAutoModeAutoSetAvailable = 5; // Not currently referenced
+  constexpr int kAutoModeAutoRequested = 6;
+  constexpr int kAutoModeAutoGranted = 7;
+  constexpr int kAutoModeAutoCleanup = 8; // Not currently referenced
+  constexpr int kAutoModeMaxValue = 8;
+
 } // end namespace
 
 // ===== HELPER / CALLBACK FUNCTIONS =====
@@ -264,7 +280,7 @@ int main(int argc, char **argv) {
   
   // Autoware-specific publishers and message stores
   tier4_vehicle_msgs::msg::BatteryStatus temp_BatteryStatus;
-  temp_BatteryStatus.energy_level = 100;
+  temp_BatteryStatus.energy_level = kDefaultEnergyLevel; 
   auto battery_status_pub =
       node->create_publisher<tier4_vehicle_msgs::msg::BatteryStatus>("vehicle/status/battery_charge", kVehicleStatusQueue);
 
@@ -421,33 +437,33 @@ int main(int argc, char **argv) {
 
 	// using the variables taken from the can frame, create the conditions to determine the control mode
 	// control mode = no command
-	if (Steer_Automation_State == 0 && Torque_Automation_State == 0)
+	if (Steer_Automation_State == kAutoModeUnknown && Torque_Automation_State == kAutoModeUnknown)
 		current_ControlModeReport.mode = ControlModeReport::NO_COMMAND;
 
 	// control mode = autonomous
-	else if (Steer_Automation_State == 7 && Torque_Automation_State == 7)
+	else if (Steer_Automation_State == kAutoModeAutoGranted && Torque_Automation_State == kAutoModeAutoGranted)
 		current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS;
 
 	// control mode = autonomous steer only
-	else if (Steer_Automation_State == 7 && Torque_Automation_State != 7)
+	else if (Steer_Automation_State == kAutoModeAutoGranted && Torque_Automation_State != kAutoModeAutoGranted)
 		current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS_STEER_ONLY;
 
 	// control mode = autonomous velocity only
-	else if (Steer_Automation_State != 7 && Torque_Automation_State == 7)
+	else if (Steer_Automation_State != kAutoModeAutoGranted && Torque_Automation_State == kAutoModeAutoGranted)
 		current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS_VELOCITY_ONLY;
 
 	// control mode = manual
-	else if (Steer_Automation_State == 3 && Torque_Automation_State == 3)
+	else if (Steer_Automation_State == kAutoModeManual && Torque_Automation_State == kAutoModeManual)
 		current_ControlModeReport.mode = ControlModeReport::MANUAL;
 
 	// control mode = disengaged
-	else if ((Steer_Automation_State >= 4 && Steer_Automation_State <= 6) ||
-			(Torque_Automation_State >= 4 && Torque_Automation_State <= 6))
+	else if ((Steer_Automation_State >= kAutoModeAutoSetup && Steer_Automation_State <= kAutoModeAutoRequested) ||
+			(Torque_Automation_State >= kAutoModeAutoSetup && Torque_Automation_State <= kAutoModeAutoRequested))
 		current_ControlModeReport.mode = ControlModeReport::DISENGAGED;
 		
 	// control mode = not ready
-	else if (Steer_Automation_State == 1 || Steer_Automation_State == 2 || Steer_Automation_State > 8 ||
-			Torque_Automation_State == 1 || Torque_Automation_State == 2 || Torque_Automation_State > 8)
+	else if (Steer_Automation_State == kAutoModeInit || Steer_Automation_State == kAutoModeNoCan2 || Steer_Automation_State > kAutoModeMaxValue ||
+			Torque_Automation_State == kAutoModeInit || Torque_Automation_State == kAutoModeNoCan2 || Torque_Automation_State > kAutoModeMaxValue)
 		current_ControlModeReport.mode = ControlModeReport::NOT_READY;
 	
 	// control mode = no command
