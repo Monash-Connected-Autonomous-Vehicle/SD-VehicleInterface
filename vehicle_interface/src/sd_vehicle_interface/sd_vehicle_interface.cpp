@@ -70,7 +70,7 @@ uint8_t Torque_Automation_State = 0;
  * Inputs:
  *   - msg: shared pointer to received CAN frame
  */
-void on_can_rx_frame(const std::shared_ptr<can_msgs::msg::Frame> msg) {
+void on_can_rx_frame(const std::shared_ptr<const can_msgs::msg::Frame> msg) {
 
   // copy CAN frame into received_can_rx_frame
   received_can_rx_frame = *msg.get();
@@ -107,7 +107,7 @@ void on_can_rx_frame(const std::shared_ptr<can_msgs::msg::Frame> msg) {
  * Extract current forward speed from NDT (speed source)
  */
 void current_velocity_callback(
-    const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg) {
+    const std::shared_ptr<const geometry_msgs::msg::TwistStamped> msg) {
   // Current Velocity Reported from NDT
   CurrentTwistLinearNDT_Mps = msg->twist.linear.x; // mps to kph
 }
