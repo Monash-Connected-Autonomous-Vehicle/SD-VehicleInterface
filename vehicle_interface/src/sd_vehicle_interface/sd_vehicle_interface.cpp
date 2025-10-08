@@ -458,12 +458,13 @@ int main(int argc, char **argv) {
 
 	// control mode = disengaged
 	else if ((Steer_Automation_State >= kAutoModeAutoSetup && Steer_Automation_State <= kAutoModeAutoRequested) ||
-			(Torque_Automation_State >= kAutoModeAutoSetup && Torque_Automation_State <= kAutoModeAutoRequested))
+			    (Torque_Automation_State >= kAutoModeAutoSetup && Torque_Automation_State <= kAutoModeAutoRequested))
 		current_ControlModeReport.mode = ControlModeReport::DISENGAGED;
 		
 	// control mode = not ready
-	else if (Steer_Automation_State == kAutoModeInit || Steer_Automation_State == kAutoModeNoCan2 || Steer_Automation_State > kAutoModeMaxValue ||
-			Torque_Automation_State == kAutoModeInit || Torque_Automation_State == kAutoModeNoCan2 || Torque_Automation_State > kAutoModeMaxValue)
+	else if (Steer_Automation_State == kAutoModeInit || Steer_Automation_State == kAutoModeNoCan2 || 
+           Steer_Automation_State > kAutoModeMaxValue || Torque_Automation_State == kAutoModeInit || 
+           Torque_Automation_State == kAutoModeNoCan2 || Torque_Automation_State > kAutoModeMaxValue)
 		current_ControlModeReport.mode = ControlModeReport::NOT_READY;
 	
 	// control mode = no command
