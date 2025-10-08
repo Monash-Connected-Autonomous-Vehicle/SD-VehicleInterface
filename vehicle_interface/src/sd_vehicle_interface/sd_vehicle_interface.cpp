@@ -76,6 +76,7 @@ namespace {
   constexpr int kTwistQueueDepth        = 100;
   constexpr int kGpsQueueDepth          = 100;
   constexpr int kImuQueueDepth          = 100;
+  constexpr int kCurrentVelocityQueueDepth = 1;
   constexpr int kSdControlQueueDepth    = 1;
   constexpr int kVehicleStatusQueue     = 10;
 } // end namespace
