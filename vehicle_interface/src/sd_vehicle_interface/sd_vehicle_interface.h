@@ -116,9 +116,9 @@ uint8_t TargetHazardLightsCmd; // Hazard lights command received from autoware
 uint8_t TargetIndicatorsCmd;   // Indicators command received from autoware
 uint8_t TargetGearCmd;         // Gear command received from autoware
 
-// Other Autwoare Control
+// Other Autoware Control
 uint8_t TargetGateModeCmd;
-bool IsEmergency;
+bool is_emergency;
 double TargetAccelCmd_temp;
 double TargetBrakeCmd_temp;
 double TargetSteerCmd_temp;
@@ -151,7 +151,7 @@ int FF_Contribution_Pc = 0; // The torque contributed by feedforward gain
 // Ros variables
 
 // CAN frame received from vehicle
-can_msgs::msg::Frame ReceivedFrameCANRx;
+can_msgs::msg::Frame received_can_rx_frame;
 // Customer_Control_1 CAN frame (0x101), sent to CAN bus
 can_msgs::msg::Frame CustomerControlCANTx;
 // Customer_Control_2 CAN frame (0x104), sent to CAN bus

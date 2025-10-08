@@ -33,6 +33,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <chrono>
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
@@ -55,14 +56,13 @@
 #include "sd_msgs/msg/sd_control.hpp"
 #include "sd_vehicle_interface.h"
 
-using namespace std;
 using autoware_vehicle_msgs::msg::ControlModeReport;
 
 // Stating variables for automation modes
 uint8_t Steer_Automation_State  = 0;
 uint8_t Torque_Automation_State = 0;
 
-// ===== CALLBACK FUNCTIONS =====
+// ===== HELPER / CALLBACK FUNCTIONS =====
 
 /**
  * Process incoming CAN message, parse data into variables
@@ -72,11 +72,11 @@ uint8_t Torque_Automation_State = 0;
  */
 void on_can_rx_frame(const std::shared_ptr<can_msgs::msg::Frame> msg) {
 
-  // copy CAN frame into ReceivedFrameCANRx
-  ReceivedFrameCANRx = *msg.get();
+  // copy CAN frame into received_can_rx_frame
+  received_can_rx_frame = *msg.get();
 
   // get current speed, automation status flags and autonomation states
-  sd::parse_sd_can_rx_frame(ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, CurrentSteer_pc,
+  sd::parse_sd_can_rx_frame(received_can_rx_frame, CurrentTwistLinearCANSD_Mps, CurrentSteer_pc,
                           AutomationArmed_B, AutomationGranted_B, Steer_Automation_State, Torque_Automation_State);
 
   // parse data depending on IMU/GPS device used
@@ -84,37 +84,37 @@ void on_can_rx_frame(const std::shared_ptr<can_msgs::msg::Frame> msg) {
     IMUVarianceKnown_B = true; // variance/covariance known for OXTS
     // parse using OXTS function
     sd::ParseRxCANDataOXTSCan(
-        ReceivedFrameCANRx, CurrentTwistLinearCANImu_Mps, GPS_Longitude,
+        received_can_rx_frame, CurrentTwistLinearCANImu_Mps, GPS_Longitude,
         GPS_Latitude, IMU_Angle_X, IMU_Angle_Y, IMU_Angle_Z, IMU_Rate_X,
         IMU_Rate_Y, IMU_Rate_Z, IMU_Accel_X, IMU_Accel_Y, IMU_Accel_Z);
   } else if (peak_string == _sd_gps_imu) {
     // parse using PEAK function
     IMUVarianceKnown_B = false; // variance/covariance not known for PEAK
     sd::ParseRxCANDataPEAKCan(
-        ReceivedFrameCANRx, CurrentTwistLinearCANImu_Mps, GPS_Longitude,
+        received_can_rx_frame, CurrentTwistLinearCANImu_Mps, GPS_Longitude,
         GPS_Latitude, IMU_Angle_X, IMU_Angle_Y, IMU_Angle_Z, IMU_Rate_X,
         IMU_Rate_Y, IMU_Rate_Z, IMU_Accel_X, IMU_Accel_Y, IMU_Accel_Z);
   } else if (no_imu_string == _sd_gps_imu) {
     // no IMU, do nothing
   } else {
-    // unkonwn IMU, warning
+    // unknown IMU, warning
     // RCLCPP_WARN(node->get_logger(), "SD_Vehicle_Interface parameter for
     // sd_gps_imu is not valid\n");
   }
 }
 
 /**
- * extract current forward speed from NDT (speed source)
+ * Extract current forward speed from NDT (speed source)
  */
 void current_velocity_callback(
-    const shared_ptr<geometry_msgs::msg::TwistStamped> msg) {
+    const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg) {
   // Current Velocity Reported from NDT
   CurrentTwistLinearNDT_Mps = msg->twist.linear.x; // mps to kph
 }
 
 // ===== AUTOWARE PUB/SUB =====
 void control_cmd_callback(
-    const shared_ptr<autoware_control_msgs::msg::Control> msg) {
+    const std::shared_ptr<autoware_control_msgs::msg::Control> msg) {
   TargetTireAngle_Rad = msg->lateral.steering_tire_angle;
   TargetTwistLinear_Mps =
       msg->longitudinal.velocity / UNDO_STREETDRONE_SCALING_FACTOR;
@@ -122,32 +122,32 @@ void control_cmd_callback(
 }
 
 void hazard_cmd_callback(
-    const shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand> msg) {
+    const std::shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand> msg) {
   TargetHazardLightsCmd = msg->command;
 }
 
 void indicators_cmd_callback(
-    const shared_ptr<autoware_vehicle_msgs::msg::TurnIndicatorsCommand> msg) {
+    const std::shared_ptr<autoware_vehicle_msgs::msg::TurnIndicatorsCommand> msg) {
   TargetIndicatorsCmd = msg->command;
 }
 
 void gear_cmd_callback(
-    const shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg) {
+    const std::shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg) {
   TargetGearCmd = msg->command;
 }
 
 void gate_mode_cmd_callback(
-    const shared_ptr<tier4_control_msgs::msg::GateMode> msg) {
+    const std::shared_ptr<tier4_control_msgs::msg::GateMode> msg) {
   TargetGateModeCmd = msg->data;
 }
 
 void emergency_cmd_callback(
-    const shared_ptr<tier4_vehicle_msgs::msg::VehicleEmergencyStamped> msg) {
-  IsEmergency = msg->emergency;
+    const std::shared_ptr<tier4_vehicle_msgs::msg::VehicleEmergencyStamped> msg) {
+  is_emergency = msg->emergency;
 }
 
 void actuation_cmd_callback(
-    const shared_ptr<tier4_vehicle_msgs::msg::ActuationCommandStamped> msg) {
+    const std::shared_ptr<tier4_vehicle_msgs::msg::ActuationCommandStamped> msg) {
   TargetAccelCmd_temp = msg->actuation.accel_cmd;
   TargetBrakeCmd_temp = msg->actuation.brake_cmd;
   TargetSteerCmd_temp = msg->actuation.steer_cmd;
@@ -175,11 +175,11 @@ int main(int argc, char **argv) {
   // create node + declare parameters:
   //   "sd_vehicle", "sd_gps_imu", "sd_speed_source", "sd_simulation_mode"
   auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
-  node->declare_parameter<string>("sd_vehicle", "env200");
+  node->declare_parameter<std::string>("sd_vehicle", "env200");
   _sd_vehicle = node->get_parameter("sd_vehicle").as_string();
-  node->declare_parameter<string>("sd_gps_imu", "oxts");
+  node->declare_parameter<std::string>("sd_gps_imu", "oxts");
   _sd_gps_imu = node->get_parameter("sd_gps_imu").as_string();
-  node->declare_parameter<string>("sd_speed_source", "vehicle_can_speed");
+  node->declare_parameter<std::string>("sd_speed_source", "vehicle_can_speed");
   _sd_speed_source = node->get_parameter("sd_speed_source").as_string();
   node->declare_parameter<bool>("sd_simulation_mode", false);
   _sd_simulation_mode = node->get_parameter("sd_simulation_mode").as_bool();
@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
 
   // Subscribers
   // store messages from vehicle
-  auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>(
+  auto received_can_rx_frame_sub = node->create_subscription<can_msgs::msg::Frame>(
       "from_can_bus", 100, on_can_rx_frame);
   auto current_velocity_sub =
       node->create_subscription<geometry_msgs::msg::TwistStamped>(
@@ -345,7 +345,7 @@ int main(int argc, char **argv) {
           ((node->now() - autonomous_entry) >=
            rclcpp::Duration::from_seconds(0.1))) {
 
-        if (IsEmergency) {
+        if (is_emergency) {
           TargetTwistLinear_Mps = 0;
           TargetTireAngle_Rad = 0;
         }
@@ -495,7 +495,7 @@ int main(int argc, char **argv) {
   };
 
   // run main loop every 5ms
-  auto timer = node->create_wall_timer(5ms, main_loop);
+  auto timer = node->create_wall_timer(std::chrono::milliseconds(5), main_loop);
 
   try {
     // keep node active to process subscriptions, timers, services, callbacks
