@@ -62,6 +62,24 @@ using autoware_vehicle_msgs::msg::ControlModeReport;
 uint8_t Steer_Automation_State  = 0;
 uint8_t Torque_Automation_State = 0;
 
+// Constants
+namespace {
+  // Math and timing
+  constexpr double kLoopCalcDelaySec    = 0.1;
+  constexpr int kMainLoopMs             = 5;
+  constexpr double kYawDtSec            = 0.05;
+  constexpr double kDegToRad            = M_PI / 180.0;
+
+  // Queue depths
+  constexpr int kToCanQueueDepth        = 100;
+  constexpr int kFromCanQueueDepth      = 100; // Queue depth for incoming control e.g. CAN, commands
+  constexpr int kTwistQueueDepth        = 100;
+  constexpr int kGpsQueueDepth          = 100;
+  constexpr int kImuQueueDepth          = 100;
+  constexpr int kSdControlQueueDepth    = 1;
+  constexpr int kVehicleStatusQueue     = 10;
+} // end namespace
+
 // ===== HELPER / CALLBACK FUNCTIONS =====
 
 /**
@@ -156,9 +174,8 @@ void actuation_cmd_callback(
 double compute_lateral_velocity(double vehicle_speed_mps,
                               double gps_course_deg,
                               double integrated_yaw_deg) {
-  constexpr double DEG_TO_RAD = M_PI / 180.0;
-  double course_rad = gps_course_deg * DEG_TO_RAD;
-  double yaw_rad = integrated_yaw_deg * DEG_TO_RAD;
+  double course_rad = gps_course_deg * kDegToRad;
+  double yaw_rad = integrated_yaw_deg * kDegToRad;
 
   return vehicle_speed_mps * std::sin(course_rad - yaw_rad);
 }
@@ -199,81 +216,81 @@ int main(int argc, char **argv) {
   // Subscribers
   // store messages from vehicle
   auto received_can_rx_frame_sub = node->create_subscription<can_msgs::msg::Frame>(
-      "from_can_bus", 100, on_can_rx_frame);
+      "from_can_bus", kFromCanQueueDepth, on_can_rx_frame);
   auto current_velocity_sub =
       node->create_subscription<geometry_msgs::msg::TwistStamped>(
-          "current_velocity", 1, current_velocity_callback);
+          "current_velocity", kCurrentVelocityQueueDepth, current_velocity_callback);
   
   // Autoware-specific subscribers
   auto control_sub =
       node->create_subscription<autoware_control_msgs::msg::Control>(
-          "/control/command/control_cmd", 100, control_cmd_callback);
+          "/control/command/control_cmd", kFromCanQueueDepth, control_cmd_callback);
   auto gear_sub =
       node->create_subscription<autoware_vehicle_msgs::msg::GearCommand>(
-          "/control/command/gear_cmd", 100, gear_cmd_callback);
+          "/control/command/gear_cmd", kFromCanQueueDepth, gear_cmd_callback);
   auto gate_mode_sub =
       node->create_subscription<tier4_control_msgs::msg::GateMode>(
-          "/control/current_gate_mode", 100, gate_mode_cmd_callback);
+          "/control/current_gate_mode", kFromCanQueueDepth, gate_mode_cmd_callback);
   auto emergency_cmd_sub =
       node->create_subscription<tier4_vehicle_msgs::msg::VehicleEmergencyStamped>(
-          "/control/command/emergency_cmd", 100, emergency_cmd_callback);
+          "/control/command/emergency_cmd", kFromCanQueueDepth, emergency_cmd_callback);
   auto actuation_cmd_sub =
       node->create_subscription<tier4_vehicle_msgs::msg::ActuationCommandStamped>(
-          "/control/command/actuation_cmd", 100, actuation_cmd_callback);
+          "/control/command/actuation_cmd", kFromCanQueueDepth, actuation_cmd_callback);
   auto hazard_lights_sub = node->create_subscription<
       autoware_vehicle_msgs::msg::HazardLightsCommand>(
-      "/control/command/hazard_lights_cmd", 100, hazard_cmd_callback);
+      "/control/command/hazard_lights_cmd", kFromCanQueueDepth, hazard_cmd_callback);
   auto indicators_sub = node->create_subscription<
       autoware_vehicle_msgs::msg::TurnIndicatorsCommand>(
-      "/control/command/turn_indicators_cmd", 100,
+      "/control/command/turn_indicators_cmd", kFromCanQueueDepth,
       indicators_cmd_callback);
 
   // Publishers
   // control commands (for ENV200)
   auto sent_msgs_pub =
-      node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
+      node->create_publisher<can_msgs::msg::Frame>("to_can_bus", kToCanQueueDepth);
 
   // current velocity
   auto current_twist_pub =
       node->create_publisher<geometry_msgs::msg::TwistStamped>(
-          "sd_current_twist", 100);
+          "sd_current_twist", kTwistQueueDepth);
   auto current_GPS_pub = node->create_publisher<sensor_msgs::msg::NavSatFix>(
-      "sd_current_GPS", 100);
+      "sd_current_GPS", kGpsQueueDepth);
   auto current_IMU_pub =
-      node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw", 100);
+      node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw", kImuQueueDepth);
   auto sd_control_pub =
-      node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1);
+      node->create_publisher<sd_msgs::msg::SDControl>("sd_control", kSdControlQueueDepth);
   
   // Autoware-specific publishers and message stores
   tier4_vehicle_msgs::msg::BatteryStatus temp_BatteryStatus;
   temp_BatteryStatus.energy_level = 100;
   auto battery_status_pub =
-      node->create_publisher<tier4_vehicle_msgs::msg::BatteryStatus>("vehicle/status/battery_charge", 10);
+      node->create_publisher<tier4_vehicle_msgs::msg::BatteryStatus>("vehicle/status/battery_charge", kVehicleStatusQueue);
 
   autoware_vehicle_msgs::msg::ControlModeReport current_ControlModeReport;
   current_ControlModeReport.mode = ControlModeReport::AUTONOMOUS; 
   auto control_mode_status_pub =
-      node->create_publisher<autoware_vehicle_msgs::msg::ControlModeReport>("vehicle/status/control_mode", 10);
+      node->create_publisher<autoware_vehicle_msgs::msg::ControlModeReport>("vehicle/status/control_mode", kVehicleStatusQueue);
   
   autoware_vehicle_msgs::msg::GearReport current_GearStatus;
   auto gear_status_pub =
-      node->create_publisher<autoware_vehicle_msgs::msg::GearReport>("vehicle/status/gear_status", 10);
+      node->create_publisher<autoware_vehicle_msgs::msg::GearReport>("vehicle/status/gear_status", kVehicleStatusQueue);
   
   autoware_vehicle_msgs::msg::HazardLightsReport current_HazardLightsStatus;
   auto hazard_light_status_pub =
-      node->create_publisher<autoware_vehicle_msgs::msg::HazardLightsReport>("vehicle/status/hazard_lights_status", 10);
+      node->create_publisher<autoware_vehicle_msgs::msg::HazardLightsReport>("vehicle/status/hazard_lights_status", kVehicleStatusQueue);
 
   autoware_vehicle_msgs::msg::TurnIndicatorsReport current_IndicatorStatus;
   auto indicator_status_pub =
-      node->create_publisher<autoware_vehicle_msgs::msg::TurnIndicatorsReport>("vehicle/status/turn_indicators_status", 10);
+      node->create_publisher<autoware_vehicle_msgs::msg::TurnIndicatorsReport>("vehicle/status/turn_indicators_status", kVehicleStatusQueue);
 
   autoware_vehicle_msgs::msg::SteeringReport current_SteeringStatus;
   auto steering_status_pub =
-      node->create_publisher<autoware_vehicle_msgs::msg::SteeringReport>("vehicle/status/steering_status", 10);
+      node->create_publisher<autoware_vehicle_msgs::msg::SteeringReport>("vehicle/status/steering_status", kVehicleStatusQueue);
 
   autoware_vehicle_msgs::msg::VelocityReport current_VelocityStatus;
   auto velocity_status_pub =
-      node->create_publisher<autoware_vehicle_msgs::msg::VelocityReport>("vehicle/status/velocity_status", 10);
+      node->create_publisher<autoware_vehicle_msgs::msg::VelocityReport>("vehicle/status/velocity_status", kVehicleStatusQueue);
 
 
   // set frequency of main loop (Hz)
@@ -307,7 +324,7 @@ int main(int argc, char **argv) {
     // ===== UPDATE MESSAGES =====
 
     // angular + linear velocity
-    current_Twist.twist.angular.z = IMU_Rate_Z * DEG_to_RAD;
+    current_Twist.twist.angular.z = IMU_Rate_Z * kDegToRad;
     current_Twist.twist.linear.x =
         CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
     // GPS location
@@ -343,7 +360,7 @@ int main(int argc, char **argv) {
       // run at set frequency, +0.1s delay before running calculations
       if (0 == (AliveCounter_Z % CONTROL_LOOP) &&
           ((node->now() - autonomous_entry) >=
-           rclcpp::Duration::from_seconds(0.1))) {
+           rclcpp::Duration::from_seconds(kLoopCalcDelaySec))) {
 
         if (is_emergency) {
           TargetTwistLinear_Mps = 0;
@@ -436,8 +453,6 @@ int main(int argc, char **argv) {
 	else
 		current_ControlModeReport.mode = ControlModeReport::NO_COMMAND;
 
-
-
     // publish to autoware (regardless on weather autonomous or not)
     temp_BatteryStatus.stamp = node->get_clock()->now();
     battery_status_pub->publish(temp_BatteryStatus);
@@ -467,8 +482,7 @@ int main(int argc, char **argv) {
 
     // TODO: Recheck
     static double integrated_yaw_deg = 0.0;
-    constexpr double dt = 0.05;
-    integrated_yaw_deg += IMU_Rate_Z * dt;
+    integrated_yaw_deg += IMU_Rate_Z * kYawDtSec;
 
     current_VelocityStatus.lateral_velocity = compute_lateral_velocity(
       CurrentTwistLinearCANImu_Mps,
@@ -495,7 +509,7 @@ int main(int argc, char **argv) {
   };
 
   // run main loop every 5ms
-  auto timer = node->create_wall_timer(std::chrono::milliseconds(5), main_loop);
+  auto timer = node->create_wall_timer(std::chrono::milliseconds(kMainLoopMs), main_loop);
 
   try {
     // keep node active to process subscriptions, timers, services, callbacks
