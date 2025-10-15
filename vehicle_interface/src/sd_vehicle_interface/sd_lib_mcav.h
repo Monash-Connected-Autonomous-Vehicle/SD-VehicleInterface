@@ -101,7 +101,7 @@ void set_crc(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   frame.data[0] = crc;
 }
 
-void ParseSDCANRxFrame(can_msgs::msg::Frame &frame,
+void ParseSdCanRxFrame(can_msgs::msg::Frame &frame,
                          double &CurrentLinearVelocity_Mps, int8_t& current_steer_pc,
                          bool &automation_armed_b, bool &automation_granted_b, 
                          uint8_t &steer_automation_state, uint8_t &torque_automation_state) {
@@ -157,17 +157,17 @@ void ParseSDCANRxFrame(can_msgs::msg::Frame &frame,
 /*				SD TX FUNCTIONS				*/
 //**************************************************
 
-void InitialiseSDInterfaceControl(can_msgs::msg::Frame &frame) {
+void InitialiseSdInterfaceControl(can_msgs::msg::Frame &frame) {
   frame.dlc = 8;    // length of data (bytes)
   frame.id = 0x101; // customer Control frame id constant
 }
 
-void InitialiseSDInterfaceControl_2(can_msgs::msg::Frame &frame) {
+void InitialiseSdInterfaceControl_2(can_msgs::msg::Frame &frame) {
   frame.dlc = 8;    // length of data (bytes)
   frame.id = 0x104; // customer Control frame id constant
 }
 
-void InitialiseSDInterfaceFeedback(can_msgs::msg::Frame &frame) {
+void InitialiseSdInterfaceFeedback(can_msgs::msg::Frame &frame) {
   frame.dlc = 8;    // length of data (bytes)
   frame.id = 0x103; // customer Feedback frame id
 }
@@ -187,7 +187,7 @@ void RequestAutonomousControl(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   sd::set_crc(frame, aliveCount);
 }
 
-void ResetControlCANData(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
+void ResetControlCanData(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   frame.data[0] = 0;
   frame.data[1] = 0;
   frame.data[2] = 0;

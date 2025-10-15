@@ -105,27 +105,27 @@ namespace {
  * Inputs:
  *   - msg: shared pointer to received CAN frame
  */
-void OnCANRxFrame(const std::shared_ptr<const can_msgs::msg::Frame> msg) {
+void OnCanRxFrame(const std::shared_ptr<const can_msgs::msg::Frame> msg) {
 
   // copy CAN frame into received_can_rx_frame
   received_can_rx_frame = *msg.get();
 
   // get current speed, automation status flags and autonomation states
-  sd::ParseSDCANRxFrame(received_can_rx_frame, current_twist_linear_can_sd_mps, current_steer_pc,
+  sd::ParseSdCanRxFrame(received_can_rx_frame, current_twist_linear_can_sd_mps, current_steer_pc,
                           automation_armed_b, automation_granted_b, steer_automation_state, torque_automation_state);
 
   // parse data depending on IMU/GPS device used
   if (oxts_string == _sd_gps_imu) {
     imu_variance_known_b = true; // variance/covariance known for OXTS
     // parse using OXTS function
-    sd::ParseRxCANDataOXTSCan(
+    sd::ParseRxCanDataOxtsCan(
         received_can_rx_frame, current_twist_linear_can_imu_mps, gps_longitude,
         gps_latitude, imu_angle_x, imu_angle_y, imu_angle_z, imu_rate_x,
         imu_rate_y, imu_rate_z, imu_accel_x, imu_accel_y, imu_accel_z);
   } else if (peak_string == _sd_gps_imu) {
     // parse using PEAK function
     imu_variance_known_b = false; // variance/covariance not known for PEAK
-    sd::ParseRxCANDataPEAKCan(
+    sd::ParseRxCanDataPeakCan(
         received_can_rx_frame, current_twist_linear_can_imu_mps, gps_longitude,
         gps_latitude, imu_angle_x, imu_angle_y, imu_angle_z, imu_rate_x,
         imu_rate_y, imu_rate_z, imu_accel_x, imu_accel_y, imu_accel_z);
@@ -219,9 +219,9 @@ int main(int argc, char **argv) {
   _sd_simulation_mode = node->get_parameter("sd_simulation_mode").as_bool();
 
   // initialise CAN variables
-  sd::InitialiseSDInterfaceControl(customer_control_can_tx);     // Customer_Control_1
-  sd::InitialiseSDInterfaceFeedback(ControllerFeedbackCANTx); // receive feedback data
-  sd::InitialiseSDInterfaceControl_2(
+  sd::InitialiseSdInterfaceControl(customer_control_can_tx);     // Customer_Control_1
+  sd::InitialiseSdInterfaceFeedback(ControllerFeedbackCANTx); // receive feedback data
+  sd::InitialiseSdInterfaceControl_2(
       customer_control_auxiliary_can_tx); // Customer_Control_2
 
   // message objects (stores incoming data)
@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
   // Subscribers
   // store messages from vehicle
   auto received_can_rx_frame_sub = node->create_subscription<can_msgs::msg::Frame>(
-      "from_can_bus", kFromCanQueueDepth, OnCANRxFrame);
+      "from_can_bus", kFromCanQueueDepth, OnCanRxFrame);
   auto current_velocity_sub =
       node->create_subscription<geometry_msgs::msg::TwistStamped>(
           "current_velocity", kCurrentVelocityQueueDepth, CurrentVelocityCallback);
@@ -348,7 +348,7 @@ int main(int argc, char **argv) {
     current_gps.longitude = gps_longitude;
     current_gps.latitude = gps_latitude;
     // IMU (acceleration / angular rate)
-    sd::PackIMUMessage(imu_variance_known_b, current_imu, imu_angle_x,
+    sd::PackImuMessage(imu_variance_known_b, current_imu, imu_angle_x,
                        imu_angle_y, imu_angle_z, imu_rate_x, imu_rate_y,
                        imu_rate_z, imu_accel_x, imu_accel_y, imu_accel_z);
     current_imu.header.stamp = node->get_clock()->now();
@@ -366,7 +366,7 @@ int main(int argc, char **argv) {
         sd::RequestAutonomousControl(customer_control_can_tx, alive_counter_z);
       } else {
         // fill CAN frame with 0s
-        sd::ResetControlCANData(customer_control_can_tx, alive_counter_z);
+        sd::ResetControlCanData(customer_control_can_tx, alive_counter_z);
       }
     }
 

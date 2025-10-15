@@ -58,7 +58,7 @@ Quaternion ToQuaternion(double yaw, double pitch,
   return q;
 }
 
-void ParseRxCANDataOXTSCan(can_msgs::msg::Frame &ReceivedFrameCAN,
+void ParseRxCanDataOxtsCan(can_msgs::msg::Frame &ReceivedFrameCAN,
                            double &CurrentLinearVelocity_Mps,
                            double &gps_longitude, double &gps_latitude,
                            double &imu_angle_x, double &imu_angle_y,
@@ -121,7 +121,7 @@ void ParseRxCANDataOXTSCan(can_msgs::msg::Frame &ReceivedFrameCAN,
   }
 }
 
-void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &ReceivedFrameCAN,
+void ParseRxCanDataPeakCan(can_msgs::msg::Frame &ReceivedFrameCAN,
                            double &CurrentLinearVelocity_Mps,
                            double &gps_longitude, double &gps_latitude,
                            double &imu_angle_x, double &imu_angle_y,
@@ -233,7 +233,7 @@ void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &ReceivedFrameCAN,
   }
 }
 
-void PackIMUMessage(bool imu_variance_known_b, sensor_msgs::msg::Imu &current_imu,
+void PackImuMessage(bool imu_variance_known_b, sensor_msgs::msg::Imu &current_imu,
                     double imu_angle_x, double imu_angle_y, double imu_angle_z,
                     double imu_rate_x, double imu_rate_y, double imu_rate_z,
                     double imu_accel_x, double imu_accel_y,
