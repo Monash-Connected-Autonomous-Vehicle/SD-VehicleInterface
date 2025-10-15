@@ -348,7 +348,7 @@ int main(int argc, char **argv) {
     current_gps.longitude = gps_longitude;
     current_gps.latitude = gps_latitude;
     // IMU (acceleration / angular rate)
-    sd::PackImuMessage(imu_variance_known_b, current_imu, imu_angle_x,
+    sd::PackIMUMessage(imu_variance_known_b, current_imu, imu_angle_x,
                        imu_angle_y, imu_angle_z, imu_rate_x, imu_rate_y,
                        imu_rate_z, imu_accel_x, imu_accel_y, imu_accel_z);
     current_imu.header.stamp = node->get_clock()->now();

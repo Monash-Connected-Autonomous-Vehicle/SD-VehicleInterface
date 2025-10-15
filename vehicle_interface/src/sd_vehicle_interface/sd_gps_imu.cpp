@@ -233,7 +233,7 @@ void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &ReceivedFrameCAN,
   }
 }
 
-void PackImuMessage(bool imu_variance_known_b, sensor_msgs::msg::Imu &current_imu,
+void PackIMUMessage(bool imu_variance_known_b, sensor_msgs::msg::Imu &current_imu,
                     double imu_angle_x, double imu_angle_y, double imu_angle_z,
                     double imu_rate_x, double imu_rate_y, double imu_rate_z,
                     double imu_accel_x, double imu_accel_y,

@@ -71,7 +71,7 @@ void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &, double &, double &, double &,
                            double &, double &, double &, double &, double &,
                            double &, double &, double &, double &);
 
-void PackImuMessage(bool, sensor_msgs::msg::Imu &, double, double, double,
+void PackIMUMessage(bool, sensor_msgs::msg::Imu &, double, double, double,
                     double, double, double, double, double, double);
 
 } // namespace sd
