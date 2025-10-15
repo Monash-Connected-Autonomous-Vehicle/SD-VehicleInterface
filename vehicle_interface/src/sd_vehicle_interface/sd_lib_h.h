@@ -45,9 +45,9 @@ namespace sd {
  *   can_msgs/Frame.h, this is the RX can stream
  * - double& CurrentLinearVelocity_Mps: updated with the latest Linear Velocity
  *   as read from the CAN bus in Mps
- * - bool& AutomationGranted_B: set to TRUE if the CAN data confirms vehicle is
+ * - bool& automation_granted_b: set to TRUE if the CAN data confirms vehicle is
  *   in Automated Mode
- * - bool& AutomationArmed_B: set to TRIE if the CAN data confirms vehicle is
+ * - bool& automation_armed_b: set to TRIE if the CAN data confirms vehicle is
  *   armed for autonomous mode
  */
 void ParseRxCANDataSDCan(can_msgs::msg::Frame &, double &, int8_t &, bool &, bool &);
@@ -62,7 +62,7 @@ void ParseRxCANDataSDCan(can_msgs::msg::Frame &, double &, int8_t &, bool &, boo
  * Run on initialisation before main loop. Feedback message is optional
  *
  * Inputs:
- * - can_msgs::msg::Frame& CustomerControlCANTx/CustomerFeedbackCANTx to be
+ * - can_msgs::msg::Frame& customer_control_can_tx/CustomerFeedbackCANTx to be
  *   initialised
  */
 void InitSDInterfaceControl(can_msgs::msg::Frame &);
@@ -71,9 +71,9 @@ void InitSDInterfaceFeedback(can_msgs::msg::Frame &);
 /*
  * Request autonomous control of the vehicle
  * Inputs:
- * - can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control
+ * - can_msgs::msg::Frame& customer_control_can_tx :The SD Interface Control
  *   Message after initialisation
- * - uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1
+ * - uint8_t alive_counter_z : An Alive counter. Increment this variable by 1
  *   each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*
  */
 void RequestAutonomousControl(can_msgs::msg::Frame &, uint8_t);
@@ -81,9 +81,9 @@ void RequestAutonomousControl(can_msgs::msg::Frame &, uint8_t);
 /*
  * Resets all but the alive counter to 0. Control returned to safety driver.
  * Inputs
- * - can_msgs::msg::Frame& CustomerControlCANTx: The SD Interface Control
+ * - can_msgs::msg::Frame& customer_control_can_tx: The SD Interface Control
  *   Message after initialisation
- * - uint8_t AliveCounter_Z: Alive counter, increment by 1 each loop (min
+ * - uint8_t alive_counter_z: Alive counter, increment by 1 each loop (min
  * 200Hz). Protects again stale CAN data
  */
 void ResetControlCanData(can_msgs::msg::Frame &, uint8_t);
@@ -93,13 +93,13 @@ void UpdateControlAlive(can_msgs::msg::Frame &, uint8_t);
  * Set steer/torque request in Customer_Control_1 CAN frame
  *
  * Inputs:
- * - can_msgs::msg::Frame& CustomerControlCANTx:  The SD Interface Control
+ * - can_msgs::msg::Frame& customer_control_can_tx:  The SD Interface Control
  *   Message after initialisation
- * - int8_t FinalDBWTorqueRequest_Pc: The Torque percentage requested of the
+ * - int8_t final_dbw_torque_request_pc: The Torque percentage requested of the
  *   vehicle
- * - int8_t FinalDBWSteerRequest_Pc: The Steer Percentage requested of the
+ * - int8_t final_dbw_steer_request_pc: The Steer Percentage requested of the
  *   vehicle
- * - uint8_t AliveCounter_Z: Alive counter, increment by 1 each loop (min
+ * - uint8_t alive_counter_z: Alive counter, increment by 1 each loop (min
  *   200Hz). Protects again stale CAN data*
  */
 void PopControlCANData(can_msgs::msg::Frame &, int8_t, int8_t, uint8_t);
@@ -116,10 +116,10 @@ void PopControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
  *
  * Inputs:
  * - void can_msgs::msg::Frame& ControllerFeedbackCANTx
- * - int P_Contribution_Pc: contribution to final torque by P term
- * - int I_Contribution_Pc: contribution to final torque by I term
- * - int D_Contribution_Pc: contribution to final torque by D term
- * - int FF_Contribution_Pc: contribution to final torque by Feedforward control
+ * - int p_contribution_pc: contribution to final torque by P term
+ * - int i_contribution_pc: contribution to final torque by I term
+ * - int d_contribution_pc: contribution to final torque by D term
+ * - int ff_contribution_pc: contribution to final torque by Feedforward control
  * - double TargetLinearVelocity_Mps: target speed (feedback only)
  * - double TargetAngularVelocity_Degps: target angular velocity (feedback only)
  */

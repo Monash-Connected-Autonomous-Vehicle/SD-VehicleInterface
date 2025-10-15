@@ -82,7 +82,7 @@ namespace sd {
   `y`
  * integrity. See CRC calculation in SD user manual.
  */
-void SetCRC(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
+void set_crc(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   // CRC Parameters (these make more sense if you read up on CRC)
   // Polynomial: 0x1D
   // Initial CRC value: 0xFF
@@ -101,10 +101,10 @@ void SetCRC(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   frame.data[0] = crc;
 }
 
-void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
-                         double &CurrentLinearVelocity_Mps, int8_t& CurrentSteer_pc,
-                         bool &AutomationArmed_B, bool &AutomationGranted_B, 
-                         uint8_t &Steer_Automation_State, uint8_t &Torque_Automation_State) {
+void ParseSdCanRxFrame(can_msgs::msg::Frame &frame,
+                         double &CurrentLinearVelocity_Mps, int8_t& current_steer_pc,
+                         bool &automation_armed_b, bool &automation_granted_b, 
+                         uint8_t &steer_automation_state, uint8_t &torque_automation_state) {
 
   // check type of frame and update data accordingly
   if (frame.id == 0x100) { // StreetDrone_Control_1
@@ -116,15 +116,15 @@ void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
         frame.data[7] & 0x10; // bit 60 (0b0001 0000)
     bool torque_automation_granted =
         frame.data[7] & 0x4; // bit 61 (0b0000 0100)
-    AutomationArmed_B =
+    automation_armed_b =
         steer_automation_available && torque_automation_available;
-    AutomationGranted_B = steer_automation_granted && torque_automation_granted;
-    AutomationGranted_B = frame.data[7] & 0b00100010;
+    automation_granted_b = steer_automation_granted && torque_automation_granted;
+    automation_granted_b = frame.data[7] & 0b00100010;
 
     // Control mode determination
-    Torque_Automation_State = frame.data[6] & 0x0F; // bits 52 - 55
+    torque_automation_state = frame.data[6] & 0x0F; // bits 52 - 55
 
-    Steer_Automation_State  = (frame.data[6] >> 4) & 0x0F;  // bits 48 - 51
+    steer_automation_state  = (frame.data[6] >> 4) & 0x0F;  // bits 48 - 51
     
   } 
   
@@ -149,7 +149,7 @@ void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
       CurrentLinearVelocity_Mps = (CurrentVelocity16bit * KPH_TO_MPS);
     }
 
-    CurrentSteer_pc = frame.data[2];
+    current_steer_pc = frame.data[2];
   }
 }
 
@@ -157,17 +157,17 @@ void ParseRxCANDataSDCan(can_msgs::msg::Frame &frame,
 /*				SD TX FUNCTIONS				*/
 //**************************************************
 
-void InitSDInterfaceControl(can_msgs::msg::Frame &frame) {
+void InitialiseSdInterfaceControl(can_msgs::msg::Frame &frame) {
   frame.dlc = 8;    // length of data (bytes)
   frame.id = 0x101; // customer Control frame id constant
 }
 
-void InitSDInterfaceControl2(can_msgs::msg::Frame &frame) {
+void InitialiseSdInterfaceControl_2(can_msgs::msg::Frame &frame) {
   frame.dlc = 8;    // length of data (bytes)
   frame.id = 0x104; // customer Control frame id constant
 }
 
-void InitSDInterfaceFeedback(can_msgs::msg::Frame &frame) {
+void InitialiseSdInterfaceFeedback(can_msgs::msg::Frame &frame) {
   frame.dlc = 8;    // length of data (bytes)
   frame.id = 0x103; // customer Feedback frame id
 }
@@ -175,7 +175,7 @@ void InitSDInterfaceFeedback(can_msgs::msg::Frame &frame) {
 void RequestAutonomousControl(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   frame.dlc = 8;        // length of data in bytes
   frame.id = 0x101;     // CustomerControl frame id: 0x101
-  frame.data[0] = 0;    // Customer_Control_1_CRC  (set in SetCRC)
+  frame.data[0] = 0;    // Customer_Control_1_CRC  (set in set_crc)
   frame.data[1] = 0;    // Customer_Control_1_Alive  (increments every message)
   frame.data[2] = 0;    // Steer_Request (units %)
   frame.data[3] = 0;    // Torque_Request (units %)
@@ -184,7 +184,7 @@ void RequestAutonomousControl(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   frame.data[6] = 0;    // Reserved
   frame.data[7] = 0x11; // SteerAutomationRequest = TorqueAutomationRequest = 1
 
-  sd::SetCRC(frame, aliveCount);
+  sd::set_crc(frame, aliveCount);
 }
 
 void ResetControlCanData(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
@@ -197,24 +197,24 @@ void ResetControlCanData(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
   frame.data[6] = 0;
   frame.data[7] = 0;
 
-  sd::SetCRC(frame, aliveCount);
+  sd::set_crc(frame, aliveCount);
 }
 
-void UpdateControlAlive(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
-  SetCRC(frame, aliveCount);
+void update_control_alive_count(can_msgs::msg::Frame &frame, uint8_t aliveCount) {
+  set_crc(frame, aliveCount);
 }
 
-void PopControlCANData(can_msgs::msg::Frame &frame, int8_t torque_request_pc,
+void PopulateControlCANData(can_msgs::msg::Frame &frame, int8_t torque_request_pc,
                        int8_t steer_request_pc, uint8_t aliveCount) {
   frame.data[2] = steer_request_pc;  // Steer_Request
   frame.data[3] = torque_request_pc; // Torque_Request
-  SetCRC(frame, aliveCount);
+  set_crc(frame, aliveCount);
 }
 
 /**
  * Populate the Customer_Control_2 CAN frame.
  */
-void PopControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
+void PopulateControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
                         bool leftIndicatorRequest, bool rightIndicatorRequest,
                         uint8_t aliveCount) {
   if (hazardLightsRequest) {
@@ -226,12 +226,12 @@ void PopControl2CANData(can_msgs::msg::Frame &frame, bool hazardLightsRequest,
   if (rightIndicatorRequest) {
     frame.data[5] = frame.data[5] | 0x00010000;
   }
-  SetCRC(frame, aliveCount);
+  set_crc(frame, aliveCount);
 }
 
 // unimplemeted as not required for customers in general operation and not much
 // info available.
-void PopFeedbackCANData(can_msgs::msg::Frame &, int, int, int, int, double,
+void populate_feedback_can_data(can_msgs::msg::Frame &, int, int, int, int, double,
 
                         double);
 

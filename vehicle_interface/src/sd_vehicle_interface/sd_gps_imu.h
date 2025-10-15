@@ -63,11 +63,11 @@ struct Quaternion {
 // Converts from Euler to Quaternion format.
 Quaternion ToQuaternion(double, double, double); // yaw (Z), pitch (Y), roll (X)
 
-void ParseRxCANDataOXTSCan(can_msgs::msg::Frame &, double &, double &, double &,
+void ParseRxCanDataOxtsCan(can_msgs::msg::Frame &, double &, double &, double &,
                            double &, double &, double &, double &, double &,
                            double &, double &, double &, double &);
 
-void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &, double &, double &, double &,
+void ParseRxCanDataPeakCan(can_msgs::msg::Frame &, double &, double &, double &,
                            double &, double &, double &, double &, double &,
                            double &, double &, double &, double &);
 

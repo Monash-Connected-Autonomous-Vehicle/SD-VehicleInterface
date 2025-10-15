@@ -49,7 +49,7 @@ using namespace std;
 // MCAV note: we create this to convert the reported speed to
 // actually be in meters per second. Previously, the code was not
 // correctly interpreting the CAN frames
-const double UNDO_STREETDRONE_SCALING_FACTOR = 50;
+const double kUndoSDScalingFactor = 50;
 
 // rate at which we publish data
 #define ROS_LOOP (200)
@@ -59,110 +59,110 @@ const double UNDO_STREETDRONE_SCALING_FACTOR = 50;
 
 // ===== FUNCTION SIGNATURES =====
 
-void control_cmd_callback(
+void ControlCmdCallback(
     const shared_ptr<autoware_control_msgs::msg::Control> msg);
 
-void hazard_cmd_callback(
+void HazardCmdCallback(
     const shared_ptr<autoware_vehicle_msgs::msg::HazardLightsCommand> msg);
 
-void indicators_cmd_callback(
+void IndicatorsCmdCallback(
     const shared_ptr<autoware_vehicle_msgs::msg::TurnIndicatorsCommand> msg);
 
-void gear_cmd_callback(
+void GearCmdCallback(
     const shared_ptr<autoware_vehicle_msgs::msg::GearCommand> msg);
 
-void gate_mode_cmd_callback(
+void GateModeCmdCallback(
     const shared_ptr<tier4_control_msgs::msg::GateMode> msg);
 
-void emergency_cmd_callback(
+void EmergencyCmdCallback(
     const shared_ptr<tier4_vehicle_msgs::msg::VehicleEmergencyStamped> msg);
 
-void actuation_cmd_callback(
+void ActuationCmdCallback(
     const shared_ptr<tier4_vehicle_msgs::msg::ActuationCommandStamped> msg);
 
 // ===== VARIABLES =====
 
 // current twist (m/s), read from GPS/IMU
-double CurrentTwistLinearCANImu_Mps = 0.0;
+double current_twist_linear_can_imu_mps = 0.0;
 // speed used within control functions.
 // specified as based on CAN/IMU/localisation at launch
-double CurrentTwistLinearSD_Mps_Final = 0.0;
-double CurrentTwistLinearCANSD_Mps =
+double current_twist_linear_sd_mps_final = 0.0;
+double current_twist_linear_can_sd_mps =
     0.0; // Current Twist Linear in Mps, as read from the CAN bus from the
          // StreetDrone XCU
-int8_t CurrentSteer_pc = 0;
-double CurrentTwistLinearNDT_Mps =
+int8_t current_steer_pc = 0;
+double current_twist_linear_ndt_mps =
     0.0; // Current Twist Linear in Mps, as reported by NDT locolisation
-double GPS_Latitude = 0.0;  // latitude, as read from the CAN bus
-double GPS_Longitude = 0.0; // latitude, as read from the CAN bus
-double IMU_Angle_X = 0;
-double IMU_Angle_Y = 0;
-double IMU_Angle_Z = 0;
-double IMU_Rate_X = 0;
-double IMU_Rate_Y = 0;
-double IMU_Rate_Z = 0;
-double IMU_Accel_X = 0;
-double IMU_Accel_Y = 0;
-double IMU_Accel_Z = 0;
+double gps_latitude = 0.0;  // latitude, as read from the CAN bus
+double gps_longitude = 0.0; // latitude, as read from the CAN bus
+double imu_angle_x = 0;
+double imu_angle_y = 0;
+double imu_angle_z = 0;
+double imu_rate_x = 0;
+double imu_rate_y = 0;
+double imu_rate_z = 0;
+double imu_accel_x = 0;
+double imu_accel_y = 0;
+double imu_accel_z = 0;
 
 // === Ackermann Targets ===
 
-double TargetTwistLinear_Mps;          // Target Twist linear in m/s
-double TargetTireAngle_Rad;            // Target Twist angular in deg/s
-double TargetSteeringTireRotationRate; // Steering angle rate of change (rad/s)
+double target_twist_linear_mps;          // Target Twist linear in m/s
+double target_tire_angle_rad;            // Target Twist angular in deg/s
+double target_steering_tire_rotation_rate; // Steering angle rate of change (rad/s)
 
 // Auxiliary control
-uint8_t TargetHazardLightsCmd; // Hazard lights command received from autoware
-uint8_t TargetIndicatorsCmd;   // Indicators command received from autoware
-uint8_t TargetGearCmd;         // Gear command received from autoware
+uint8_t target_hazard_lights_cmd; // Hazard lights command received from autoware
+uint8_t target_indicators_cmd;   // Indicators command received from autoware
+uint8_t target_gear_cmd;         // Gear command received from autoware
 
-// Other Autwoare Control
-uint8_t TargetGateModeCmd;
-bool IsEmergency;
-double TargetAccelCmd_temp;
-double TargetBrakeCmd_temp;
-double TargetSteerCmd_temp;
+// Other Autoware Control
+uint8_t target_gate_mode_cmd;
+bool is_emergency;
+double target_accel_cmd_temp;
+double target_brake_cmd_temp;
+double target_steer_cmd_temp;
 
 // Requests populated to CAN frame to vehicle
-bool FinalHazardLightsRequest;
-bool FinalIndicatorLeftRequest;
-bool FinalIndicatorRightRequest;
+bool final_hazard_lights_request;
+bool final_indicator_left_request;
+bool final_indicator_right_request;
 
 //
-uint8_t AliveCounter_Z = 0;     // Alive Counter, increments every cycle
-bool AutomationArmed_B = false; // Boolean, true if safety driver turns mode
+uint8_t alive_counter_z = 0;     // Alive Counter, increments every cycle
+bool automation_armed_b = false; // Boolean, true if safety driver turns mode
                                 // switch to autonomous mode
-bool AutomationGranted_B =
+bool automation_granted_b =
     false; // Boolean, true if vehicle grants autonomous mode request
-bool IMUVarianceKnown_B = false; // Boolean, true if the inout GPS has known
+bool imu_variance_known_b = false; // Boolean, true if the inout GPS has known
                                  // variance (OXTS YES, PEAK NO)
 
 // Speed Control
-int8_t FinalDBWTorqueRequest_Pc =
+int8_t final_dbw_torque_request_pc =
     0; // The Final Drive-By-Wire torque request, expressed from -100% (full
        // brake) to 100% (full throttle)
-int8_t FinalDBWSteerRequest_Pc =
+int8_t final_dbw_steer_request_pc =
     0; // Final steer request, +/- 100 is full lock left and right
-int P_Contribution_Pc = 0;  // The torque contributed by proportional gain
-int I_Contribution_Pc = 0;  // The torque contributed  by integral gain
-int D_Contribution_Pc = 0;  // The torque contributed by derivative gain
-int FF_Contribution_Pc = 0; // The torque contributed by feedforward gain
+int p_contribution_pc = 0;  // The torque contributed by proportional gain
+int i_contribution_pc = 0;  // The torque contributed  by integral gain
+int d_contribution_pc = 0;  // The torque contributed by derivative gain
+int ff_contribution_pc = 0; // The torque contributed by feedforward gain
 
 // Ros variables
 
 // CAN frame received from vehicle
-can_msgs::msg::Frame ReceivedFrameCANRx;
+can_msgs::msg::Frame received_can_rx_frame;
 // Customer_Control_1 CAN frame (0x101), sent to CAN bus
-can_msgs::msg::Frame CustomerControlCANTx;
+can_msgs::msg::Frame customer_control_can_tx;
 // Customer_Control_2 CAN frame (0x104), sent to CAN bus
-can_msgs::msg::Frame CustomerControlAuxiliaryCANTx;
+can_msgs::msg::Frame customer_control_auxiliary_can_tx;
 // feedback CAN frame (0x103), supplies data to tune controller (UNUSED)
 can_msgs::msg::Frame ControllerFeedbackCANTx;
 
 // ros::Publisher sent_msgs_pub;
 // ros::Publisher current_twist_pub;
-// ros::Publisher current_GPS_pub;
-// ros::Publisher current_IMU_pub;
+// ros::Publisher current_gps_pub;
+// ros::Publisher current_imu_pub;
 // ros::Publisher sd_control_pub;
 
 static string _sd_vehicle;

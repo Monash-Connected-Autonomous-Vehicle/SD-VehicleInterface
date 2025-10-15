@@ -90,10 +90,10 @@ int8_t CalculateSteerRequest(double TargetSteerAngle_Rad) {
  */
 int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps,
                                    double CurrentLinearVelocity_Mps,
-                                   int &P_Contribution_Pc,
-                                   int &I_Contribution_Pc,
-                                   int &D_Contribution_Pc,
-                                   int &FF_Contribution_Pc) {
+                                   int &p_contribution_pc,
+                                   int &i_contribution_pc,
+                                   int &d_contribution_pc,
+                                   int &ff_contribution_pc) {
 
   // stores PID Errors - static as needed to persist across multiple calls
   static double LinearVelocityError_Mps;
@@ -101,7 +101,7 @@ int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps,
   static double LinearVelocityDerivativeError;
 
   // final torque request to send to DBW system
-  int FinalDBWTorqueRequest_Pc;
+  int final_dbw_torque_request_pc;
 
   // Speed index and remainder used to interpolate between different speed
   // values of the steer table
@@ -116,13 +116,13 @@ int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps,
   // received, we clamp it to 0 (standstill)
   if (TargetLinearVelocity_Mps <= 0) {
     TargetLinearVelocity_Mps = 0;
-    FF_Contribution_Pc = 0;
+    ff_contribution_pc = 0;
   } else {
     // Calculate Feedforward contribution
-    // FF_Contribution_Pc  =
+    // ff_contribution_pc  =
     // (1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] +
     // speed_index_remainder*feedforward_torque_map_twizy[speed_index+1];
-    FF_Contribution_Pc =
+    ff_contribution_pc =
         ((1 - speed_index_remainder) *
              feedforward_torque_map_twizy[speed_index] +
          speed_index_remainder * feedforward_torque_map_twizy[speed_index + 1]);
@@ -138,74 +138,74 @@ int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps,
 
   if ((TargetLinearVelocity_Mps == 0 &&
        CurrentLinearVelocity_Mps == 0)) { // not moving
-    P_Contribution_Pc = 0;
-    I_Contribution_Pc = 0;
-    D_Contribution_Pc = 0;
-    FF_Contribution_Pc = BRAKE_HOLD_TORQUE_TWIZY;
+    p_contribution_pc = 0;
+    i_contribution_pc = 0;
+    d_contribution_pc = 0;
+    ff_contribution_pc = BRAKE_HOLD_TORQUE_TWIZY;
   } else if (abs(LinearVelocityError_Mps) <
              ANTI_FUSSINESS_TWIZY) { // within error range
 
     // PID remain the same. I gain = 0. This resets the I gain so we don't
-    //  have to "unwind" LinearVelocityIntegratedError = 0; I_Contribution_Pc
+    //  have to "unwind" LinearVelocityIntegratedError = 0; i_contribution_pc
     //  = 0;
     // P, D and FF fails maintain last value
 
     LinearVelocityIntegratedError = 0.975 * LinearVelocityIntegratedError;
-    I_Contribution_Pc = 0.975 * I_Contribution_Pc;
+    i_contribution_pc = 0.975 * i_contribution_pc;
 
   } else if ((TargetLinearVelocity_Mps == 0 &&
               CurrentLinearVelocity_Mps > 0)) { // trying to stop
-    P_Contribution_Pc =
+    p_contribution_pc =
         LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Twizy;
-    I_Contribution_Pc =
+    i_contribution_pc =
         LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Twizy;
-    D_Contribution_Pc =
+    d_contribution_pc =
         LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
 
   } else if (LinearVelocityError_Mps < -ANTI_FUSSINESS_TWIZY) { 
     // going too fast (account for vehicle overrun/coasting)
-    P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
-    I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
-    D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
+    p_contribution_pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
+    i_contribution_pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
+    d_contribution_pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
 
   } else { // too slow
-    P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Twizy;
-    I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
-    D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
+    p_contribution_pc = LinearVelocityError_Mps * Kp_Speed_Twizy;
+    i_contribution_pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
+    d_contribution_pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
   }
 
   // I gain Anti windup Strategy
-  if (I_Contribution_Pc > MAX_ABS_I_CONTRIBUTION_TWIZY) { // I Gain saturation
-    I_Contribution_Pc = MAX_ABS_I_CONTRIBUTION_TWIZY;
-  } else if (I_Contribution_Pc < -MAX_ABS_I_CONTRIBUTION_TWIZY) {
-    I_Contribution_Pc = -MAX_ABS_I_CONTRIBUTION_TWIZY;
+  if (i_contribution_pc > MAX_ABS_I_CONTRIBUTION_TWIZY) { // I Gain saturation
+    i_contribution_pc = MAX_ABS_I_CONTRIBUTION_TWIZY;
+  } else if (i_contribution_pc < -MAX_ABS_I_CONTRIBUTION_TWIZY) {
+    i_contribution_pc = -MAX_ABS_I_CONTRIBUTION_TWIZY;
   }
 
   // Prevents I gain winding up when sitting still with handbrake on
   if (CurrentLinearVelocity_Mps < ANTI_FUSSINESS_TWIZY) {
-    I_Contribution_Pc = 0;
+    i_contribution_pc = 0;
   }
 
   // I Gain should only influence the system in a band about the setpoint.
   if (abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_TWIZY) {
     LinearVelocityIntegratedError = 0;
-    I_Contribution_Pc = 0;
+    i_contribution_pc = 0;
   }
 
-  FinalDBWTorqueRequest_Pc = P_Contribution_Pc + I_Contribution_Pc +
-                             D_Contribution_Pc + FF_Contribution_Pc;
+  final_dbw_torque_request_pc = p_contribution_pc + i_contribution_pc +
+                             d_contribution_pc + ff_contribution_pc;
 
   // Clamp torque
-  if (FinalDBWTorqueRequest_Pc > MAX_TORQUE_TWIZY) {
-    FinalDBWTorqueRequest_Pc = MAX_TORQUE_TWIZY;
-  } else if (FinalDBWTorqueRequest_Pc < MIN_TORQUE_TWIZY) {
-    FinalDBWTorqueRequest_Pc = MIN_TORQUE_TWIZY;
+  if (final_dbw_torque_request_pc > MAX_TORQUE_TWIZY) {
+    final_dbw_torque_request_pc = MAX_TORQUE_TWIZY;
+  } else if (final_dbw_torque_request_pc < MIN_TORQUE_TWIZY) {
+    final_dbw_torque_request_pc = MIN_TORQUE_TWIZY;
   }
 
   // Remember previous variables for next cycle
   PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
 
-  return (int8_t)FinalDBWTorqueRequest_Pc;
+  return (int8_t)final_dbw_torque_request_pc;
 }
 
 /*
@@ -214,10 +214,10 @@ int8_t CalculateTorqueRequestTwizy(double TargetLinearVelocity_Mps,
  */
 int8_t CalculateTorqueRequestEnv200(double TargetLinearVelocity_Mps,
                                     double CurrentLinearVelocity_Mps,
-                                    int &P_Contribution_Pc,
-                                    int &I_Contribution_Pc,
-                                    int &D_Contribution_Pc,
-                                    int &FF_Contribution_Pc) {
+                                    int &p_contribution_pc,
+                                    int &i_contribution_pc,
+                                    int &d_contribution_pc,
+                                    int &ff_contribution_pc) {
 
   // stores PID errors - static as needed to persist across multiple calls
   static double LinearVelocityError_Mps;
@@ -225,7 +225,7 @@ int8_t CalculateTorqueRequestEnv200(double TargetLinearVelocity_Mps,
   static double LinearVelocityDerivativeError;
 
   // final torque request to send to DBW system
-  int FinalDBWTorqueRequest_Pc;
+  int final_dbw_torque_request_pc;
 
   // Speed index and remainder used to interpolate between different speed
   // values of the steer table
@@ -240,10 +240,10 @@ int8_t CalculateTorqueRequestEnv200(double TargetLinearVelocity_Mps,
   // received, we clamp it to 0 (standstill)
   if (TargetLinearVelocity_Mps <= 0) {
     TargetLinearVelocity_Mps = 0;
-    FF_Contribution_Pc = 0;
+    ff_contribution_pc = 0;
   } else {
     // Calculate Feedforward contribution
-    FF_Contribution_Pc =
+    ff_contribution_pc =
         (1 - speed_index_remainder) *
             feedforward_torque_map_env200[speed_index] +
         speed_index_remainder * feedforward_torque_map_env200[speed_index + 1];
@@ -259,73 +259,73 @@ int8_t CalculateTorqueRequestEnv200(double TargetLinearVelocity_Mps,
 
   if ((TargetLinearVelocity_Mps == 0 &&
        CurrentLinearVelocity_Mps == 0)) { // not moving
-    P_Contribution_Pc = 0;
-    I_Contribution_Pc = 0;
-    D_Contribution_Pc = 0;
-    FF_Contribution_Pc = BRAKE_HOLD_TORQUE_ENV200;
+    p_contribution_pc = 0;
+    i_contribution_pc = 0;
+    d_contribution_pc = 0;
+    ff_contribution_pc = BRAKE_HOLD_TORQUE_ENV200;
 
   } else if (abs(LinearVelocityError_Mps) <
              ANTI_FUSSINESS_ENV200) { // within error range
     // PID remain the same. I gain = 0. This resets the I gain so we don't
     // have to "unwind"
     LinearVelocityIntegratedError = 0;
-    I_Contribution_Pc = 0;
+    i_contribution_pc = 0;
     // P, D and FF fails maintain last value
 
   } else if ((TargetLinearVelocity_Mps == 0 &&
               CurrentLinearVelocity_Mps > 0)) { // trying to stop
-    P_Contribution_Pc =
+    p_contribution_pc =
         LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Env200;
-    I_Contribution_Pc =
+    i_contribution_pc =
         LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Env200;
-    D_Contribution_Pc =
+    d_contribution_pc =
         LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Env200;
 
   } else if (LinearVelocityError_Mps <
              -ANTI_FUSSINESS_ENV200) { // going to fast (account for vehicle
                                        // overrun/coasting)
-    P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Env200;
-    I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Env200;
-    D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Env200;
+    p_contribution_pc = LinearVelocityError_Mps * Kp_Speed_Retd_Env200;
+    i_contribution_pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Env200;
+    d_contribution_pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Env200;
 
   } else { // too slow
-    P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Env200;
-    I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Env200;
-    D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Env200;
+    p_contribution_pc = LinearVelocityError_Mps * Kp_Speed_Env200;
+    i_contribution_pc = LinearVelocityIntegratedError * Ki_Speed_Env200;
+    d_contribution_pc = LinearVelocityDerivativeError * Kd_Speed_Env200;
   }
 
   // I gain Anti windup Strategy
-  if (I_Contribution_Pc > MAX_ABS_I_CONTRIBUTION_ENV200) { // I Gain saturation
-    I_Contribution_Pc = MAX_ABS_I_CONTRIBUTION_ENV200;
-  } else if (I_Contribution_Pc < -MAX_ABS_I_CONTRIBUTION_ENV200) {
-    I_Contribution_Pc = -MAX_ABS_I_CONTRIBUTION_ENV200;
+  if (i_contribution_pc > MAX_ABS_I_CONTRIBUTION_ENV200) { // I Gain saturation
+    i_contribution_pc = MAX_ABS_I_CONTRIBUTION_ENV200;
+  } else if (i_contribution_pc < -MAX_ABS_I_CONTRIBUTION_ENV200) {
+    i_contribution_pc = -MAX_ABS_I_CONTRIBUTION_ENV200;
   }
 
   // Prevents I gain winding up when sitting still with handbrake on
   if (CurrentLinearVelocity_Mps < ANTI_FUSSINESS_ENV200) {
-    I_Contribution_Pc = 0;
+    i_contribution_pc = 0;
   }
 
   // I Gain should only influence the system in a band about the setpoint.
   if (abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_ENV200) {
     LinearVelocityIntegratedError = 0;
-    I_Contribution_Pc = 0;
+    i_contribution_pc = 0;
   }
 
-  FinalDBWTorqueRequest_Pc = P_Contribution_Pc + I_Contribution_Pc +
-                             D_Contribution_Pc + FF_Contribution_Pc;
+  final_dbw_torque_request_pc = p_contribution_pc + i_contribution_pc +
+                             d_contribution_pc + ff_contribution_pc;
 
   // Clamp torque
-  if (FinalDBWTorqueRequest_Pc > MAX_TORQUE_ENV200) {
-    FinalDBWTorqueRequest_Pc = MAX_TORQUE_ENV200;
-  } else if (FinalDBWTorqueRequest_Pc < MIN_TORQUE_ENV200) {
-    FinalDBWTorqueRequest_Pc = MIN_TORQUE_ENV200;
+  if (final_dbw_torque_request_pc > MAX_TORQUE_ENV200) {
+    final_dbw_torque_request_pc = MAX_TORQUE_ENV200;
+  } else if (final_dbw_torque_request_pc < MIN_TORQUE_ENV200) {
+    final_dbw_torque_request_pc = MIN_TORQUE_ENV200;
   }
 
   // Remember previous variables for next cycle
   PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
 
-  return (int8_t)FinalDBWTorqueRequest_Pc;
+  return (int8_t)final_dbw_torque_request_pc;
 }
 
 } // namespace speedcontroller

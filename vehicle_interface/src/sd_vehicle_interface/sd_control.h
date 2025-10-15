@@ -137,17 +137,17 @@ int8_t CalculateSteerRequest(double);
  * Inputs:
  * - double TargetLinearVelocity_Mps: target linear velocity (m/s)
  * - double CurrentLinearVelocity_Mps: current linear velocity (m/s)
- * - int P_Contribution_Pc: contribution to final torque given by the P term,
+ * - int p_contribution_pc: contribution to final torque given by the P term,
  *   used for user feedback for tuning
- * - int I_Contribution_Pc: contribution to final torque given by the I term,
+ * - int i_contribution_pc: contribution to final torque given by the I term,
  *   used for user feedback for tuning
- * - int D_Contribution_Pc: The contribution to final torque given by the D
+ * - int d_contribution_pc: The contribution to final torque given by the D
  *   term, used for user feedback for tuning
- * - int FF_Contribution_Pc: The contribution to final torque given by the
+ * - int ff_contribution_pc: The contribution to final torque given by the
  *   feedforward calculation, used for user feedback for tuning
  *
  * Output:
- * - int8_t FinalDBWTorqueRequest_Pc: torque request as percentage of full
+ * - int8_t final_dbw_torque_request_pc: torque request as percentage of full
  *   braking vs full throttle (+/- 100%), 0 = no torque request
  */
 int8_t CalculateTorqueRequestTwizy(double, double, int &, int &, int &, int &);
@@ -157,17 +157,17 @@ int8_t CalculateTorqueRequestTwizy(double, double, int &, int &, int &, int &);
  * Inputs:
  * - double TargetLinearVelocity_Mps: target linear velocity (m/s)
  * - double CurrentLinearVelocity_Mps: current linear velocity (m/s)
- * - int P_Contribution_Pc: contribution to final torque given by the P term,
+ * - int p_contribution_pc: contribution to final torque given by the P term,
  *   used for user feedback for tuning
- * - int I_Contribution_Pc: contribution to final torque given by the I term,
+ * - int i_contribution_pc: contribution to final torque given by the I term,
  *   used for user feedback for tuning
- * - int D_Contribution_Pc: The contribution to final torque given by the D
+ * - int d_contribution_pc: The contribution to final torque given by the D
  *   term, used for user feedback for tuning
- * - int FF_Contribution_Pc: The contribution to final torque given by the
+ * - int ff_contribution_pc: The contribution to final torque given by the
  *   feedforward calculation, used for user feedback for tuning
  *
  * Output:
- * - int8_t FinalDBWTorqueRequest_Pc: torque request as percentage of full
+ * - int8_t final_dbw_torque_request_pc: torque request as percentage of full
  *   braking vs full throttle (+/- 100%), 0 = no torque request
  */
 int8_t CalculateTorqueRequestEnv200(double, double, int &, int &, int &, int &);
