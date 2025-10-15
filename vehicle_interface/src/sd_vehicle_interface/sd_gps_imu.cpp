@@ -60,12 +60,12 @@ Quaternion ToQuaternion(double yaw, double pitch,
 
 void ParseRxCANDataOXTSCan(can_msgs::msg::Frame &ReceivedFrameCAN,
                            double &CurrentLinearVelocity_Mps,
-                           double &GPS_longitude, double &GPS_latitude,
-                           double &IMU_Angle_X, double &IMU_Angle_Y,
-                           double &IMU_Angle_Z, double &IMU_Rate_X,
-                           double &IMU_Rate_Y, double &IMU_Rate_Z,
-                           double &IMU_Accel_X, double &IMU_Accel_Y,
-                           double &IMU_Accel_Z)
+                           double &gps_longitude, double &gps_latitude,
+                           double &imu_angle_x, double &imu_angle_y,
+                           double &imu_angle_z, double &imu_rate_x,
+                           double &imu_rate_y, double &imu_rate_z,
+                           double &imu_accel_x, double &imu_accel_y,
+                           double &imu_accel_z)
 
 // This function parses the received can traffic from the OXTS unit. Please
 // see OXTS documentation
@@ -89,32 +89,32 @@ void ParseRxCANDataOXTSCan(can_msgs::msg::Frame &ReceivedFrameCAN,
   }
   case 1537: // 0x601
   {
-    GPS_longitude = ReceivedFrameUnion.dword[1] * 0.0000001;
-    GPS_latitude = ReceivedFrameUnion.dword[0] * 0.0000001;
+    gps_longitude = ReceivedFrameUnion.dword[1] * 0.0000001;
+    gps_latitude = ReceivedFrameUnion.dword[0] * 0.0000001;
 
     break;
   }
   case 1541: // 0x605
   {
-    IMU_Accel_X = ReceivedFrameUnion.word[0] * 0.01;
-    IMU_Accel_Y = ReceivedFrameUnion.word[1] * 0.01;
-    IMU_Accel_Z = ReceivedFrameUnion.word[2] * 0.01;
+    imu_accel_x = ReceivedFrameUnion.word[0] * 0.01;
+    imu_accel_y = ReceivedFrameUnion.word[1] * 0.01;
+    imu_accel_z = ReceivedFrameUnion.word[2] * 0.01;
 
     break;
   }
   case 1543: // 0x607
   {
-    IMU_Angle_X = ReceivedFrameUnion.word[0] * 0.01;
-    IMU_Angle_Y = ReceivedFrameUnion.word[1] * 0.01;
-    IMU_Angle_Z = ReceivedFrameUnion.word[2] * 0.01;
+    imu_angle_x = ReceivedFrameUnion.word[0] * 0.01;
+    imu_angle_y = ReceivedFrameUnion.word[1] * 0.01;
+    imu_angle_z = ReceivedFrameUnion.word[2] * 0.01;
 
     break;
   }
   case 1544: // 0x608
   {
-    IMU_Rate_X = ReceivedFrameUnion.word[0] * 0.01;
-    IMU_Rate_Y = ReceivedFrameUnion.word[1] * 0.01;
-    IMU_Rate_Z = ReceivedFrameUnion.word[2] * 0.01;
+    imu_rate_x = ReceivedFrameUnion.word[0] * 0.01;
+    imu_rate_y = ReceivedFrameUnion.word[1] * 0.01;
+    imu_rate_z = ReceivedFrameUnion.word[2] * 0.01;
 
     break;
   }
@@ -123,12 +123,12 @@ void ParseRxCANDataOXTSCan(can_msgs::msg::Frame &ReceivedFrameCAN,
 
 void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &ReceivedFrameCAN,
                            double &CurrentLinearVelocity_Mps,
-                           double &GPS_longitude, double &GPS_latitude,
-                           double &IMU_Angle_X, double &IMU_Angle_Y,
-                           double &IMU_Angle_Z, double &IMU_Rate_X,
-                           double &IMU_Rate_Y, double &IMU_Rate_Z,
-                           double &IMU_Accel_X, double &IMU_Accel_Y,
-                           double &IMU_Accel_Z)
+                           double &gps_longitude, double &gps_latitude,
+                           double &imu_angle_x, double &imu_angle_y,
+                           double &imu_angle_z, double &imu_rate_x,
+                           double &imu_rate_y, double &imu_rate_z,
+                           double &imu_accel_x, double &imu_accel_y,
+                           double &imu_accel_z)
 
 // This function parses the received can traffic from the OXTS unit. Please
 // see OXTS documentation
@@ -146,43 +146,43 @@ void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &ReceivedFrameCAN,
   switch (ReceivedFrameCAN.id) {
   case 1536: // 0x600
   {
-    IMU_Accel_X =
+    imu_accel_x =
         ((int16_t)ReceivedFrameUnion.word[0]) * 3.91 * 0.001 *
         9.80665; // 0.038344002; //*3.91 = mG, then conversion to m/s^2
-    IMU_Accel_Y =
+    imu_accel_y =
         ((int16_t)ReceivedFrameUnion.word[1]) * 3.91 * 0.001 * 9.80665; //
-    IMU_Accel_Z =
+    imu_accel_z =
         ((int16_t)ReceivedFrameUnion.word[2]) * 3.91 * 0.001 * 9.80665; //
 
     break;
   }
   case 1552: // 0x610
   {
-    float_bits_converter IMU_Rate_X_fbc;
-    float_bits_converter IMU_Rate_Y_fbc;
+    float_bits_converter imu_rate_x_fbc;
+    float_bits_converter imu_rate_y_fbc;
 
-    IMU_Rate_X_fbc.integer_can = ReceivedFrameUnion.dword[0];
-    IMU_Rate_Y_fbc.integer_can = ReceivedFrameUnion.dword[1];
-    IMU_Rate_X = IMU_Rate_X_fbc.float_can;
-    IMU_Rate_Y = IMU_Rate_Y_fbc.float_can;
+    imu_rate_x_fbc.integer_can = ReceivedFrameUnion.dword[0];
+    imu_rate_y_fbc.integer_can = ReceivedFrameUnion.dword[1];
+    imu_rate_x = imu_rate_x_fbc.float_can;
+    imu_rate_y = imu_rate_y_fbc.float_can;
 
-    IMU_Angle_X +=
-        IMU_Rate_X *
+    imu_angle_x +=
+        imu_rate_x *
         0.05; // Angle achieved by integrating rate over time (50 ms rate)
-    IMU_Angle_Y +=
-        IMU_Rate_Y *
+    imu_angle_y +=
+        imu_rate_y *
         0.05; // Angle achieved by integrating rate over time (50 ms rate)
 
     break;
   }
   case 1553: // 0x611
   {
-    float_bits_converter IMU_Rate_Z_fbc;
+    float_bits_converter imu_rate_z_fbc;
 
-    IMU_Rate_Z_fbc.integer_can = ReceivedFrameUnion.dword[0];
-    IMU_Rate_Z = IMU_Rate_Z_fbc.float_can;
-    IMU_Angle_Z +=
-        IMU_Rate_Z *
+    imu_rate_z_fbc.integer_can = ReceivedFrameUnion.dword[0];
+    imu_rate_z = imu_rate_z_fbc.float_can;
+    imu_angle_z +=
+        imu_rate_z *
         0.05; // Angle achieved by integrating rate over time (50 ms rate)
     break;
   }
@@ -197,97 +197,97 @@ void ParseRxCANDataPEAKCan(can_msgs::msg::Frame &ReceivedFrameCAN,
         CurrentLinearVelocity_Mps_fbc.float_can * KPH_to_MPS;
 
     Course_Deg_fbc.integer_can = ReceivedFrameUnion.dword[0];
-    IMU_Angle_Z = Course_Deg_fbc.float_can; // This is a better measurement
+    imu_angle_z = Course_Deg_fbc.float_can; // This is a better measurement
                                             // than integrated rate over time.
 
     break;
   }
   case 1571: // 0x623
   {
-    float_bits_converter GPS_Latitude_Minutes_fbc;
-    GPS_Latitude_Minutes_fbc.integer_can = ReceivedFrameUnion.dword[0];
+    float_bits_converter gps_latitude_Minutes_fbc;
+    gps_latitude_Minutes_fbc.integer_can = ReceivedFrameUnion.dword[0];
 
-    GPS_latitude =
-        (GPS_Latitude_Minutes_fbc.float_can / 60) + ReceivedFrameUnion.word[2];
+    gps_latitude =
+        (gps_latitude_Minutes_fbc.float_can / 60) + ReceivedFrameUnion.word[2];
 
     // As per PEAK CAN GPS .dbc, 83 represents south.
     if (ReceivedFrameUnion.byte[6] == 83) {
-      GPS_latitude *= -1;
+      gps_latitude *= -1;
     }
     break;
   }
   case 1570: // 0x623
   {
-    float_bits_converter GPS_Longitude_Minutes_fbc;
-    GPS_Longitude_Minutes_fbc.integer_can = ReceivedFrameUnion.dword[0];
+    float_bits_converter gps_longitude_Minutes_fbc;
+    gps_longitude_Minutes_fbc.integer_can = ReceivedFrameUnion.dword[0];
 
-    GPS_longitude =
-        (GPS_Longitude_Minutes_fbc.float_can / 60) + ReceivedFrameUnion.word[2];
+    gps_longitude =
+        (gps_longitude_Minutes_fbc.float_can / 60) + ReceivedFrameUnion.word[2];
 
     // As per PEAK CAN GPS .dbc, 87 represents west.
     if (ReceivedFrameUnion.byte[6] == 87) {
-      GPS_longitude *= -1;
+      gps_longitude *= -1;
     }
     break;
   }
   }
 }
 
-void PackImuMessage(bool IMUVarianceKnown_B, sensor_msgs::msg::Imu &current_IMU,
-                    double IMU_Angle_X, double IMU_Angle_Y, double IMU_Angle_Z,
-                    double IMU_Rate_X, double IMU_Rate_Y, double IMU_Rate_Z,
-                    double IMU_Accel_X, double IMU_Accel_Y,
-                    double IMU_Accel_Z) {
+void PackImuMessage(bool imu_variance_known_b, sensor_msgs::msg::Imu &current_imu,
+                    double imu_angle_x, double imu_angle_y, double imu_angle_z,
+                    double imu_rate_x, double imu_rate_y, double imu_rate_z,
+                    double imu_accel_x, double imu_accel_y,
+                    double imu_accel_z) {
   geometry_msgs::msg::Quaternion Orientation_Quaternion;
   geometry_msgs::msg::Vector3 AngularVelocity3D;
   geometry_msgs::msg::Vector3 LinearAccel3D;
 
   Quaternion ConvertedQuaternion = ToQuaternion(
-      IMU_Angle_X * DEG_to_RAD, IMU_Angle_Y * DEG_to_RAD,
-      IMU_Angle_Z * DEG_to_RAD); // Covert angles to quaternion, uses rad/s
+      imu_angle_x * DEG_to_RAD, imu_angle_y * DEG_to_RAD,
+      imu_angle_z * DEG_to_RAD); // Covert angles to quaternion, uses rad/s
   Orientation_Quaternion.x = ConvertedQuaternion.x;
   Orientation_Quaternion.y = ConvertedQuaternion.y;
   Orientation_Quaternion.z = ConvertedQuaternion.z;
   Orientation_Quaternion.w = ConvertedQuaternion.w;
 
-  AngularVelocity3D.x = IMU_Rate_X * DEG_to_RAD;
-  AngularVelocity3D.y = IMU_Rate_Y * DEG_to_RAD;
-  AngularVelocity3D.z = IMU_Rate_Z * DEG_to_RAD;
+  AngularVelocity3D.x = imu_rate_x * DEG_to_RAD;
+  AngularVelocity3D.y = imu_rate_y * DEG_to_RAD;
+  AngularVelocity3D.z = imu_rate_z * DEG_to_RAD;
 
-  LinearAccel3D.x = IMU_Accel_X;
-  LinearAccel3D.y = IMU_Accel_Y;
-  LinearAccel3D.z = IMU_Accel_Z;
+  LinearAccel3D.x = imu_accel_x;
+  LinearAccel3D.y = imu_accel_y;
+  LinearAccel3D.z = imu_accel_z;
 
-  if (IMUVarianceKnown_B) {
+  if (imu_variance_known_b) {
 
-    current_IMU.orientation = Orientation_Quaternion;
-    current_IMU.orientation_covariance = {Orientation_X_Variance, 0.0, 0.0, 0.0,
+    current_imu.orientation = Orientation_Quaternion;
+    current_imu.orientation_covariance = {Orientation_X_Variance, 0.0, 0.0, 0.0,
                                           Orientation_Y_Variance, 0.0, 0.0, 0.0,
                                           Orientation_Z_Variance};
 
-    current_IMU.angular_velocity = AngularVelocity3D;
-    current_IMU.angular_velocity_covariance = {Rate_X_Variance, 0.0, 0.0, 0.0,
+    current_imu.angular_velocity = AngularVelocity3D;
+    current_imu.angular_velocity_covariance = {Rate_X_Variance, 0.0, 0.0, 0.0,
                                                Rate_Y_Variance, 0.0, 0.0, 0.0,
                                                Rate_Z_Variance};
 
-    current_IMU.linear_acceleration = LinearAccel3D;
-    current_IMU.linear_acceleration_covariance = {
+    current_imu.linear_acceleration = LinearAccel3D;
+    current_imu.linear_acceleration_covariance = {
         Accel_X_Variance, 0.0, 0.0, 0.0, Accel_Y_Variance, 0.0, 0.0, 0.0,
         Accel_X_Variance};
   } else {
 
-    current_IMU.orientation = Orientation_Quaternion;
-    current_IMU.orientation_covariance = {Variance_Unkown, 0.0, 0.0, 0.0,
+    current_imu.orientation = Orientation_Quaternion;
+    current_imu.orientation_covariance = {Variance_Unkown, 0.0, 0.0, 0.0,
                                           Variance_Unkown, 0.0, 0.0, 0.0,
                                           Variance_Unkown};
 
-    current_IMU.angular_velocity = AngularVelocity3D;
-    current_IMU.angular_velocity_covariance = {Variance_Unkown, 0.0, 0.0, 0.0,
+    current_imu.angular_velocity = AngularVelocity3D;
+    current_imu.angular_velocity_covariance = {Variance_Unkown, 0.0, 0.0, 0.0,
                                                Variance_Unkown, 0.0, 0.0, 0.0,
                                                Variance_Unkown};
 
-    current_IMU.linear_acceleration = LinearAccel3D;
-    current_IMU.linear_acceleration_covariance = {
+    current_imu.linear_acceleration = LinearAccel3D;
+    current_imu.linear_acceleration_covariance = {
         Variance_Unkown, 0.0, 0.0, 0.0, Variance_Unkown, 0.0, 0.0, 0.0,
         Variance_Unkown};
   }

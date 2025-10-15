@@ -9,9 +9,9 @@ namespace auxiliarycontroller {
 bool GetHazardLightsRequest(uint8_t targetHazardLights);
 
 /** Should the left indicator be on? */
-bool GetIndicatorLeftRequest(uint8_t targetIndicatorsCmd);
+bool GetIndicatorLeftRequest(uint8_t target_indicators_cmd);
 
 /** Should the right indicator be on? */
-bool GetIndicatorRightRequest(uint8_t targetIndicatorsCmd);
+bool GetIndicatorRightRequest(uint8_t target_indicators_cmd);
 
 } // namespace auxiliarycontroller
