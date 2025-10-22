@@ -491,7 +491,7 @@ int main(int argc, char **argv) {
     indicator_status_pub->publish(current_indicator_status);
 
     current_steering_status.stamp = node->get_clock()->now();
-    current_steering_status.steering_tire_angle = current_steer_pc * MAX_STEER_ANG;
+    current_steering_status.steering_tire_angle = (current_steer_pc * MAX_STEER_ANG) / 100;
     steering_status_pub->publish(current_steering_status);
 	RCLCPP_DEBUG(node->get_logger(), "Current Steering Angle Percentage: %d", current_steer_pc);
 
