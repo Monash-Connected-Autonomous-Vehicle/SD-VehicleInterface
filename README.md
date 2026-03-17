@@ -92,3 +92,24 @@ Parameters
 | sd_gps_imu         | {oxts, peak, none}                        | oxts              | The GPS/IMU used                           |
 | sd_speed_source    | {vehicle_can_speed, imu_speed, ndt_speed} | vehicle_can_speed | Input vehicle speed                        |
 | sd_simulation_mode | {true, false}                             | false             | Use on the car or on the Gazebo simulation |
+
+
+Building and Testing: 
+1. Navigate to the workspace:  
+cd /home/mcav/ros2_ws
+
+2. Source the ROS 2 environment: 
+source /opt/ros/humble/setup.bash
+
+3. Build the package: 
+colcon build --packages-select sd_vehicle_interface
+
+4. Run all the test cases: 
+colcon test --packages-select sd_vehicle_interface \
+  --ctest-args -R "test_sd_control|test_sd_gps_imu|test_vehicle_interface_integration" \
+  --event-handlers console_direct+
+
+5. Run a specific test (e.g. test_sd_control only): 
+colcon test --packages-select sd_vehicle_interface \
+  --ctest-args -R test_sd_control \
+  --event-handlers console_direct+
