@@ -212,6 +212,10 @@ int main(int argc, char **argv)
 				// 										SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
 				// 										SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
 				// 										sd_control_pub->publish(SD_Current_Control);
+
+				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
+				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
+				sd_control_pub->publish(SD_Current_Control);
 			}
 			
 			//Populate the Can frames with calculated data
