@@ -48,6 +48,8 @@ using namespace std;
 #include "sd_gps_imu.h"
 #include "sd_control.h"
 
+bool isShowInfo = true;
+
 //Callback Functions
 void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg)
 {
@@ -84,6 +86,14 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
 	//Current Velocity Reported from NDT
     CurrentTwistLinearNDT_Mps = msg->twist.linear.x; //mps to kph
 }
+
+#define LOGGING(nodeLogger, clock, duration, message) 					\
+if (isShowInfo)															\
+{																		\
+	RCLCPP_INFO_STREAM_THROTTLE(nodeLogger, clock, duration, message);	\
+}
+
+#define a 1+1
 
 int main(int argc, char **argv)
 {
@@ -181,10 +191,27 @@ int main(int argc, char **argv)
 
 				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargeTireAngle_Rad << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
 				// cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
-				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
-				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
-				sd_control_pub->publish(SD_Current_Control);
+				LOGGING(node->get_logger(), *node->get_clock(), 1000,
+											_sd_vehicle << " TwistAngular " << setw(8) << TargeTireAngle_Rad
+											<< " Steer " << setw(8) << (int)(FinalDBWSteerRequest_Pc));
+				LOGGING(node->get_logger(), *node->get_clock(), 1000, "dvito");
+				// RCLCPP_INFO_STREAM_THROTTLE(
+				// 							node->get_logger(), *node->get_clock(), 1000,
+				// 							_sd_vehicle << " TwistAngular " << setw(8) << TargeTireAngle_Rad
+				// 										<< " Steer " << setw(8) << (int)FinalDBWSteerRequest_Pc);
 
+				// RCLCPP_INFO_STREAM_THROTTLE(
+				// 							node->get_logger(), *node->get_clock(), 1000,
+				// 							_sd_vehicle << " TwistLinear " << setw(8) << TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR
+				// 										<< " Current_V " << setw(4) << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR
+				// 										<< " Torque " << setw(2) << (int)FinalDBWTorqueRequest_Pc
+				// 										<< " P " << setw(2) << P_Contribution_Pc
+				// 										<< " I " << setw(2) << I_Contribution_Pc
+				// 										<< " D " << setw(2) << D_Contribution_Pc
+				// 										<< " FF " << setw(2) << FF_Contribution_Pc);
+				// 										SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
+				// 										SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
+				// 										sd_control_pub->publish(SD_Current_Control);
 			}
 			
 			//Populate the Can frames with calculated data
