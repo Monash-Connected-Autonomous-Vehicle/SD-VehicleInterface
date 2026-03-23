@@ -47,8 +47,11 @@ using namespace std;
 #include "sd_lib_mcav.h"
 #include "sd_gps_imu.h"
 #include "sd_control.h"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
 
-bool isShowInfo = true;
+//boolean to toggle logging on and off. 
+bool enable_logging = true;
+
 
 //Callback Functions
 void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg)
@@ -87,19 +90,21 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
     CurrentTwistLinearNDT_Mps = msg->twist.linear.x; //mps to kph
 }
 
-#define LOGGING(nodeLogger, clock, duration, message) 					\
-if (isShowInfo)															\
-{																		\
-	RCLCPP_INFO_STREAM_THROTTLE(nodeLogger, clock, duration, message);	\
-}
+// This still currently only guard the LOGGING macro and not other ROS logs. 
+#define LOGGING(logger, clock, duration_ms, message) \
+  do { \
+    if (enable_logging) { \
+      RCLCPP_INFO_STREAM_THROTTLE(logger, clock, duration_ms, message); \
+    } \
+  } while (0)
 
-#define a 1+1
+
 
 int main(int argc, char **argv)
 {
 
 	rclcpp::init(argc, argv);
-    auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
+	auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
 	node->declare_parameter<std::string>("sd_vehicle", "env200");
 	_sd_vehicle = node->get_parameter("sd_vehicle").as_string();
 	node->declare_parameter<std::string>("sd_gps_imu", "oxts");
@@ -108,6 +113,35 @@ int main(int argc, char **argv)
 	_sd_speed_source = node->get_parameter("sd_speed_source").as_string();
 	node->declare_parameter<bool>("sd_simulation_mode", false);
 	_sd_simulation_mode = node->get_parameter("sd_simulation_mode").as_bool();
+
+	// Allow logging to be enabled/disabled at runtime through a ROS 2 parameter.
+	node->declare_parameter<bool>("enable_logging", true);
+	enable_logging = node->get_parameter("enable_logging").as_bool();
+
+	auto logging_param_callback_handle =
+		node->add_on_set_parameters_callback(
+			[](const std::vector<rclcpp::Parameter> & params)
+			{
+				rcl_interfaces::msg::SetParametersResult result;
+				result.successful = true;
+				result.reason = "";
+
+				for (const auto & param : params) {
+					if (param.get_name() == "enable_logging") {
+						if (param.get_type() != rclcpp::ParameterType::PARAMETER_BOOL) {
+							result.successful = false;
+							result.reason = "enable_logging must be a bool";
+							return result;
+						}
+
+						enable_logging = param.as_bool();
+					}
+				}
+
+				return result;
+			});
+
+
 
 	//initialise the StreetDrone Output Can variables
 	sd::InitSDInterfaceControl(CustomerControlCANTx);
@@ -191,31 +225,27 @@ int main(int argc, char **argv)
 
 				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargeTireAngle_Rad << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
 				// cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
+				
+				// Logging function implementation.
 				LOGGING(node->get_logger(), *node->get_clock(), 1000,
 											_sd_vehicle << " TwistAngular " << setw(8) << TargeTireAngle_Rad
 											<< " Steer " << setw(8) << (int)(FinalDBWSteerRequest_Pc));
-				LOGGING(node->get_logger(), *node->get_clock(), 1000, "dvito");
-				// RCLCPP_INFO_STREAM_THROTTLE(
-				// 							node->get_logger(), *node->get_clock(), 1000,
-				// 							_sd_vehicle << " TwistAngular " << setw(8) << TargeTireAngle_Rad
-				// 										<< " Steer " << setw(8) << (int)FinalDBWSteerRequest_Pc);
+				
+				// Logging function implementation.
+				LOGGING(node->get_logger(), *node->get_clock(), 1000,
+        									_sd_vehicle << " TwistLinear " << setw(8) << TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR
+                    						<< " Current_V " << setw(4) << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR
+                    						<< " Torque " << setw(2) << (int)FinalDBWTorqueRequest_Pc
+                    						<< " P " << setw(2) << P_Contribution_Pc
+                    						<< " I " << setw(2) << I_Contribution_Pc
+                    						<< " D " << setw(2) << D_Contribution_Pc
+                    						<< " FF " << setw(2) << FF_Contribution_Pc);
 
-				// RCLCPP_INFO_STREAM_THROTTLE(
-				// 							node->get_logger(), *node->get_clock(), 1000,
-				// 							_sd_vehicle << " TwistLinear " << setw(8) << TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR
-				// 										<< " Current_V " << setw(4) << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR
-				// 										<< " Torque " << setw(2) << (int)FinalDBWTorqueRequest_Pc
-				// 										<< " P " << setw(2) << P_Contribution_Pc
-				// 										<< " I " << setw(2) << I_Contribution_Pc
-				// 										<< " D " << setw(2) << D_Contribution_Pc
-				// 										<< " FF " << setw(2) << FF_Contribution_Pc);
-				// 										SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
-				// 										SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
-				// 										sd_control_pub->publish(SD_Current_Control);
 
 				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
 				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
 				sd_control_pub->publish(SD_Current_Control);
+
 			}
 			
 			//Populate the Can frames with calculated data
