@@ -3,12 +3,14 @@
   <arg name="sd_gps_imu" default="peak" description="The Gps or IMU, oxts or peak"/>
   <arg name="sd_speed_source" default="vehicle_can_speed" description="The source of vehicle speed used to close the control loop, (vehicle_can_speed, imu_speed or ndt_speed)"/>
   <arg name="sd_simulation_mode" default="false" description="Choose to launch the VI for control of a real vehicle or simulated vehicle, true for simulation (e.g Gazebo)"/>
+  <arg name="sd_logger_level" default="debug" description="Choose the severity level (debug, info, warn, error, or fatal) of the logger"/>
 
   <node pkg="sd_vehicle_interface" exec="sd_vehicle_interface_node" name="sd_vehicle_interface_node" output = "screen">
     	<param name="sd_vehicle" value="$(var sd_vehicle)" />
     	<param name="sd_gps_imu" value="$(var sd_gps_imu)" />
     	<param name="sd_speed_source" value="$(var sd_speed_source)" />
     	<param name="sd_simulation_mode" value="$(var sd_simulation_mode)" />
+    	<param name="sd_logger_level" value="$(var sd_logger_level)" />
   </node>
 
   <group unless="$(var sd_simulation_mode)">
