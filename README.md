@@ -92,3 +92,20 @@ Parameters
 | sd_gps_imu         | {oxts, peak, none}                        | oxts              | The GPS/IMU used                           |
 | sd_speed_source    | {vehicle_can_speed, imu_speed, ndt_speed} | vehicle_can_speed | Input vehicle speed                        |
 | sd_simulation_mode | {true, false}                             | false             | Use on the car or on the Gazebo simulation |
+
+Logger Functionality (still testing)
+------
+The default launch command is:
+```
+source install/setup.bash
+ros2 launch sd_vehicle_interface sd_vehicle_interface.launch.xml sd_simulation_mode:=true
+```
+To toggle logger on or off before running, pass (append) in this ROS parameter to the launch command (set the value to true or false)
+```
+sd_enable_logging:=false
+```
+The logger functionality could also be toggled on or off even when the code is still running by:
+```
+ros2 param set /sd_vehicle_interface_node sd_enable_logging true
+```
+
