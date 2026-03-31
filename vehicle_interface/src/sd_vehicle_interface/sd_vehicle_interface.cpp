@@ -244,8 +244,12 @@ int main(int argc, char **argv)
 								<< " FF " << setw(2) << FF_Contribution_Pc);
 
 				// Logging function implementation.
-				WARN_COND(node, CurrentTwistLinearCANSD_Mps*UNDO_STREETDRONE_SCALING_FACTOR < 0, 
+				WARN_COND(node, TargetTwistLinear_Mps*UNDO_STREETDRONE_SCALING_FACTOR < 0, 
 								"Somehow current velocity is negative!");
+
+				// Logging function implementation.
+				WARN_COND(node, TargeTireAngle_Rad < 0, 
+								"Somehow angle is negative!");			
 
 
 				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
