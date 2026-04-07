@@ -224,7 +224,8 @@ int main(int argc, char **argv)
 				}else{
 					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestEnv200(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
 				}
-
+				
+				// Old cout prints
 				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargeTireAngle_Rad << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
 				// cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
 
@@ -243,18 +244,24 @@ int main(int argc, char **argv)
 								<< " D " << setw(2) << D_Contribution_Pc
 								<< " FF " << setw(2) << FF_Contribution_Pc);
 
-				// Logging function implementation.
-				WARN_COND(node, TargetTwistLinear_Mps*UNDO_STREETDRONE_SCALING_FACTOR < 0, 
-								"Somehow current velocity is negative!");
+						// Logging function implementation.
+						WARN_COND_THROTTLE(
+							node,
+							1000,
+							TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR < 0,
+							"Target velocity is negative!");
 
-				// Logging function implementation.
-				WARN_COND(node, TargeTireAngle_Rad < 0, 
-								"Somehow angle is negative!");			
+						// Logging function implementation.
+						WARN_COND_THROTTLE(
+							node,
+							1000,
+							(TargeTireAngle_Rad > MAX_STEER_ANG) || (TargeTireAngle_Rad < MIN_STEER_ANG),
+							"Target steering angle out of range MAX +-40°");
 
 
-				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
-				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
-				sd_control_pub->publish(SD_Current_Control);
+						SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
+						SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
+						sd_control_pub->publish(SD_Current_Control);
 
 			}
 			

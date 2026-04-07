@@ -82,6 +82,15 @@ void set_logger_level(const std::string& level, std::shared_ptr<rclcpp::Node> no
         } \
     } while(0) \
 
+#define WARN_COND_THROTTLE(node, wait_ms, condition, message) \
+    do \
+    { \
+        if(_sd_enable_logging && (condition)) \
+        { \
+            RCLCPP_WARN_STREAM_THROTTLE(node->get_logger(), *node->get_clock(), wait_ms, message); \
+        } \
+    } while(0) \
+ 
 #define ERROR(node, wait_ms, message) \
     do \
     { \

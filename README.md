@@ -93,19 +93,31 @@ Parameters
 | sd_speed_source    | {vehicle_can_speed, imu_speed, ndt_speed} | vehicle_can_speed | Input vehicle speed                        |
 | sd_simulation_mode | {true, false}                             | false             | Use on the car or on the Gazebo simulation |
 
-Logger Functionality (still testing)
+Logger Functionality 
 ------
-The default launch command is:
+
+The logging macros are defined in `sd_logger.h` and are mainly used inside `sd_vehicle_interface.cpp`.
+
+#### The default launch command is:
 ```
 source install/setup.bash
 ros2 launch sd_vehicle_interface sd_vehicle_interface.launch.xml sd_simulation_mode:=true
 ```
+#### Turning logger on/off:
 To toggle logger on or off before running, pass (append) in this ROS parameter to the launch command (set the value to true or false)
 ```
 sd_enable_logging:=false
 ```
-The logger functionality could also be toggled on or off even when the code is still running by:
+The logger functionality could also be toggled on or off at runtime by:
 ```
 ros2 param set /sd_vehicle_interface_node sd_enable_logging true
 ```
-
+#### Display different log levels:
+Different levels of logging can also be set using:
+```
+sd_logger_level:=warn
+```
+Or during runtime, the logging level display can be set using:
+```
+ros2 param set /sd_vehicle_interface_node sd_logger_level warn
+```
