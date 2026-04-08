@@ -88,9 +88,6 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
     CurrentTwistLinearNDT_Mps = msg->twist.linear.x; //mps to kph
 }
 
-
-
-
 int main(int argc, char **argv)
 {
 
@@ -225,10 +222,6 @@ int main(int argc, char **argv)
 					FinalDBWTorqueRequest_Pc = speedcontroller::CalculateTorqueRequestEnv200(TargetTwistLinear_Mps, CurrentTwistLinearSD_Mps_Final, P_Contribution_Pc, I_Contribution_Pc, D_Contribution_Pc, FF_Contribution_Pc);
 				}
 				
-				// Old cout prints
-				// cout <<_sd_vehicle <<" TwistAngular " <<  setw(8) << TargeTireAngle_Rad << " Steer " <<  setw(8) << (int)FinalDBWSteerRequest_Pc << endl;
-				// cout << _sd_vehicle << " TwistLinear " <<  setw(8) <<TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Current_V "<<  setw(4)  << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR << " Torque "<<  setw(2)  << (int)FinalDBWTorqueRequest_Pc << " P " <<  setw(2) << P_Contribution_Pc << " I " <<  setw(2) << I_Contribution_Pc << " D " <<  setw(2) << D_Contribution_Pc << " FF " <<  setw(2) << FF_Contribution_Pc << endl;
-
 				// Logging function implementation.
 				INFO(node, 1000,
 								_sd_vehicle << " TwistAngular " << setw(8) << TargeTireAngle_Rad

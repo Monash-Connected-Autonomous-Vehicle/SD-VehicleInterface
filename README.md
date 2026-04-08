@@ -98,13 +98,13 @@ Logger Functionality
 
 The logging macros are defined in `sd_logger.h` and are mainly used inside `sd_vehicle_interface.cpp`.
 
-#### The default launch command is:
+### The default launch command is:
 ```
 source install/setup.bash
 ros2 launch sd_vehicle_interface sd_vehicle_interface.launch.xml sd_simulation_mode:=true
 ```
-#### Turning logger on/off:
-To toggle logger on or off before running, pass (append) in this ROS parameter to the launch command (set the value to true or false)
+### Turning logger on/off:
+To toggle logger on or off before running, pass (append) in this ROS parameter to the launch command (set the value to true or false).
 ```
 sd_enable_logging:=false
 ```
@@ -112,7 +112,7 @@ The logger functionality could also be toggled on or off at runtime by:
 ```
 ros2 param set /sd_vehicle_interface_node sd_enable_logging true
 ```
-#### Display different log levels:
+### Display different log levels:
 Different levels of logging can also be set using:
 ```
 sd_logger_level:=warn
