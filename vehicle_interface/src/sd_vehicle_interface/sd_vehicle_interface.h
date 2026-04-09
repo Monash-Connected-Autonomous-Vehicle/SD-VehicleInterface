@@ -92,6 +92,7 @@ static string _sd_vehicle;
 static string _sd_gps_imu;
 static string _sd_speed_source; 
 static bool _sd_simulation_mode;
+static bool _sd_enable_logging;
 
 static string twizy_string = "twizy";
 
