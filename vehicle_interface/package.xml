@@ -11,7 +11,7 @@
   <depend>sensor_msgs</depend>
   <depend>rclcpp</depend>
   <depend>sd_msgs</depend>
-  <depend>ros2_socketcan</depend>
+  <exec_depend>ros2_socketcan</exec_depend>
   <depend>can_msgs</depend>
   <depend>std_msgs</depend>
   <depend>autoware_control_msgs</depend>

@@ -45,7 +45,11 @@ jobs:
             rosdep init
           fi
           rosdep update --rosdistro humble
-          rosdep install --from-paths . --ignore-src -y --rosdistro humble
+          # ros2_socketcan is a launch-time dependency only (see launch XML). It is not
+          # linked at build time, and the Debian package is often unavailable on minimal
+          # CI images, so skip it here.
+          rosdep install --from-paths . --ignore-src -y --rosdistro humble \
+            --skip-keys ros2_socketcan
 
       - name: Build sd_msgs
         shell: bash

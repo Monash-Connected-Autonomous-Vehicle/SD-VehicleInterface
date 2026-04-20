@@ -124,6 +124,8 @@ A GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on eve
 3. Generates a line coverage report using `lcov`
 4. Fails the build if line coverage drops below **60%**
 
+The workflow skips installing `ros2_socketcan` via `rosdep` because that package is only needed to run the launch file’s SocketCAN bridge, not to compile or run unit tests. On a real machine, install it when you need launches (for example `sudo apt install ros-humble-ros2-socketcan` if your ROS apt mirror provides it, or build [ros2_socketcan](https://github.com/autowarefoundation/ros2_socketcan) from source).
+
 To build locally with coverage instrumentation:
 ```
 colcon build --packages-up-to sd_vehicle_interface \
