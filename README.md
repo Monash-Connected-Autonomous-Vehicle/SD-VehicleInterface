@@ -139,7 +139,7 @@ lcov --list coverage.info
 
 Current CI lint policy (temporary)
 ----------------------------------
-To prioritize compile + unit/integration test confidence while modernizing this legacy codebase, some `ament_lint_auto` checks are currently skipped in `CMakeLists.txt` (`copyright`, `cpplint`, `uncrustify`, `lint_cmake`, `cppcheck`).
+To prioritize compile + unit/integration test confidence while modernizing this legacy codebase, some `ament_lint_auto` checks are currently skipped in `CMakeLists.txt` (`copyright`, `cpplint`).
 
 Planned re-enable checklist:
 1. Fix `lint_cmake` warnings in package CMake files

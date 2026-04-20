@@ -47,9 +47,6 @@ if(BUILD_TESTING)
   # ament_lint_auto). Re-enable and fix findings when ready.
   set(ament_cmake_copyright_FOUND TRUE)
   set(ament_cmake_cpplint_FOUND TRUE)
-  set(ament_cmake_uncrustify_FOUND TRUE)
-  set(ament_cmake_lint_cmake_FOUND TRUE)
-  set(ament_cmake_cppcheck_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 
   set(TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/sd_vehicle_interface)

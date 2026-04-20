@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2020 StreetDrone Limited - All rights reserved
- * 
+ *
  * Author: Fionán O'Sullivan
  *
  * Based on original work of: Efimia Panagiotaki
@@ -34,133 +34,133 @@ using namespace std;
 #include <cmath>
 #include <stdint.h>
 
-namespace speedcontroller{
+namespace speedcontroller {
 
 
-	//Calibrations
-	//The Proportional, Integral and Derivative gains of the linear velocity feedback loop are set here. 
-	//It is possible to set different gains for occasions where the vehicle is braking to a stop, braking and accellerating
+  //Calibrations
+  //The Proportional, Integral and Derivative gains of the linear velocity feedback loop are set here.
+  //It is possible to set different gains for occasions where the vehicle is braking to a stop, braking and accellerating
 
-	//*****TWIZY CALIBRATIONS*****
-	//Gains for increasing speed
-	#define Kp_Speed_Twizy                    (23)
-	#define Ki_Speed_Twizy                    (1)
-	#define Kd_Speed_Twizy                    (0)
+  //*****TWIZY CALIBRATIONS*****
+  //Gains for increasing speed
+        #define Kp_Speed_Twizy                    (23)
+        #define Ki_Speed_Twizy                    (1)
+        #define Kd_Speed_Twizy                    (0)
 
-	//Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
-	//#define ANTI_FUSSINESS_TWIZY (0.1)
-	#define ANTI_FUSSINESS_TWIZY (0.00175)
+  //Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
+  //#define ANTI_FUSSINESS_TWIZY (0.1)
+        #define ANTI_FUSSINESS_TWIZY (0.00175)
 
-	//Gains for braking to a stop only
-	#define Kp_Speed_FullStop_Braking_Twizy            (65)
-	#define Ki_Speed_FullStop_Braking_Twizy             (0)
-	#define Kd_Speed_FullStop_Braking_Twizy            (0)
+  //Gains for braking to a stop only
+        #define Kp_Speed_FullStop_Braking_Twizy            (65)
+        #define Ki_Speed_FullStop_Braking_Twizy             (0)
+        #define Kd_Speed_FullStop_Braking_Twizy            (0)
 
-	//Gains for reducing speed, not to a stop
-	#define Kp_Speed_Retd_Twizy          (40)
-	#define Ki_Speed_Retd_Twizy           (1)
-	#define Kd_Speed_Retd_Twizy          (0)
-
-
-	//Maximum and minimum torque requests
-	#define MAX_TORQUE_TWIZY  (100)
-	#define MIN_TORQUE_TWIZY    (-100)
-	#define MAX_ABS_I_CONTRIBUTION_TWIZY  (15)
-	#define I_GAIN_ERROR_BAND_TWIZY (2) //The absolute error about a setpoint where I gain is allowed to accumulate. 
+  //Gains for reducing speed, not to a stop
+        #define Kp_Speed_Retd_Twizy          (40)
+        #define Ki_Speed_Retd_Twizy           (1)
+        #define Kd_Speed_Retd_Twizy          (0)
 
 
-	//Other control calibratables
-	#define BRAKE_HOLD_TORQUE_TWIZY (0) //Torque needed to hold the vehicle still
-	//*****
-	//*****ENV200 CALIBRATIONS
-		//Gains for increasing speed
-	#define Kp_Speed_Env200                    (7)
-	#define Ki_Speed_Env200                    (0.6)
-	#define Kd_Speed_Env200                    (0)
-
-	//Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
-	#define ANTI_FUSSINESS_ENV200 (0.1)
-
-	//Gains for braking to a stop only
-	#define Kp_Speed_FullStop_Braking_Env200            (20)
-	#define Ki_Speed_FullStop_Braking_Env200            (0)
-	#define Kd_Speed_FullStop_Braking_Env200            (0)
-
-	//Gains for reducing speed, not to a stop
-	#define Kp_Speed_Retd_Env200          (15)
-	#define Ki_Speed_Retd_Env200           (1)
-	#define Kd_Speed_Retd_Env200          (0)
+  //Maximum and minimum torque requests
+        #define MAX_TORQUE_TWIZY  (100)
+        #define MIN_TORQUE_TWIZY    (-100)
+        #define MAX_ABS_I_CONTRIBUTION_TWIZY  (15)
+        #define I_GAIN_ERROR_BAND_TWIZY (2) //The absolute error about a setpoint where I gain is allowed to accumulate.
 
 
-	//Maximum and minimum torque requests
-	#define MAX_TORQUE_ENV200  (35)
-	#define MIN_TORQUE_ENV200    (-100)
-	#define MAX_ABS_I_CONTRIBUTION_ENV200  (7)
-	#define I_GAIN_ERROR_BAND_ENV200 (2) //The absolute error about a setpoint where I gain is allowed to accumulate. 
+  //Other control calibratables
+        #define BRAKE_HOLD_TORQUE_TWIZY (0) //Torque needed to hold the vehicle still
+  //*****
+  //*****ENV200 CALIBRATIONS
+  //Gains for increasing speed
+        #define Kp_Speed_Env200                    (7)
+        #define Ki_Speed_Env200                    (0.6)
+        #define Kd_Speed_Env200                    (0)
 
-	//Other control calibratables
-	#define BRAKE_HOLD_TORQUE_ENV200 (-50) //Initial torque needed to get the vehicle moving
-	//******
-	//*****SHARED CALIBRATIONS
-	//Max and min steer angle in radians (positive = left steer, negative = right steer)
-	#define MAX_STEER_ANG   (0.69813)
-	#define MIN_STEER_ANG    (-0.69813)
-	
-	//Yaw Map Calibrations
-	#define V_XAXIS    (10) //If extending map, increase these constants to match
-	
-	#define YAW_YAXIS  (14)
-	#define YAW_STEPS (5) //At which discrete steps is each point on the yaw axis, defult 5 deg/s steps
-	
-	//******
+  //Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
+        #define ANTI_FUSSINESS_ENV200 (0.1)
 
-	//The below table represents a feedforward control yaw to steering table, based on input yaw and velocity
-	//The variables below are fully tunable, and inbetween values of speed and yaw shall interpolate between map entries
+  //Gains for braking to a stop only
+        #define Kp_Speed_FullStop_Braking_Env200            (20)
+        #define Ki_Speed_FullStop_Braking_Env200            (0)
+        #define Kd_Speed_FullStop_Braking_Env200            (0)
 
-	extern uint8_t steer_map[YAW_YAXIS][V_XAXIS];
-
-	//FeedForward Calibration
-	//Map is used to provide feedforward torque (% from 0-100) for a given speed. An additional axis should be considered for gradient
-	//Note, the FF gain at exactly 0 will be BRAKE_HOLD_TORQUE
-	extern int8_t feedforward_torque_map_twizy[V_XAXIS];
-	extern int8_t feedforward_torque_map_env200[V_XAXIS];
+  //Gains for reducing speed, not to a stop
+        #define Kp_Speed_Retd_Env200          (15)
+        #define Ki_Speed_Retd_Env200           (1)
+        #define Kd_Speed_Retd_Env200          (0)
 
 
-	//This function calculates the steer angle that will achieve a given angular velocity at a given speed
-    int8_t CalculateSteerRequest(double);
-	/*Inputs
-	double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
-	Outputs
-	int8_t FinalDBWSteerRequest_Pc: The steer angle request, expressed as a percentage from full lock left/right (+/- 100%). 0 being centred steering. */
-	
-	//This function calculates the torque using PID and feedforward control
-	int8_t CalculateTorqueRequestTwizy(double, double, int&, int&, int&, int&);
-    /*Inputs
-	string _sd_vehicle: The StreetDrone vehicle under control, 'twizy' or 'env200'
-	double TargetLinearVelocity_Mps: The target linear velocity in Metres per Second
-	double CurrentTwistLinear_Mps: The current linear velocity in Metres per Second
-	double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
-	int P_Contribution_Pc: The contribution to final torque given by the P term, used for user feedback for tuning
-	int I_Contribution_Pc: The contribution to final torque given by the I term, used for user feedback for tuning
-	int D_Contribution_Pc: The contribution to final torque given by the D term, used for user feedback for tuning
-	int FF_Contribution_Pc: The contribution to final torque given by the feedforward calculation, used for user feedback for tuning
+  //Maximum and minimum torque requests
+        #define MAX_TORQUE_ENV200  (35)
+        #define MIN_TORQUE_ENV200    (-100)
+        #define MAX_ABS_I_CONTRIBUTION_ENV200  (7)
+        #define I_GAIN_ERROR_BAND_ENV200 (2) //The absolute error about a setpoint where I gain is allowed to accumulate.
 
-	Outputs
-	int8_t FinalDBWTorqueRequest_Pc: The torque request, expressed as a percentage of full braking vs full throttle (+/- 100%). 0 being no torque request.*/
-	
-		//This function calculates the torque using PID and feedforward control
-	int8_t CalculateTorqueRequestEnv200(double, double, int&, int&, int&, int&);
-    /*Inputs
-	string _sd_vehicle: The StreetDrone vehicle under control, 'twizy' or 'env200'
-	double TargetLinearVelocity_Mps: The target linear velocity in Metres per Second
-	double CurrentTwistLinear_Mps: The current linear velocity in Metres per Second
-	double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
-	int P_Contribution_Pc: The contribution to final torque given by the P term, used for user feedback for tuning
-	int I_Contribution_Pc: The contribution to final torque given by the I term, used for user feedback for tuning
-	int D_Contribution_Pc: The contribution to final torque given by the D term, used for user feedback for tuning
-	int FF_Contribution_Pc: The contribution to final torque given by the feedforward calculation, used for user feedback for tuning
+  //Other control calibratables
+        #define BRAKE_HOLD_TORQUE_ENV200 (-50) //Initial torque needed to get the vehicle moving
+  //******
+  //*****SHARED CALIBRATIONS
+  //Max and min steer angle in radians (positive = left steer, negative = right steer)
+        #define MAX_STEER_ANG   (0.69813)
+        #define MIN_STEER_ANG    (-0.69813)
 
-	Outputs
-	int8_t FinalDBWTorqueRequest_Pc: The torque request, expressed as a percentage of full braking vs full throttle (+/- 100%). 0 being no torque request.*/
-	
+  //Yaw Map Calibrations
+        #define V_XAXIS    (10) //If extending map, increase these constants to match
+
+        #define YAW_YAXIS  (14)
+        #define YAW_STEPS (5) //At which discrete steps is each point on the yaw axis, defult 5 deg/s steps
+
+  //******
+
+  //The below table represents a feedforward control yaw to steering table, based on input yaw and velocity
+  //The variables below are fully tunable, and inbetween values of speed and yaw shall interpolate between map entries
+
+  extern uint8_t steer_map[YAW_YAXIS][V_XAXIS];
+
+  //FeedForward Calibration
+  //Map is used to provide feedforward torque (% from 0-100) for a given speed. An additional axis should be considered for gradient
+  //Note, the FF gain at exactly 0 will be BRAKE_HOLD_TORQUE
+  extern int8_t feedforward_torque_map_twizy[V_XAXIS];
+  extern int8_t feedforward_torque_map_env200[V_XAXIS];
+
+
+  //This function calculates the steer angle that will achieve a given angular velocity at a given speed
+  int8_t CalculateSteerRequest(double);
+  /*Inputs
+  double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
+  Outputs
+  int8_t FinalDBWSteerRequest_Pc: The steer angle request, expressed as a percentage from full lock left/right (+/- 100%). 0 being centred steering. */
+
+  //This function calculates the torque using PID and feedforward control
+  int8_t CalculateTorqueRequestTwizy(double, double, int &, int &, int &, int &);
+  /*Inputs
+      string _sd_vehicle: The StreetDrone vehicle under control, 'twizy' or 'env200'
+      double TargetLinearVelocity_Mps: The target linear velocity in Metres per Second
+      double CurrentTwistLinear_Mps: The current linear velocity in Metres per Second
+      double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
+      int P_Contribution_Pc: The contribution to final torque given by the P term, used for user feedback for tuning
+      int I_Contribution_Pc: The contribution to final torque given by the I term, used for user feedback for tuning
+      int D_Contribution_Pc: The contribution to final torque given by the D term, used for user feedback for tuning
+      int FF_Contribution_Pc: The contribution to final torque given by the feedforward calculation, used for user feedback for tuning
+
+      Outputs
+      int8_t FinalDBWTorqueRequest_Pc: The torque request, expressed as a percentage of full braking vs full throttle (+/- 100%). 0 being no torque request.*/
+
+  //This function calculates the torque using PID and feedforward control
+  int8_t CalculateTorqueRequestEnv200(double, double, int &, int &, int &, int &);
+  /*Inputs
+      string _sd_vehicle: The StreetDrone vehicle under control, 'twizy' or 'env200'
+      double TargetLinearVelocity_Mps: The target linear velocity in Metres per Second
+      double CurrentTwistLinear_Mps: The current linear velocity in Metres per Second
+      double TargetAngularVelocity_Dps: The target Angular Velocity in Degrees per Second
+      int P_Contribution_Pc: The contribution to final torque given by the P term, used for user feedback for tuning
+      int I_Contribution_Pc: The contribution to final torque given by the I term, used for user feedback for tuning
+      int D_Contribution_Pc: The contribution to final torque given by the D term, used for user feedback for tuning
+      int FF_Contribution_Pc: The contribution to final torque given by the feedforward calculation, used for user feedback for tuning
+
+      Outputs
+      int8_t FinalDBWTorqueRequest_Pc: The torque request, expressed as a percentage of full braking vs full throttle (+/- 100%). 0 being no torque request.*/
+
 }
