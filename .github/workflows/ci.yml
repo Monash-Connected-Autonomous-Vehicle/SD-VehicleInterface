@@ -81,8 +81,7 @@ jobs:
         run: |
           lcov --capture \
             --directory build/sd_vehicle_interface \
-            --output-file coverage_raw.info \
-            --ignore-errors mismatch
+            --output-file coverage_raw.info
 
           lcov --remove coverage_raw.info \
             '/opt/*' '/usr/*' '*/test/*' '*/gtest/*' \
