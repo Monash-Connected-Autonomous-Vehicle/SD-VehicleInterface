@@ -1,3 +1,4 @@
+[![CI – Build, Test & Coverage](https://github.com/Monash-Connected-Autonomous-Vehicle/SD-VehicleInterface/actions/workflows/ci.yml/badge.svg)](https://github.com/Monash-Connected-Autonomous-Vehicle/SD-VehicleInterface/actions/workflows/ci.yml)
 
 ## The StreetDrone Vehicle Interface
 This package is responsible for the communication between the [StreetDrone](https://streetdrone.com/) vehicles and ROS based self-driving software stacks.
@@ -113,3 +114,23 @@ colcon test --packages-select sd_vehicle_interface \
 colcon test --packages-select sd_vehicle_interface \
   --ctest-args -R test_sd_control \
   --event-handlers console_direct+
+
+CI/CD
+------
+A GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on every push and pull request. The pipeline:
+
+1. Builds `sd_msgs` and `sd_vehicle_interface` inside a ROS 2 Humble container
+2. Runs all gtest suites (`test_sd_control`, `test_sd_gps_imu`, `test_vehicle_interface_integration`)
+3. Generates a line coverage report using `lcov`
+4. Fails the build if line coverage drops below **60%**
+
+To build locally with coverage instrumentation:
+```
+colcon build --packages-up-to sd_vehicle_interface \
+  --cmake-args -DCOVERAGE=ON -DBUILD_TESTING=ON
+```
+After running tests, collect the report with:
+```
+lcov --capture --directory build/sd_vehicle_interface --output-file coverage.info
+lcov --list coverage.info
+```
