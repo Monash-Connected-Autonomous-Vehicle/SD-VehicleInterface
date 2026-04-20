@@ -25,8 +25,8 @@ find_package(sensor_msgs REQUIRED)
 find_package(autoware_control_msgs REQUIRED)
 
 add_executable(sd_vehicle_interface_node src/sd_vehicle_interface/sd_vehicle_interface.cpp
-		src/sd_vehicle_interface/sd_control.cpp
-		src/sd_vehicle_interface/sd_gps_imu.cpp)
+        src/sd_vehicle_interface/sd_control.cpp
+        src/sd_vehicle_interface/sd_gps_imu.cpp)
 
 ament_target_dependencies(sd_vehicle_interface_node rclcpp sensor_msgs std_msgs sd_msgs can_msgs autoware_control_msgs)
 
@@ -47,6 +47,9 @@ if(BUILD_TESTING)
   # ament_lint_auto). Re-enable and fix findings when ready.
   set(ament_cmake_copyright_FOUND TRUE)
   set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+  set(ament_cmake_lint_cmake_FOUND TRUE)
+  set(ament_cmake_cppcheck_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 
   set(TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/sd_vehicle_interface)
