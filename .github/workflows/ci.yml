@@ -24,20 +24,42 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends \
             lcov \
             bc \
-            python3-colcon-common-extensions
+            python3-colcon-common-extensions \
+            python3-rosdep
+
+          EXTRA_ROS_PKGS=""
+          for pkg in ros-humble-can-msgs ros-humble-can_msgs ros-humble-autoware-control-msgs; do
+            if apt-cache show "${pkg}" >/dev/null 2>&1; then
+              EXTRA_ROS_PKGS="${EXTRA_ROS_PKGS} ${pkg}"
+            fi
+          done
+          if [ -n "${EXTRA_ROS_PKGS}" ]; then
+            apt-get install -y --no-install-recommends ${EXTRA_ROS_PKGS}
+          fi
+
           rm -rf /var/lib/apt/lists/*
 
       - name: Install ROS dependencies via rosdep
         run: |
+          if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then
+            rosdep init
+          fi
           rosdep update --rosdistro humble
-          rosdep install --from-paths . --ignore-src -y --rosdistro humble || true
+          rosdep install --from-paths . --ignore-src -y --rosdistro humble
 
-      - name: Build sd_msgs and sd_vehicle_interface with coverage
+      - name: Build sd_msgs
         shell: bash
         run: |
           source /opt/ros/humble/setup.bash
+          colcon build --packages-select sd_msgs --cmake-args -DBUILD_TESTING=ON
+
+      - name: Build sd_vehicle_interface with coverage
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          source install/setup.bash
           colcon build \
-            --packages-up-to sd_vehicle_interface \
+            --packages-select sd_vehicle_interface \
             --cmake-args -DCOVERAGE=ON -DBUILD_TESTING=ON
 
       - name: Run tests
