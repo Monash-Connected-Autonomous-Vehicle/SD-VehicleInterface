@@ -1,0 +1,80 @@
+name: CI – Build, Test & Coverage
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+env:
+  MIN_COVERAGE: 60
+
+jobs:
+  build-test-coverage:
+    runs-on: ubuntu-22.04
+    container:
+      image: ros:humble-ros-base
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system tooling
+        run: |
+          apt-get update && apt-get install -y --no-install-recommends \
+            lcov \
+            bc \
+            python3-colcon-common-extensions
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Install ROS dependencies via rosdep
+        run: |
+          rosdep update --rosdistro humble
+          rosdep install --from-paths . --ignore-src -y --rosdistro humble || true
+
+      - name: Build sd_msgs and sd_vehicle_interface with coverage
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          colcon build \
+            --packages-up-to sd_vehicle_interface \
+            --cmake-args -DCOVERAGE=ON -DBUILD_TESTING=ON
+
+      - name: Run tests
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          source install/setup.bash
+          colcon test \
+            --packages-select sd_vehicle_interface \
+            --event-handlers console_direct+
+          colcon test-result --verbose
+
+      - name: Generate coverage report
+        shell: bash
+        run: |
+          lcov --capture \
+            --directory build/sd_vehicle_interface \
+            --output-file coverage_raw.info \
+            --ignore-errors mismatch
+
+          lcov --remove coverage_raw.info \
+            '/opt/*' '/usr/*' '*/test/*' '*/gtest/*' \
+            --output-file coverage.info
+
+          echo "### Coverage Summary"
+          lcov --list coverage.info
+
+      - name: Enforce minimum coverage
+        shell: bash
+        run: |
+          COVERAGE_PCT=$(lcov --summary coverage.info 2>&1 \
+            | grep 'lines' | head -1 \
+            | sed 's/.*:\s*//' | sed 's/%.*//')
+          echo "Line coverage: ${COVERAGE_PCT}%"
+
+          if [ "$(echo "${COVERAGE_PCT} < ${MIN_COVERAGE}" | bc -l)" -eq 1 ]; then
+            echo "::error::Coverage ${COVERAGE_PCT}% is below the minimum ${MIN_COVERAGE}%"
+            exit 1
+          fi
+          echo "Coverage ${COVERAGE_PCT}% meets the minimum threshold of ${MIN_COVERAGE}%"
