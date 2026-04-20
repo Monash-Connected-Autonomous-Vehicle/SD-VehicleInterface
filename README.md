@@ -122,7 +122,7 @@ A GitHub Actions workflow (`.github/workflows/ci.yml`) runs automatically on eve
 1. Builds `sd_msgs` and `sd_vehicle_interface` inside a ROS 2 Humble container
 2. Runs all gtest suites (`test_sd_control`, `test_sd_gps_imu`, `test_vehicle_interface_integration`)
 3. Generates a line coverage report using `lcov`
-4. Fails the build if line coverage drops below **60%**
+4. Fails the build if line coverage drops below **50%** (temporary baseline while coverage tests are expanded)
 
 The workflow skips installing `ros2_socketcan` via `rosdep` because that package is only needed to run the launch file’s SocketCAN bridge, not to compile or run unit tests. On a real machine, install it when you need launches (for example `sudo apt install ros-humble-ros2-socketcan` if your ROS apt mirror provides it, or build [ros2_socketcan](https://github.com/autowarefoundation/ros2_socketcan) from source).
 

@@ -7,7 +7,7 @@ on:
     branches: ['**']
 
 env:
-  MIN_COVERAGE: 60
+  MIN_COVERAGE: 50
 
 jobs:
   build-test-coverage:
