@@ -8,6 +8,11 @@ TEST(SDControlTest, SteerRequestSaturatesToConfiguredLimits)
     EXPECT_EQ(-100, speedcontroller::CalculateSteerRequest(-1.0));
 }
 
+TEST(SDControlTest, SteerRequestZeroAngleReturnsZero)
+{
+    EXPECT_EQ(0, speedcontroller::CalculateSteerRequest(0.0));
+}
+
 TEST(SDControlTest, TwizyTorqueRequestRemainsWithinBounds)
 {
     int proportional = 0;
