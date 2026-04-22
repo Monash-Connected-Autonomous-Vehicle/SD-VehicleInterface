@@ -27,18 +27,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-
+#ifndef SD_VEHICLE_INTERFACE__SD_GPS_IMU_H_
+#define SD_VEHICLE_INTERFACE__SD_GPS_IMU_H_
 
 #include "can_msgs/msg/frame.hpp"
-#include "sd_typedefs.h"
-#include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
+#include "sd_typedefs.h"  // NOLINT(build/include_subdir)
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
 
-//Constants
+// Constants
 
-//Variances calcualted from standard deviation in OXTS Manual
+// Variances calcualted from standard deviation in OXTS Manual
 #define Orientation_X_Variance (2.74155703e-7)
 #define Orientation_Y_Variance (2.74155703e-7)
 #define Orientation_Z_Variance (0.00000304617)
@@ -48,26 +49,22 @@
 #define Accel_X_Variance (2.4059025e-10)
 #define Accel_Y_Variance (2.4059025e-10)
 #define Accel_Z_Variance (2.4059025e-10)
-#define Variance_Unkown (0) //Variance for PEAK not currently known
+#define Variance_Unkown (0) // Variance for PEAK not currently known
 
-#define  DEG_to_RAD  (0.0174533)                //Conversion constant from deg to rad
-
-
-using namespace std;
+#define  DEG_to_RAD  (0.0174533)                // Conversion constant from deg to rad
 
 namespace sd {
-  //Structs
-  //Used for storing Quaternion
+  // Structs
+  // Used for storing Quaternion
   struct Quaternion
   {
     double w, x, y, z;
   };
 
-  //Functions
+  // Functions
 
-  //Converts from Euler to Quaternion format.
+  // Converts from Euler to Quaternion format.
   Quaternion ToQuaternion(double, double, double);       // yaw (Z), pitch (Y), roll (X)
-
 
   void ParseRxCANDataOXTSCan(
     can_msgs::msg::Frame &,
@@ -77,7 +74,6 @@ namespace sd {
     double &, double &, double &,
     double &, double &, double &);
 
-
   void ParseRxCANDataPEAKCan(
     can_msgs::msg::Frame &,
     double &,
@@ -86,10 +82,10 @@ namespace sd {
     double &, double &, double &,
     double &, double &, double &);
 
-
   void PackImuMessage(
     bool, sensor_msgs::msg::Imu &, double, double, double, double, double, double,
     double, double, double);
 
+}  // namespace sd
 
-}
+#endif  // SD_VEHICLE_INTERFACE__SD_GPS_IMU_H_

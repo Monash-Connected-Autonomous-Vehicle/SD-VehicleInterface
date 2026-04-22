@@ -29,8 +29,11 @@
  *
  */
 
-#include <stdlib.h>
+#ifndef SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_
+#define SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_
+
 #include <can_msgs/msg/frame.hpp>
+#include <stdlib.h>
 
 #define KPH_TO_MPS (0.277778)
 
@@ -67,9 +70,9 @@ static unsigned char const crc8_data[] = {
 };
 
 namespace sd {
-  //**************************************************
-  /*				SD RX FUNCTIONS				*/
-  //**************************************************
+  // **************************************************
+  /*        SD RX FUNCTIONS        */
+  // **************************************************
   void SetCRC(can_msgs::msg::Frame & frame, uint8_t aliveCount)
   {
     // See the CRC calculation in the StreetDrone user manual
@@ -111,8 +114,8 @@ namespace sd {
       AutomationGranted_B = steer_automation_granted && torque_automation_granted;
       AutomationGranted_B = frame.data[7] & 0b00100010;
     } else if (frame.id == 0x102) {             // StreetDrone_Data_1
-      //Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
-      uint8_t CurrentVelocity8bit = frame.data[0];                   //Speed Actual kph low resolution
+      // Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
+      uint8_t CurrentVelocity8bit = frame.data[0];                   // Speed Actual kph low resolution
       /*
                 Steer_Actual is frame.data[2]
                 Pedal_Actual is frame.data[4]
@@ -121,9 +124,9 @@ namespace sd {
 
       uint8_t speed_HR_B1 = frame.data[6];
       uint8_t speed_HR_B2 = frame.data[7];
-      uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;                   ////Speed Actual kph high resolution
+      uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;                   // // Speed Actual kph high resolution
 
-      //To support older versions of XCU firmware which do not output high resolution speed. If high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
+      // To support older versions of XCU firmware which do not output high resolution speed. If high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
       if (CurrentVelocity16bit == 0) {
         CurrentLinearVelocity_Mps = (CurrentVelocity8bit * KPH_TO_MPS) / 100.0;
         // MCAV note: not sure why the speeds are scaled by 1/100. This is also missing the scaling factor of 0.5 present in CAN definition.
@@ -139,9 +142,9 @@ namespace sd {
   bool& AutomationGranted_B,  This function shall set this variable to TRUE if the latest received can data condirms vehicle is in Automated Mode
   bool& AutomationArmed_B  This function shall set this variable to TRIE if the latest received CAN data confirms that the vehicle is armed for autonomous mode*/
 
-  //**************************************************
-  /*				SD TX FUNCTIONS				*/
-  //**************************************************
+  // **************************************************
+  /*        SD TX FUNCTIONS        */
+  // **************************************************
 
   /*
   InitSDInterfaceControl & InitSDInterfaceFeedback
@@ -162,7 +165,7 @@ namespace sd {
   /*Inputs
   can_msgs::msg::Frame& CustomerControlCANTx/CustomerFeedbackCANTx to be initialised*/
 
-  //Request Autonomous Control of the Vehicle
+  // Request Autonomous Control of the Vehicle
   void RequestAutonomousControl(can_msgs::msg::Frame & frame, uint8_t aliveCount)
   {
     frame.dlc = 8;             // length of data in bytes
@@ -184,9 +187,9 @@ namespace sd {
   can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
   uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //ResetControlCanData
-  //This function resets all but the alive counter to 0
-  //This will handback control to the safety driver
+  // ResetControlCanData
+  // This function resets all but the alive counter to 0
+  // This will handback control to the safety driver
   void ResetControlCanData(can_msgs::msg::Frame & frame, uint8_t aliveCount)
   {
     frame.data[0] = 0;
@@ -212,8 +215,8 @@ namespace sd {
   can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
   uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //PopControlCANData
-  //Populates the Control Tx message to the vehicle
+  // PopControlCANData
+  // Populates the Control Tx message to the vehicle
   void PopControlCANData(
     can_msgs::msg::Frame & frame, int8_t torque_request_pc,
     int8_t steer_request_pc, uint8_t aliveCount)
@@ -228,7 +231,7 @@ namespace sd {
   int8_t FinalDBWSteerRequest_Pc: The Steer Percentage requested of the vehicle
   uint8_t AliveCounter_Z  : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //Populates the Feedback CAN message (Optional)
+  // Populates the Feedback CAN message (Optional)
   void PopFeedbackCANData(can_msgs::msg::Frame &, int, int, int, int, double, double);
   // This hasn't been re-implemented since it is not required for customers in general operation
   // and there wasn't much info available.
@@ -242,4 +245,6 @@ namespace sd {
   double TargetLinearVelocity_Mps :The Target speed (feedback only)
   double TargetAngularVelocity_Degps: The Target Angular velocity (Feedback Only)*/
 
-}
+}  // namespace sd
+
+#endif  // SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_

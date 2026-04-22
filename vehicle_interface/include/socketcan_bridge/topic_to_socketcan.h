@@ -34,22 +34,22 @@
 
 namespace socketcan_bridge
 {
-  class TopicToSocketCAN {
+class TopicToSocketCAN {
 public:
-    TopicToSocketCAN(
-      ros::NodeHandle * nh, ros::NodeHandle * nh_param,
-      can::DriverInterfaceSharedPtr driver);
-    void setup();
+  TopicToSocketCAN(
+    ros::NodeHandle * nh, ros::NodeHandle * nh_param,
+    can::DriverInterfaceSharedPtr driver);
+  void setup();
 
 private:
-    ros::Subscriber can_topic_;
-    can::DriverInterfaceSharedPtr driver_;
+  ros::Subscriber can_topic_;
+  can::DriverInterfaceSharedPtr driver_;
 
-    can::StateListenerConstSharedPtr state_listener_;
+  can::StateListenerConstSharedPtr state_listener_;
 
-    void msgCallback(const can_msgs::msg::Frame::ConstPtr & msg);
-    void stateCallback(const can::State & s);
-  };
+  void msgCallback(const can_msgs::msg::Frame::ConstPtr & msg);
+  void stateCallback(const can::State & s);
+};
 
   void convertMessageToSocketCAN(const can_msgs::msg::Frame & m, can::Frame & f)
   {
@@ -59,7 +59,7 @@ private:
     f.is_rtr = m.is_rtr;
     f.is_extended = m.is_extended;
 
-    for (int i = 0; i < 8; i++) { // always copy all data, regardless of dlc.
+    for (int i = 0; i < 8; i++) {  // always copy all data, regardless of dlc.
       f.data[i] = m.data[i];
     }
   }
