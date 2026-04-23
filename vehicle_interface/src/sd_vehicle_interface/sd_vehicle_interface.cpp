@@ -28,6 +28,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#include "sd_vehicle_interface.h"  // NOLINT(build/include_subdir)
+#include <memory>
+#include <string>
 #include <can_msgs/msg/frame.hpp>
 #include "autoware_control_msgs/msg/control.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
@@ -37,12 +40,9 @@
 #include "sd_msgs/msg/sd_control.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include <memory>
-#include <string>
 #include "sd_control.h"  // NOLINT(build/include_subdir)
 #include "sd_gps_imu.h"  // NOLINT(build/include_subdir)
 #include "sd_lib_mcav.h"  // NOLINT(build/include_subdir)
-#include "sd_vehicle_interface.h"  // NOLINT(build/include_subdir)
 
 // Callback functions
 void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg)
@@ -52,9 +52,7 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
   sd::ParseRxCANDataSDCan(
     ReceivedFrameCANRx, CurrentTwistLinearCANSD_Mps, AutomationArmed_B,
     AutomationGranted_B);
-
   if (oxts_string == _sd_gps_imu) {
-
     IMUVarianceKnown_B = true;  // Variance/covariance known for OXTS.
     // Use the OXTS parsing function.
     sd::ParseRxCANDataOXTSCan(
@@ -93,7 +91,6 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
 
 int main(int argc, char ** argv)
 {
-
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
   node->declare_parameter<std::string>("sd_vehicle", "env200");
@@ -108,7 +105,6 @@ int main(int argc, char ** argv)
   // Initialise StreetDrone output CAN variables.
   sd::InitSDInterfaceControl(CustomerControlCANTx);
   sd::InitSDInterfaceFeedback(ControllerFeedbackCANTx);
-
   geometry_msgs::msg::TwistStamped current_Twist;
   sensor_msgs::msg::NavSatFix current_GPS;
   sensor_msgs::msg::Imu current_IMU;
@@ -132,7 +128,6 @@ int main(int argc, char ** argv)
   auto current_IMU_pub = node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw", 100);
   auto sd_control_pub =
     node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1);
-
 
   rclcpp::Rate loop_rate(ROS_LOOP);
   rclcpp::Time autonomous_entry(0, 0, RCL_ROS_TIME);
@@ -182,7 +177,6 @@ int main(int argc, char ** argv)
       }
 
       if (AutomationGranted_B || _sd_simulation_mode) {
-
         if (
           0 == (AliveCounter_Z % CONTROL_LOOP) &&
           ((node->now() - autonomous_entry) >= rclcpp::Duration::from_seconds(0.1)))
@@ -222,14 +216,13 @@ int main(int argc, char ** argv)
       current_twist_pub->publish(current_Twist);
       current_GPS_pub->publish(current_GPS);
 
-
       // If an IMU source is configured, publish IMU message.
       if (no_imu_string != _sd_gps_imu) {
         current_IMU_pub->publish(current_IMU);
       }
     };
 
-  auto timer = node->create_wall_timer(5ms, main_loop);  // 5 ms gives 200 Hz loop.
+  auto timer = node->create_wall_timer(std::chrono::milliseconds(5), main_loop);  // 5ms gives 200Hz loop rate
 
   try {
     rclcpp::spin(node);

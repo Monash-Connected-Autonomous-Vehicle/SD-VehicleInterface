@@ -28,6 +28,9 @@
  *
  */
 
+#ifndef SD_VEHICLE_INTERFACE__SD_TYPEDEFS_H_
+#define SD_VEHICLE_INTERFACE__SD_TYPEDEFS_H_
+
 #include "rclcpp/rclcpp.hpp"
 #define KPH_to_MPS (0.278)
 
@@ -39,7 +42,7 @@ typedef union CAN_frame_t {
   uint64_t frame;
 } CAN_frame_t;
 
-//Used to pack CAN words (16 bit signals)
+// Used to pack CAN words (16 bit signals).
 typedef union CAN_word_t {
   uint8_t bytes[2];
   uint16_t word;
@@ -49,3 +52,5 @@ typedef union float_bits_converter {
   unsigned int integer_can;
   float float_can;
 } float_bits_converter;
+
+#endif  // SD_VEHICLE_INTERFACE__SD_TYPEDEFS_H_

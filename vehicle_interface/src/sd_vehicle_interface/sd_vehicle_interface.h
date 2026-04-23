@@ -29,22 +29,27 @@
  *
  */
 
-#include <string>
-//*****CONSTANTS*****
+#ifndef SD_VEHICLE_INTERFACE__SD_VEHICLE_INTERFACE_H_
+#define SD_VEHICLE_INTERFACE__SD_VEHICLE_INTERFACE_H_
 
-//Constants
-#define  RAD_to_DEG  (57.2958)                  //Conversion constant from rad to deg
-#define  DEG_to_RAD  (0.0174533)                //Conversion constant from deg to rad
+#include <cstdint>
+#include <string>
+#include <can_msgs/msg/frame.hpp>
+// *****CONSTANTS*****
+
+// Constants
+#define  RAD_to_DEG  (57.2958)  // Conversion constant from rad to deg.
+#define  DEG_to_RAD  (0.0174533)  // Conversion constant from deg to rad.
 const double UNDO_STREETDRONE_SCALING_FACTOR = 50;
 // MCAV note: this converts reported speed to meters per second.
 
-//Ros Frequencies
-#define ROS_LOOP (200)          //The rate at which we publish data
+// Ros frequencies
+#define ROS_LOOP (200)  // The rate at which we publish data.
 
-//Control Frequencies
-#define CONTROL_LOOP (20) //The number of cycles that are counted for ever control loop cycle. 200/20 = 5Hz.
+// Control frequencies
+#define CONTROL_LOOP (20)  // 200 / 20 = 5 Hz.
 
-//*****VARIABLES*****
+// *****VARIABLES*****
 double CurrentTwistLinearCANImu_Mps = 0.0;  // Current twist linear from GPS/IMU CAN bus.
 double CurrentTwistLinearSD_Mps_Final = 0.0;  // Final speed source used by control loops.
 double CurrentTwistLinearCANSD_Mps = 0.0;  // Current twist linear from StreetDrone XCU CAN.
@@ -68,7 +73,7 @@ bool AutomationGranted_B = false;  // True when vehicle grants autonomous reques
 bool IMUVarianceKnown_B = false;  // True if IMU covariance is known (OXTS yes, PEAK no).
 
 
-//Speed Control
+// Speed control
 int8_t FinalDBWTorqueRequest_Pc = 0;  // Final torque request, -100 (brake) to 100.
 int8_t FinalDBWSteerRequest_Pc = 0;  // Final steer request, +/-100 full lock.
 int P_Contribution_Pc = 0;  // Torque contributed by proportional gain.
@@ -76,7 +81,7 @@ int I_Contribution_Pc = 0;  // Torque contributed by integral gain.
 int D_Contribution_Pc = 0;  // Torque contributed by derivative gain.
 int FF_Contribution_Pc = 0;  // Torque contributed by feedforward gain.
 
-//Ros variables
+// ROS variables
 can_msgs::msg::Frame ReceivedFrameCANRx;  // Latest received CAN frame.
 can_msgs::msg::Frame CustomerControlCANTx;  // CAN frame sent to vehicle control bus.
 can_msgs::msg::Frame ControllerFeedbackCANTx;  // Optional controller feedback frame.
@@ -88,9 +93,9 @@ can_msgs::msg::Frame ControllerFeedbackCANTx;  // Optional controller feedback f
 // ros::Publisher sd_control_pub;
 
 
-std::string _sd_vehicle;
-std::string _sd_gps_imu;
-std::string _sd_speed_source;
+std::string _sd_vehicle;  // NOLINT(runtime/string)
+std::string _sd_gps_imu;  // NOLINT(runtime/string)
+std::string _sd_speed_source;  // NOLINT(runtime/string)
 static bool _sd_simulation_mode;
 
 const char * const twizy_string = "twizy";
@@ -102,3 +107,5 @@ const char * const no_imu_string = "none";
 const char * const vehicle_can_speed_string = "vehicle_can_speed";
 const char * const imu_speed_string = "imu_speed";
 const char * const ndt_speed_string = "ndt_speed";
+
+#endif  // SD_VEHICLE_INTERFACE__SD_VEHICLE_INTERFACE_H_

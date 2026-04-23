@@ -49,17 +49,17 @@
 #define Accel_X_Variance (2.4059025e-10)
 #define Accel_Y_Variance (2.4059025e-10)
 #define Accel_Z_Variance (2.4059025e-10)
-#define Variance_Unkown (0) // Variance for PEAK not currently known
+#define Variance_Unkown (0)  // Variance for PEAK not currently known
 
 #define  DEG_to_RAD  (0.0174533)                // Conversion constant from deg to rad
 
 namespace sd {
   // Structs
   // Used for storing Quaternion
-  struct Quaternion
-  {
-    double w, x, y, z;
-  };
+struct Quaternion
+{
+  double w, x, y, z;
+};
 
   // Functions
 
@@ -85,7 +85,6 @@ namespace sd {
   void PackImuMessage(
     bool, sensor_msgs::msg::Imu &, double, double, double, double, double, double,
     double, double, double);
-
 }  // namespace sd
 
 #endif  // SD_VEHICLE_INTERFACE__SD_GPS_IMU_H_

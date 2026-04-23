@@ -32,6 +32,7 @@
 #ifndef SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_
 #define SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_
 
+#include <stdlib.h>
 #include <can_msgs/msg/frame.hpp>
 #include <stdlib.h>
 
@@ -244,7 +245,6 @@ namespace sd {
   int FF_Contribution_Pc :The Contribution to final torque by Feedorward control
   double TargetLinearVelocity_Mps :The Target speed (feedback only)
   double TargetAngularVelocity_Degps: The Target Angular velocity (Feedback Only)*/
-
 }  // namespace sd
 
 #endif  // SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_

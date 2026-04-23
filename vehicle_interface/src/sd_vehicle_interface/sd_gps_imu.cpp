@@ -32,7 +32,6 @@
 
 namespace sd
 {
-
 // Functions
 
 // Converts from Euler to Quaternion format.
@@ -112,7 +111,6 @@ void ParseRxCANDataOXTSCan(
 
         break;
       }
-
   }
 }
 
@@ -254,7 +252,6 @@ void PackImuMessage(
       0.0, Accel_Y_Variance, 0.0,
       0.0, 0.0, Accel_X_Variance};
   } else {
-
     current_IMU.orientation = Orientation_Quaternion;
     current_IMU.orientation_covariance = {Variance_Unkown, 0.0, 0.0,
       0.0, Variance_Unkown, 0.0,
@@ -270,7 +267,5 @@ void PackImuMessage(
       0.0, Variance_Unkown, 0.0,
       0.0, 0.0, Variance_Unkown};
   }
-
 }
-
 }  // namespace sd

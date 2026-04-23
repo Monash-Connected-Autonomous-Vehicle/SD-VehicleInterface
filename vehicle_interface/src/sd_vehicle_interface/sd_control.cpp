@@ -52,11 +52,13 @@ uint8_t steer_map[YAW_YAXIS][V_XAXIS] =
   {100, 100, 100, 100, 100, 90, 70, 55, 45, 17},                                        // <50 deg/s
   {100, 100, 100, 100, 100, 95, 80, 60, 50, 19},                                        // <55 deg/s
   {100, 100, 100, 100, 100, 100, 90, 65, 53, 20},                                       // <60 deg/s
-  {100, 100, 100, 100, 100, 100, 100, 70, 55, 45},                                      // >60 deg/s // Map should be extended if tighter turns needed above 6m/s
+  {100, 100, 100, 100, 100, 100, 100, 70, 55, 45},                                      // >60 deg/s 
+  // Extend if tighter turns needed above 6m/s
 };
 
 // FeedForward Calibration
-// Map is used to provide feedforward torque (% from 0-100) for a given speed. An additional axis should be considered for gradient
+// Map provides feedforward torque (% from 0-100) for a given speed.
+// Additional axis should be considered for gradient
 // Note, the FF gain at exactly 0 will be BRAKE_HOLD_TORQUE
 int8_t feedforward_torque_map_twizy[V_XAXIS] =
   // >0m/s  <1m/s  <2m/s  <3m/s  <4m/s  <5m/s  <6m/s  <7m/s  <8m/s  <9m/s
@@ -65,7 +67,6 @@ int8_t feedforward_torque_map_twizy[V_XAXIS] =
 int8_t feedforward_torque_map_env200[V_XAXIS] =
   // >0m/s  <1m/s  <2m/s  <3m/s  <4m/s  <5m/s  <6m/s  <7m/s  <8m/s  <9m/s
 {-5, 0, 2, 6, 7, 8, 10, 12, 13, 15};
-
 
 // This function calculates the steer angle (%) given the request
 int8_t CalculateSteerRequest(double TargetSteerAngle_Rad)
@@ -89,7 +90,6 @@ int8_t CalculateTorqueRequestTwizy(
   int & I_Contribution_Pc, int & D_Contribution_Pc,
   int & FF_Contribution_Pc)
 {
-
   // Calculate PID Errors
   static double LinearVelocityError_Mps;
   static double LinearVelocityIntegratedError;
@@ -104,8 +104,7 @@ int8_t CalculateTorqueRequestTwizy(
     speed_index = V_XAXIS - 2;
   }
 
-
-  // Reverse currently not suppported. If a negative speed request is received, we clamp it to 0 (standstill)
+  // Clamp negative speed requests to standstill (reverse not supported).
   if (TargetLinearVelocity_Mps <= 0) {
     TargetLinearVelocity_Mps = 0;
     FF_Contribution_Pc = 0;
@@ -117,19 +116,16 @@ int8_t CalculateTorqueRequestTwizy(
       speed_index_remainder * feedforward_torque_map_twizy[speed_index + 1]);
   }
 
-  LinearVelocityError_Mps = TargetLinearVelocity_Mps - CurrentLinearVelocity_Mps;                                               // The error between current speed and target speed
-  LinearVelocityDerivativeError = LinearVelocityError_Mps - PreviousLinearVelocityError_Mps;                    // The difference between current error and error on last cycle
-  LinearVelocityIntegratedError = LinearVelocityIntegratedError + LinearVelocityError_Mps;                                      // The accumulated error over time
+  LinearVelocityError_Mps = TargetLinearVelocity_Mps - CurrentLinearVelocity_Mps;
+  LinearVelocityDerivativeError = LinearVelocityError_Mps - PreviousLinearVelocityError_Mps;
+  LinearVelocityIntegratedError = LinearVelocityIntegratedError + LinearVelocityError_Mps;
 
   if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps == 0)) {
-
     P_Contribution_Pc = 0;
     I_Contribution_Pc = 0;
     D_Contribution_Pc = 0;
-    FF_Contribution_Pc = BRAKE_HOLD_TORQUE_TWIZY;                     // If we currently have  a speed target of 0 (standstill), and are not moving, lightly hold the vehicle still by gently braking
-
+    FF_Contribution_Pc = BRAKE_HOLD_TORQUE_TWIZY;
   } else if (abs(LinearVelocityError_Mps) < ANTI_FUSSINESS_TWIZY) {
-
     // // PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
     // LinearVelocityIntegratedError = 0;
     // I_Contribution_Pc = 0;
@@ -137,9 +133,7 @@ int8_t CalculateTorqueRequestTwizy(
 
     LinearVelocityIntegratedError = 0.975 * LinearVelocityIntegratedError;
     I_Contribution_Pc = 0.975 * I_Contribution_Pc;
-
-  } else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)) {              // Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop).
-
+  } else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)) {
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Twizy;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Twizy;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
@@ -149,9 +143,7 @@ int8_t CalculateTorqueRequestTwizy(
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
-
-  } else {               // else use the calculated errors
-
+  } else {  // else use the calculated errors
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Twizy;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
@@ -173,10 +165,8 @@ int8_t CalculateTorqueRequestTwizy(
     I_Contribution_Pc = 0;
   }
 
-
   FinalDBWTorqueRequest_Pc = P_Contribution_Pc + I_Contribution_Pc + D_Contribution_Pc +
     FF_Contribution_Pc;
-
 
   // Impose limits on the torque if greater than or less than maximum and minimum values
   if (FinalDBWTorqueRequest_Pc > MAX_TORQUE_TWIZY) {
@@ -189,7 +179,6 @@ int8_t CalculateTorqueRequestTwizy(
   PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
 
   return (int8_t)FinalDBWTorqueRequest_Pc;
-
 }
 
 int8_t CalculateTorqueRequestEnv200(
@@ -198,7 +187,6 @@ int8_t CalculateTorqueRequestEnv200(
   int & I_Contribution_Pc, int & D_Contribution_Pc,
   int & FF_Contribution_Pc)
 {
-
   // Calculate PID Errors
   static double LinearVelocityError_Mps;
   static double LinearVelocityIntegratedError;
@@ -213,8 +201,7 @@ int8_t CalculateTorqueRequestEnv200(
     speed_index = V_XAXIS - 2;
   }
 
-
-  // Reverse currently not suppported. If a negative speed request is received, we clamp it to 0 (standstill)
+  // Clamp negative speed requests to standstill (reverse not supported).
   if (TargetLinearVelocity_Mps <= 0) {
     TargetLinearVelocity_Mps = 0;
     FF_Contribution_Pc = 0;
@@ -224,17 +211,16 @@ int8_t CalculateTorqueRequestEnv200(
       speed_index_remainder * feedforward_torque_map_env200[speed_index + 1];
   }
 
-  LinearVelocityError_Mps = TargetLinearVelocity_Mps - CurrentLinearVelocity_Mps;                                               // The error between current speed and target speed
-  LinearVelocityDerivativeError = LinearVelocityError_Mps - PreviousLinearVelocityError_Mps;                    // The difference between current error and error on last cycle
-  LinearVelocityIntegratedError = LinearVelocityIntegratedError + LinearVelocityError_Mps;                                      // The accumulated error over time
+  LinearVelocityError_Mps = TargetLinearVelocity_Mps - CurrentLinearVelocity_Mps;
+  LinearVelocityDerivativeError = LinearVelocityError_Mps - PreviousLinearVelocityError_Mps;
+  LinearVelocityIntegratedError = LinearVelocityIntegratedError + LinearVelocityError_Mps;
 
   if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps == 0)) {
 
     P_Contribution_Pc = 0;
     I_Contribution_Pc = 0;
     D_Contribution_Pc = 0;
-    FF_Contribution_Pc = BRAKE_HOLD_TORQUE_ENV200;                     // If we currently have  a speed target of 0 (standstill), and are not moving, lightly hold the vehicle still by gently braking
-
+    FF_Contribution_Pc = BRAKE_HOLD_TORQUE_ENV200;
   } else if (abs(LinearVelocityError_Mps) < ANTI_FUSSINESS_ENV200) {
 
     // PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
@@ -253,9 +239,7 @@ int8_t CalculateTorqueRequestEnv200(
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Env200;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Env200;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Env200;
-
-  } else {               // else use the calculated errors
-
+  } else {  // else use the calculated errors
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Env200;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Env200;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Env200;
@@ -277,10 +261,8 @@ int8_t CalculateTorqueRequestEnv200(
     I_Contribution_Pc = 0;
   }
 
-
   FinalDBWTorqueRequest_Pc = P_Contribution_Pc + I_Contribution_Pc + D_Contribution_Pc +
     FF_Contribution_Pc;
-
 
   // Impose limits on the torque if greater than or less than maximum and minimum values
   if (FinalDBWTorqueRequest_Pc > MAX_TORQUE_ENV200) {
@@ -293,7 +275,5 @@ int8_t CalculateTorqueRequestEnv200(
   PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
 
   return (int8_t)FinalDBWTorqueRequest_Pc;
-
 }
-
-}
+}  // namespace speedcontroller
