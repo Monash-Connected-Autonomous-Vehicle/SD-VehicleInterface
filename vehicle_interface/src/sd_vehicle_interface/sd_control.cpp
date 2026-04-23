@@ -35,7 +35,8 @@
 namespace speedcontroller
 {
 
-static double PreviousLinearVelocityError_Mps = 0;                      // The linear velocity error from the last cycle. Initialised as 0
+// The linear velocity error from the last cycle. Initialised as 0.
+static double PreviousLinearVelocityError_Mps = 0;
 
 uint8_t steer_map[YAW_YAXIS][V_XAXIS] =
 {        // 0m/s  <1m/s  <2m/s  <3m/s  <4m/s  <5m/s  <6m/s  <7m/s  <8m/s  <9m/s
@@ -52,7 +53,7 @@ uint8_t steer_map[YAW_YAXIS][V_XAXIS] =
   {100, 100, 100, 100, 100, 90, 70, 55, 45, 17},                                        // <50 deg/s
   {100, 100, 100, 100, 100, 95, 80, 60, 50, 19},                                        // <55 deg/s
   {100, 100, 100, 100, 100, 100, 90, 65, 53, 20},                                       // <60 deg/s
-  {100, 100, 100, 100, 100, 100, 100, 70, 55, 45},                                      // >60 deg/s 
+  {100, 100, 100, 100, 100, 100, 100, 70, 55, 45},                                      // >60 deg/s
   // Extend if tighter turns needed above 6m/s
 };
 
@@ -110,7 +111,8 @@ int8_t CalculateTorqueRequestTwizy(
     FF_Contribution_Pc = 0;
   } else {
     // Calculate Feedforward contribution
-    // FF_Contribution_Pc  = (1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] + speed_index_remainder*feedforward_torque_map_twizy[speed_index+1];
+    // FF_Contribution_Pc  = (1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] +
+    // speed_index_remainder*feedforward_torque_map_twizy[speed_index+1];
     FF_Contribution_Pc = 0.8 *
       ((1 - speed_index_remainder) * feedforward_torque_map_twizy[speed_index] +
       speed_index_remainder * feedforward_torque_map_twizy[speed_index + 1]);
@@ -138,7 +140,9 @@ int8_t CalculateTorqueRequestTwizy(
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Twizy;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
 
-  } else if (LinearVelocityError_Mps < -ANTI_FUSSINESS_TWIZY) {              // When we are going too fast, we reduce speed with a different set of gains. (this allows us to account for vehicle overrun/coasting)
+  } else if (LinearVelocityError_Mps < -ANTI_FUSSINESS_TWIZY) {
+    // When we are going too fast, we reduce speed with a different set of gains.
+    // this allows us to account for vehicle overrun/coasting
 
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
@@ -156,11 +160,13 @@ int8_t CalculateTorqueRequestTwizy(
     I_Contribution_Pc = -MAX_ABS_I_CONTRIBUTION_TWIZY;
   }
 
-  if (CurrentLinearVelocity_Mps < ANTI_FUSSINESS_TWIZY) {             // Prevents I gain winding up when sitting still with handbrake on
+  if (CurrentLinearVelocity_Mps < ANTI_FUSSINESS_TWIZY) {
+    // Prevents I gain winding up when sitting still with handbrake on
     I_Contribution_Pc = 0;
   }
 
-  if (abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_TWIZY) {             // I Gain should only influence the system in a band about the setpoint.
+  if (abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_TWIZY) {
+    // I Gain should only influence the system in a band about the setpoint.
     LinearVelocityIntegratedError = 0;
     I_Contribution_Pc = 0;
   }
@@ -216,25 +222,26 @@ int8_t CalculateTorqueRequestEnv200(
   LinearVelocityIntegratedError = LinearVelocityIntegratedError + LinearVelocityError_Mps;
 
   if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps == 0)) {
-
     P_Contribution_Pc = 0;
     I_Contribution_Pc = 0;
     D_Contribution_Pc = 0;
     FF_Contribution_Pc = BRAKE_HOLD_TORQUE_ENV200;
   } else if (abs(LinearVelocityError_Mps) < ANTI_FUSSINESS_ENV200) {
-
     // PID remain the same. I gain = 0. This resets the I gain so we don't have to "unwind"
     LinearVelocityIntegratedError = 0;
     I_Contribution_Pc = 0;
     // P, D and FF fails maintain last value
 
-  } else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)) {              // Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop).
+  } else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)) {
+    // Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop).
 
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Env200;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Env200;
     D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Env200;
 
-  } else if (LinearVelocityError_Mps < -ANTI_FUSSINESS_ENV200) {              // When we are going too fast, we reduce speed with a different set of gains. (this allows us to account for vehicle overrun/coasting)
+  } else if (LinearVelocityError_Mps < -ANTI_FUSSINESS_ENV200) {
+    // When we are going too fast, we reduce speed with a different set of gains. (this allows us to
+    // account for vehicle overrun/coasting)
 
     P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Env200;
     I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Env200;
@@ -252,11 +259,13 @@ int8_t CalculateTorqueRequestEnv200(
     I_Contribution_Pc = -MAX_ABS_I_CONTRIBUTION_ENV200;
   }
 
-  if (CurrentLinearVelocity_Mps < ANTI_FUSSINESS_ENV200) {             // Prevents I gain winding up when sitting still with handbrake on
+  if (CurrentLinearVelocity_Mps < ANTI_FUSSINESS_ENV200) {
+    // Prevents I gain winding up when sitting still with handbrake on
     I_Contribution_Pc = 0;
   }
 
-  if (abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_ENV200) {             // I Gain should only influence the system in a band about the setpoint.
+  if (abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_ENV200) {
+    // I Gain should only influence the system in a band about the setpoint.
     LinearVelocityIntegratedError = 0;
     I_Contribution_Pc = 0;
   }

@@ -35,27 +35,26 @@
 
 namespace socketcan_bridge
 {
-class SocketCANToTopic {
+  class SocketCANToTopic {  // NOLINT(runtime/indentation_namespace)
 public:
-  SocketCANToTopic(
-    ros::NodeHandle * nh, ros::NodeHandle * nh_param,
-    can::DriverInterfaceSharedPtr driver);
-  void setup();
-  void setup(const can::FilteredFrameListener::FilterVector & filters);
-  void setup(XmlRpc::XmlRpcValue filters);
-  void setup(ros::NodeHandle nh);
+    SocketCANToTopic(
+      ros::NodeHandle * nh, ros::NodeHandle * nh_param,
+      can::DriverInterfaceSharedPtr driver);
+    void setup();
+    void setup(const can::FilteredFrameListener::FilterVector & filters);
+    void setup(XmlRpc::XmlRpcValue filters);
+    void setup(ros::NodeHandle nh);
 
 private:
-  ros::Publisher can_topic_;
-  can::DriverInterfaceSharedPtr driver_;
+    ros::Publisher can_topic_;
+    can::DriverInterfaceSharedPtr driver_;
 
-  can::FrameListenerConstSharedPtr frame_listener_;
-  can::StateListenerConstSharedPtr state_listener_;
+    can::FrameListenerConstSharedPtr frame_listener_;
+    can::StateListenerConstSharedPtr state_listener_;
 
-
-  void frameCallback(const can::Frame & f);
-  void stateCallback(const can::State & s);
-};
+    void frameCallback(const can::Frame & f);
+    void stateCallback(const can::State & s);
+  };
 
   void convertSocketCANToMessage(const can::Frame & f, can_msgs::msg::Frame & m)
   {

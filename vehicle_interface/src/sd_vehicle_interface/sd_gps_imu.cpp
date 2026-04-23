@@ -136,9 +136,11 @@ void ParseRxCANDataPEAKCan(
   switch (ReceivedFrameCAN.id) {
     case 1536:                     // 0x600
       {
-        IMU_Accel_X = ((int16_t)ReceivedFrameUnion.word[0]) * 3.91 * 0.001 * 9.80665;                           // 0.038344002; // *3.91 = mG, then conversion to m/s^2
-        IMU_Accel_Y = ((int16_t)ReceivedFrameUnion.word[1]) * 3.91 * 0.001 * 9.80665;                           //
-        IMU_Accel_Z = ((int16_t)ReceivedFrameUnion.word[2]) * 3.91 * 0.001 * 9.80665;                           //
+        IMU_Accel_X = ((int16_t)ReceivedFrameUnion.word[0]) * 3.91 * 0.001 * 9.80665;
+        // 0.038344002;
+        // *3.91 = mG, then conversion to m/s^2
+        IMU_Accel_Y = ((int16_t)ReceivedFrameUnion.word[1]) * 3.91 * 0.001 * 9.80665;
+        IMU_Accel_Z = ((int16_t)ReceivedFrameUnion.word[2]) * 3.91 * 0.001 * 9.80665;
 
         break;
       }
@@ -152,8 +154,8 @@ void ParseRxCANDataPEAKCan(
         IMU_Rate_X = IMU_Rate_X_fbc.float_can;
         IMU_Rate_Y = IMU_Rate_Y_fbc.float_can;
 
-        IMU_Angle_X += IMU_Rate_X * 0.05;                               // Angle achieved by integrating rate over time (50 ms rate)
-        IMU_Angle_Y += IMU_Rate_Y * 0.05;                               // Angle achieved by integrating rate over time (50 ms rate)
+        IMU_Angle_X += IMU_Rate_X * 0.05;
+        IMU_Angle_Y += IMU_Rate_Y * 0.05;
 
         break;
       }
@@ -163,7 +165,7 @@ void ParseRxCANDataPEAKCan(
 
         IMU_Rate_Z_fbc.integer_can = ReceivedFrameUnion.dword[0];
         IMU_Rate_Z = IMU_Rate_Z_fbc.float_can;
-        IMU_Angle_Z += IMU_Rate_Z * 0.05;                               // Angle achieved by integrating rate over time (50 ms rate)
+        IMU_Angle_Z += IMU_Rate_Z * 0.05;
         break;
       }
 
@@ -176,7 +178,7 @@ void ParseRxCANDataPEAKCan(
         CurrentLinearVelocity_Mps = CurrentLinearVelocity_Mps_fbc.float_can * KPH_to_MPS;
 
         Course_Deg_fbc.integer_can = ReceivedFrameUnion.dword[0];
-        IMU_Angle_Z = Course_Deg_fbc.float_can;                                 // This is a better measurement than integrated rate over time.
+        IMU_Angle_Z = Course_Deg_fbc.float_can;
 
         break;
       }
@@ -221,7 +223,7 @@ void PackImuMessage(
 
   Quaternion ConvertedQuaternion = ToQuaternion(
     IMU_Angle_X * DEG_to_RAD, IMU_Angle_Y * DEG_to_RAD,
-    IMU_Angle_Z * DEG_to_RAD);                                                                                                         // Covert angles to quaternion, uses rad/s
+    IMU_Angle_Z * DEG_to_RAD);
   Orientation_Quaternion.x = ConvertedQuaternion.x;
   Orientation_Quaternion.y = ConvertedQuaternion.y;
   Orientation_Quaternion.z = ConvertedQuaternion.z;
@@ -236,7 +238,6 @@ void PackImuMessage(
   LinearAccel3D.z = IMU_Accel_Z;
 
   if (IMUVarianceKnown_B) {
-
     current_IMU.orientation = Orientation_Quaternion;
     current_IMU.orientation_covariance = {Orientation_X_Variance, 0.0, 0.0,
       0.0, Orientation_Y_Variance, 0.0,

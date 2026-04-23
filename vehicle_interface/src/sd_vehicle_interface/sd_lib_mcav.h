@@ -34,7 +34,6 @@
 
 #include <stdlib.h>
 #include <can_msgs/msg/frame.hpp>
-#include <stdlib.h>
 
 #define KPH_TO_MPS (0.277778)
 
@@ -107,16 +106,17 @@ namespace sd {
   {
     // Check which kind of frame we have received and update data accordingly
     if (frame.id == 0x100) {             // StreetDrone_Control_1
-      bool steer_automation_available = frame.data[7] & 0x01;                   // bit 56 (0b0000 0001)
-      bool steer_automation_granted = frame.data[7] & 0x40;                   // bit 57 (0b0100 0000)
-      bool torque_automation_available = frame.data[7] & 0x10;                   // bit 60 (0b0001 0000)
-      bool torque_automation_granted = frame.data[7] & 0x4;                   // bit 61 (0b0000 0100)
+      bool steer_automation_available = frame.data[7] & 0x01;  // bit 56 (0b0000 0001)
+      bool steer_automation_granted = frame.data[7] & 0x40;  // bit 57 (0b0100 0000)
+      bool torque_automation_available = frame.data[7] & 0x10;  // bit 60 (0b0001 0000)
+      bool torque_automation_granted = frame.data[7] & 0x4;  // bit 61 (0b0000 0100)
       AutomationArmed_B = steer_automation_available && torque_automation_available;
       AutomationGranted_B = steer_automation_granted && torque_automation_granted;
       AutomationGranted_B = frame.data[7] & 0b00100010;
     } else if (frame.id == 0x102) {             // StreetDrone_Data_1
-      // Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
-      uint8_t CurrentVelocity8bit = frame.data[0];                   // Speed Actual kph low resolution
+      // Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit
+      // variable. The /100 divider handles the signal resolution
+      uint8_t CurrentVelocity8bit = frame.data[0];  // Speed Actual kph low resolution
       /*
                 Steer_Actual is frame.data[2]
                 Pedal_Actual is frame.data[4]
@@ -125,12 +125,15 @@ namespace sd {
 
       uint8_t speed_HR_B1 = frame.data[6];
       uint8_t speed_HR_B2 = frame.data[7];
-      uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;                   // // Speed Actual kph high resolution
+      uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;  // // Speed Actual kph high
+      // resolution
 
-      // To support older versions of XCU firmware which do not output high resolution speed. If high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
+      // To support older versions of XCU firmware which do not output high resolution speed. If
+      // high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
       if (CurrentVelocity16bit == 0) {
         CurrentLinearVelocity_Mps = (CurrentVelocity8bit * KPH_TO_MPS) / 100.0;
-        // MCAV note: not sure why the speeds are scaled by 1/100. This is also missing the scaling factor of 0.5 present in CAN definition.
+        // MCAV note: not sure why the speeds are scaled by 1/100. This is also missing the scaling
+        // factor of 0.5 present in CAN definition.
         // Actual meters per second speed would be ((double)frame.data[0])*0.5*KPH_TO_MPS
       } else {
         CurrentLinearVelocity_Mps = (CurrentVelocity16bit * KPH_TO_MPS);
@@ -171,16 +174,21 @@ namespace sd {
   {
     frame.dlc = 8;             // length of data in bytes
     frame.id = 0x101;             // CustomerControl frame id: 0x101
-    frame.data[0] = 0;             // Customer_Control_1_CRC (byte 0) (8-bit unsigned integer, calculation in SetCRC)
-    frame.data[1] = 0;             // Customer_Control_1_Alive (byte 1) (8-bit unsigned integer, increments by 1 every message)
-    frame.data[2] = 0;             // Steer_Request (byte 2) (8-bit signed integer, units %, min value -100 decimal == 0x9C, max value 100 decimal == 0x64)
+    frame.data[0] = 0;  // Customer_Control_1_CRC (byte 0) (8-bit unsigned integer, calculation in
+    // SetCRC)
+    frame.data[1] = 0;  // Customer_Control_1_Alive (byte 1) (8-bit unsigned integer, increments by
+    // 1 every message)
+    frame.data[2] = 0;  // Steer_Request (byte 2) (8-bit signed integer, units %, min value -100
+    // decimal == 0x9C, max value 100 decimal == 0x64)
     frame.data[3] = 0;             // Torque_Request (byte 3) (as for Steer_Request)
     frame.data[4] = 0;             // Reserved (byte 4)
     frame.data[5] = 0;             // Reserved (byte 5)
     frame.data[6] = 0;             // Reserved (byte 6)
-    frame.data[7] = 0x11;             // sets SteerAutomationRequest and TorqueAutomationRequest to 1.
-    // (byte 7 contains two bit flags that set SteerAutomationRequest and TorqueAutomationRequest to true or false)
-    // 0x11 in binary is 0b00010001, so it sets bit 56 and bit 60 from the start of the CAN frame (seems to read right to left?)
+    frame.data[7] = 0x11;  // sets SteerAutomationRequest and TorqueAutomationRequest to 1.
+    // (byte 7 contains two bit flags that set SteerAutomationRequest and TorqueAutomationRequest to
+    // true or false)
+    // 0x11 in binary is 0b00010001, so it sets bit 56 and bit 60 from the start of the CAN frame
+    // (seems to read right to left?)
 
     sd::SetCRC(frame, aliveCount);             //
   }
@@ -222,7 +230,8 @@ namespace sd {
     can_msgs::msg::Frame & frame, int8_t torque_request_pc,
     int8_t steer_request_pc, uint8_t aliveCount)
   {
-    frame.data[2] = steer_request_pc;             // Steer_Request (byte 2) (8-bit signed integer, units %, min value -100 decimal == 0x9C, max value 100 decimal == 0x64)
+    frame.data[2] = steer_request_pc;  // Steer_Request (byte 2) (8-bit signed integer, units %, min
+    // value -100 decimal == 0x9C, max value 100 decimal == 0x64)
     frame.data[3] = torque_request_pc;             // Torque_Request (byte 3) (as for Steer_Request)
     SetCRC(frame, aliveCount);
   }

@@ -56,10 +56,10 @@
 namespace sd {
   // Structs
   // Used for storing Quaternion
-struct Quaternion
-{
-  double w, x, y, z;
-};
+  struct Quaternion  // NOLINT(runtime/indentation_namespace)
+  {
+    double w, x, y, z;
+  };
 
   // Functions
 

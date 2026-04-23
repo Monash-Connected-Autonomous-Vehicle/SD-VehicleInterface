@@ -34,22 +34,22 @@
 
 namespace socketcan_bridge
 {
-class TopicToSocketCAN {
+  class TopicToSocketCAN {  // NOLINT(runtime/indentation_namespace)
 public:
-  TopicToSocketCAN(
-    ros::NodeHandle * nh, ros::NodeHandle * nh_param,
-    can::DriverInterfaceSharedPtr driver);
-  void setup();
+    TopicToSocketCAN(
+      ros::NodeHandle * nh, ros::NodeHandle * nh_param,
+      can::DriverInterfaceSharedPtr driver);
+    void setup();
 
 private:
-  ros::Subscriber can_topic_;
-  can::DriverInterfaceSharedPtr driver_;
+    ros::Subscriber can_topic_;
+    can::DriverInterfaceSharedPtr driver_;
 
-  can::StateListenerConstSharedPtr state_listener_;
+    can::StateListenerConstSharedPtr state_listener_;
 
-  void msgCallback(const can_msgs::msg::Frame::ConstPtr & msg);
-  void stateCallback(const can::State & s);
-};
+    void msgCallback(const can_msgs::msg::Frame::ConstPtr & msg);
+    void stateCallback(const can::State & s);
+  };
 
   void convertMessageToSocketCAN(const can_msgs::msg::Frame & m, can::Frame & f)
   {

@@ -69,10 +69,10 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
   } else if (no_imu_string == _sd_gps_imu) {
     // Do nothing.
   } else {
-    // RCLCPP_WARN(node->get_logger(), "SD_Vehicle_Interface parameter for sd_gps_imu is not valid\n");
+    // RCLCPP_WARN(node->get_logger(), "SD_Vehicle_Interface parameter for sd_gps_imu is not
+    // valid\n");
   }
 }
-
 
 void AckermannCommand_callback(
   const std::shared_ptr<autoware_control_msgs::msg::Control> msg)
@@ -222,7 +222,8 @@ int main(int argc, char ** argv)
       }
     };
 
-  auto timer = node->create_wall_timer(std::chrono::milliseconds(5), main_loop);  // 5ms gives 200Hz loop rate
+  auto timer = node->create_wall_timer(
+    std::chrono::milliseconds(5), main_loop);  // 5ms gives 200Hz loop rate
 
   try {
     rclcpp::spin(node);
