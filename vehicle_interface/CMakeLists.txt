@@ -43,9 +43,6 @@ install(DIRECTORY
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
-  # Skip ament linters that this legacy codebase does not satisfy yet (CI runs them via
-  # ament_lint_auto). Re-enable and fix findings when ready.
-  set(ament_cmake_copyright_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 
   set(TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/sd_vehicle_interface)
