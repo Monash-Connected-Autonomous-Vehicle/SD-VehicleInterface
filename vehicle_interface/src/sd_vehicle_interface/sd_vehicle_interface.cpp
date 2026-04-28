@@ -74,12 +74,10 @@ void ReceivedFrameCANRx_callback(const std::shared_ptr<can_msgs::msg::Frame> msg
 	}
 }
 
-
-void AckermannCommand_callback(const std::shared_ptr<autoware_control_msgs::msg::Control> msg)
+void TwistCommand_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
 {
-	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
-    TargeTireAngle_Rad= msg->lateral.steering_tire_angle; //Radians
-    TargetTwistLinear_Mps = msg->longitudinal.velocity / UNDO_STREETDRONE_SCALING_FACTOR; //still Mps
+    TargeTireAngle_Rad = msg->twist.angular.z;
+    TargetTwistLinear_Mps = msg->twist.linear.x / UNDO_STREETDRONE_SCALING_FACTOR;
 }
 
 void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
@@ -154,7 +152,7 @@ int main(int argc, char **argv)
 	//Subscriber
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
     auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
-    auto ackermann_cmd_sub = node->create_subscription<autoware_control_msgs::msg::Control>("/control/command/control_cmd", 100, AckermannCommand_callback);
+    auto twist_cmd_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("/control/command/control_cmd", 100, TwistCommand_callback);
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);
