@@ -40,7 +40,8 @@ namespace speedcontroller
 {
 
 // Test fixture for CalculateSteerRequest tests
-class TestCalculateSteerRequest : public ::testing::Test {
+class TestCalculateSteerRequest : public ::testing::Test
+{
 protected:
   void SetUp() override {}
   void TearDown() override {}
@@ -112,7 +113,8 @@ TEST_F(TestCalculateSteerRequest, ReturnValueRangeValidation) {
 // Test CalculateTorqueRequestTwizy - Has static state
 // ============================================================================
 
-class TestCalculateTorqueRequestTwizy : public ::testing::Test {
+class TestCalculateTorqueRequestTwizy : public ::testing::Test
+{
 protected:
   void SetUp() override {}
   void TearDown() override {}
@@ -123,8 +125,9 @@ TEST_F(TestCalculateTorqueRequestTwizy, InitialState) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // Target 5 m/s, current 0 m/s - first call, stationary to accelerating
-  int8_t result = CalculateTorqueRequestTwizy(5.0, 0.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result = CalculateTorqueRequestTwizy(
+    5.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
 
   // Should return a positive torque (accelerating)
   EXPECT_GE(result, 0);
@@ -139,14 +142,16 @@ TEST_F(TestCalculateTorqueRequestTwizy, StationaryToAcceleration) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // First call: target 3 m/s, current 0 m/s
-  int8_t result1 = CalculateTorqueRequestTwizy(3.0, 0.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result1 = CalculateTorqueRequestTwizy(
+    3.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
   EXPECT_GE(result1, 0);
   EXPECT_LE(result1, MAX_TORQUE_TWIZY);
 
   // Second call: target 3 m/s, current 1 m/s (still accelerating)
-  int8_t result2 = CalculateTorqueRequestTwizy(3.0, 1.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result2 = CalculateTorqueRequestTwizy(
+    3.0, 1.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
   EXPECT_GE(result2, 0);
   EXPECT_LE(result2, MAX_TORQUE_TWIZY);
 }
@@ -156,8 +161,9 @@ TEST_F(TestCalculateTorqueRequestTwizy, DecelerationToStop) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // Vehicle moving at 5 m/s, target is 0 (braking to stop)
-  int8_t result = CalculateTorqueRequestTwizy(0.0, 5.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result = CalculateTorqueRequestTwizy(
+    0.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
 
   // Should return negative torque (braking)
   EXPECT_LE(result, 0);
@@ -169,8 +175,9 @@ TEST_F(TestCalculateTorqueRequestTwizy, OverspeedCondition) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // Target 3 m/s, current 5 m/s (going too fast)
-  int8_t result = CalculateTorqueRequestTwizy(3.0, 5.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result = CalculateTorqueRequestTwizy(
+    3.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
 
   // Should return negative torque (reducing speed)
   EXPECT_LE(result, 0);
@@ -192,8 +199,9 @@ TEST_F(TestCalculateTorqueRequestTwizy, ReturnValueRangeValidation) {
   };
 
   for (const auto & tc : test_cases) {
-    int8_t result = CalculateTorqueRequestTwizy(tc.first, tc.second, p_contrib, i_contrib,
-        d_contrib, ff_contrib);
+    int8_t result = CalculateTorqueRequestTwizy(
+      tc.first, tc.second, p_contrib, i_contrib,
+      d_contrib, ff_contrib);
     EXPECT_GE(result, MIN_TORQUE_TWIZY)
       << "Result " << static_cast<int>(result) << " for target=" << tc.first
       << ", current=" << tc.second << " is below MIN_TORQUE_TWIZY";
@@ -207,7 +215,8 @@ TEST_F(TestCalculateTorqueRequestTwizy, ReturnValueRangeValidation) {
 // Test CalculateTorqueRequestEnv200 - Has static state
 // ============================================================================
 
-class TestCalculateTorqueRequestEnv200 : public ::testing::Test {
+class TestCalculateTorqueRequestEnv200 : public ::testing::Test
+{
 protected:
   void SetUp() override {}
   void TearDown() override {}
@@ -218,8 +227,9 @@ TEST_F(TestCalculateTorqueRequestEnv200, InitialState) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // Target 5 m/s, current 0 m/s - first call, stationary to accelerating
-  int8_t result = CalculateTorqueRequestEnv200(5.0, 0.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result = CalculateTorqueRequestEnv200(
+    5.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
 
   // Should return a positive torque (accelerating)
   EXPECT_GE(result, 0);
@@ -231,14 +241,16 @@ TEST_F(TestCalculateTorqueRequestEnv200, StationaryToAcceleration) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // First call: target 3 m/s, current 0 m/s
-  int8_t result1 = CalculateTorqueRequestEnv200(3.0, 0.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result1 = CalculateTorqueRequestEnv200(
+    3.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
   EXPECT_GE(result1, 0);
   EXPECT_LE(result1, MAX_TORQUE_ENV200);
 
   // Second call: target 3 m/s, current 1 m/s (still accelerating)
-  int8_t result2 = CalculateTorqueRequestEnv200(3.0, 1.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result2 = CalculateTorqueRequestEnv200(
+    3.0, 1.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
   EXPECT_GE(result2, 0);
   EXPECT_LE(result2, MAX_TORQUE_ENV200);
 }
@@ -248,8 +260,9 @@ TEST_F(TestCalculateTorqueRequestEnv200, DecelerationToStop) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // Vehicle moving at 5 m/s, target is 0 (braking to stop)
-  int8_t result = CalculateTorqueRequestEnv200(0.0, 5.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result = CalculateTorqueRequestEnv200(
+    0.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
 
   // Should return negative torque (braking)
   EXPECT_LE(result, 0);
@@ -261,8 +274,9 @@ TEST_F(TestCalculateTorqueRequestEnv200, OverspeedCondition) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
 
   // Target 3 m/s, current 5 m/s (going too fast)
-  int8_t result = CalculateTorqueRequestEnv200(3.0, 5.0, p_contrib, i_contrib, d_contrib,
-      ff_contrib);
+  int8_t result = CalculateTorqueRequestEnv200(
+    3.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
 
   // Should return negative torque (reducing speed)
   EXPECT_LE(result, 0);
@@ -284,8 +298,9 @@ TEST_F(TestCalculateTorqueRequestEnv200, ReturnValueRangeValidation) {
   };
 
   for (const auto & tc : test_cases) {
-    int8_t result = CalculateTorqueRequestEnv200(tc.first, tc.second, p_contrib, i_contrib,
-        d_contrib, ff_contrib);
+    int8_t result = CalculateTorqueRequestEnv200(
+      tc.first, tc.second, p_contrib, i_contrib,
+      d_contrib, ff_contrib);
     EXPECT_GE(result, MIN_TORQUE_ENV200)
       << "Result " << static_cast<int>(result) << " for target=" << tc.first
       << ", current=" << tc.second << " is below MIN_TORQUE_ENV200";
@@ -298,7 +313,7 @@ TEST_F(TestCalculateTorqueRequestEnv200, ReturnValueRangeValidation) {
 }  // namespace speedcontroller
 
 // Main function for running tests
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
