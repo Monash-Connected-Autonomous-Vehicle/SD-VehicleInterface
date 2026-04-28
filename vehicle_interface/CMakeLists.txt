@@ -50,20 +50,33 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 
   set(TEST_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/sd_vehicle_interface)
-  set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../test)
+  set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
-  ament_add_gtest(test_sd_control ${TEST_DIR}/test_sd_control.cpp ${TEST_SRC_DIR}/sd_control.cpp)
-  target_include_directories(test_sd_control PRIVATE ${TEST_SRC_DIR})
-  ament_target_dependencies(test_sd_control rclcpp std_msgs sd_msgs can_msgs)
+  ament_add_gtest(test_sd_control_extended ${TEST_DIR}/test_sd_control.cpp ${TEST_SRC_DIR}/sd_control.cpp)
+  target_include_directories(test_sd_control_extended PRIVATE
+    ${TEST_SRC_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  ament_target_dependencies(test_sd_control_extended rclcpp std_msgs sd_msgs can_msgs)
+
+  ament_add_gtest(test_sd_control_minimal ${TEST_DIR}/test_sd_control_minimal.cpp ${TEST_SRC_DIR}/sd_control.cpp)
+  target_include_directories(test_sd_control_minimal PRIVATE
+    ${TEST_SRC_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
+  ament_target_dependencies(test_sd_control_minimal rclcpp std_msgs sd_msgs can_msgs)
 
   ament_add_gtest(test_sd_gps_imu ${TEST_DIR}/test_sd_gpu_imu.cpp ${TEST_SRC_DIR}/sd_gps_imu.cpp)
-  target_include_directories(test_sd_gps_imu PRIVATE ${TEST_SRC_DIR})
+  target_include_directories(test_sd_gps_imu PRIVATE
+    ${TEST_SRC_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
   ament_target_dependencies(test_sd_gps_imu rclcpp sensor_msgs std_msgs sd_msgs can_msgs)
 
   ament_add_gtest(test_vehicle_interface_integration
     ${TEST_DIR}/test_vehicle_interface_integration.cpp)
-  target_include_directories(test_vehicle_interface_integration PRIVATE ${TEST_SRC_DIR})
+  target_include_directories(test_vehicle_interface_integration PRIVATE
+    ${TEST_SRC_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src)
   ament_target_dependencies(test_vehicle_interface_integration rclcpp sensor_msgs std_msgs sd_msgs can_msgs autoware_control_msgs)
+
 endif()
 
 ament_package()
