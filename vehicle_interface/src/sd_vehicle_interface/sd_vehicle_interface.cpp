@@ -32,6 +32,7 @@
 // Based on original work of: Efimia Panagiotaki
 
 #include "sd_vehicle_interface.h"  // NOLINT(build/include_subdir)
+#include <chrono>
 #include <memory>
 #include <string>
 #include <can_msgs/msg/frame.hpp>
@@ -94,6 +95,8 @@ void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistSta
 
 int main(int argc, char ** argv)
 {
+  using namespace std::chrono_literals;
+
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("sd_twizy_interface_node");
   node->declare_parameter<std::string>("sd_vehicle", "env200");
@@ -225,8 +228,7 @@ int main(int argc, char ** argv)
       }
     };
 
-  auto timer = node->create_wall_timer(
-    std::chrono::milliseconds(5), main_loop);  // 5ms gives 200Hz loop rate
+  auto timer = node->create_wall_timer(5ms, main_loop);  // 5ms gives 200Hz loop rate
 
   try {
     rclcpp::spin(node);

@@ -136,6 +136,8 @@ void ParseRxCANDataPEAKCan(
   ReceivedFrameUnion.byte[6] = ReceivedFrameCAN.data[6];
   ReceivedFrameUnion.byte[7] = ReceivedFrameCAN.data[7];
 
+  constexpr double kImuSamplePeriodSec = 0.05;
+
   switch (ReceivedFrameCAN.id) {
     case 1536:                     // 0x600
       {
@@ -157,8 +159,8 @@ void ParseRxCANDataPEAKCan(
         IMU_Rate_X = IMU_Rate_X_fbc.float_can;
         IMU_Rate_Y = IMU_Rate_Y_fbc.float_can;
 
-        IMU_Angle_X += IMU_Rate_X * 0.05;
-        IMU_Angle_Y += IMU_Rate_Y * 0.05;
+        IMU_Angle_X += IMU_Rate_X * kImuSamplePeriodSec;
+        IMU_Angle_Y += IMU_Rate_Y * kImuSamplePeriodSec;
 
         break;
       }
@@ -168,7 +170,7 @@ void ParseRxCANDataPEAKCan(
 
         IMU_Rate_Z_fbc.integer_can = ReceivedFrameUnion.dword[0];
         IMU_Rate_Z = IMU_Rate_Z_fbc.float_can;
-        IMU_Angle_Z += IMU_Rate_Z * 0.05;
+        IMU_Angle_Z += IMU_Rate_Z * kImuSamplePeriodSec;
         break;
       }
 
