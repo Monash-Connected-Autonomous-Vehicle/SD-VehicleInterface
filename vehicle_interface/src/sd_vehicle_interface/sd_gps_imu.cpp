@@ -1,45 +1,44 @@
-/*
- * Copyright (C) 2020 StreetDrone Limited - All rights reserved
- *
- * Author: Fionán O'Sullivan
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of the copyright holder nor the names of its
- *     contributors may be used to endorse or promote products derived from
- *     this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+// Copyright (c) 2020 StreetDrone Limited
+//
+//
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the StreetDrone Limited nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
+// Author: Fionán O'Sullivan
+// Based on original work of: Efimia Panagiotaki
 
- #include "sd_gps_imu.h"
-using namespace std;
+#include "sd_gps_imu.h"  // NOLINT(build/include_subdir)
 
 namespace sd
 {
+// Functions
 
-
-//Functions
-
-//Converts from Euler to Quaternion format.
-Quaternion ToQuaternion(double yaw, double pitch, double roll)         // yaw (Z), pitch (Y), roll (X)
+// Converts from Euler to Quaternion format.
+Quaternion ToQuaternion(double yaw, double pitch, double roll)  // yaw (Z), pitch (Y), roll (X)
 {
   // Abbreviations for the various angular functions
   double cy = cos(yaw * 0.5);
@@ -65,7 +64,7 @@ void ParseRxCANDataOXTSCan(
   double & IMU_Angle_X, double & IMU_Angle_Y, double & IMU_Angle_Z,
   double & IMU_Rate_X, double & IMU_Rate_Y, double & IMU_Rate_Z,
   double & IMU_Accel_X, double & IMU_Accel_Y, double & IMU_Accel_Z)
-//This function parses the received can traffic from the OXTS unit. Please see OXTS documentation
+// This function parses the received can traffic from the OXTS unit. Please see OXTS documentation
 {
   CAN_frame_t ReceivedFrameUnion;
   ReceivedFrameUnion.byte[0] = ReceivedFrameCAN.data[0];
@@ -77,22 +76,21 @@ void ParseRxCANDataOXTSCan(
   ReceivedFrameUnion.byte[6] = ReceivedFrameCAN.data[6];
   ReceivedFrameUnion.byte[7] = ReceivedFrameCAN.data[7];
 
-
   switch (ReceivedFrameCAN.id) {
-    case 1539:                      //0x603
+    case 1539:                      // 0x603
       {
         CurrentLinearVelocity_Mps = ReceivedFrameUnion.word[3] * 0.01;
 
         break;
       }
-    case 1537:                     //0x601
+    case 1537:                     // 0x601
       {
         GPS_longitude = ReceivedFrameUnion.dword[1] * 0.0000001;
         GPS_latitude = ReceivedFrameUnion.dword[0] * 0.0000001;
 
         break;
       }
-    case 1541:                     //0x605
+    case 1541:                     // 0x605
       {
         IMU_Accel_X = ReceivedFrameUnion.word[0] * 0.01;
         IMU_Accel_Y = ReceivedFrameUnion.word[1] * 0.01;
@@ -100,7 +98,7 @@ void ParseRxCANDataOXTSCan(
 
         break;
       }
-    case 1543:                     //0x607
+    case 1543:                     // 0x607
       {
         IMU_Angle_X = ReceivedFrameUnion.word[0] * 0.01;
         IMU_Angle_Y = ReceivedFrameUnion.word[1] * 0.01;
@@ -108,7 +106,7 @@ void ParseRxCANDataOXTSCan(
 
         break;
       }
-    case 1544:                     //0x608
+    case 1544:                     // 0x608
       {
         IMU_Rate_X = ReceivedFrameUnion.word[0] * 0.01;
         IMU_Rate_Y = ReceivedFrameUnion.word[1] * 0.01;
@@ -116,10 +114,8 @@ void ParseRxCANDataOXTSCan(
 
         break;
       }
-
   }
 }
-
 
 void ParseRxCANDataPEAKCan(
   can_msgs::msg::Frame & ReceivedFrameCAN,
@@ -128,7 +124,7 @@ void ParseRxCANDataPEAKCan(
   double & IMU_Angle_X, double & IMU_Angle_Y, double & IMU_Angle_Z,
   double & IMU_Rate_X, double & IMU_Rate_Y, double & IMU_Rate_Z,
   double & IMU_Accel_X, double & IMU_Accel_Y, double & IMU_Accel_Z)
-//This function parses the received can traffic from the OXTS unit. Please see OXTS documentation
+// This function parses the received can traffic from the OXTS unit. Please see OXTS documentation
 {
   CAN_frame_t ReceivedFrameUnion;
   ReceivedFrameUnion.byte[0] = ReceivedFrameCAN.data[0];
@@ -140,16 +136,20 @@ void ParseRxCANDataPEAKCan(
   ReceivedFrameUnion.byte[6] = ReceivedFrameCAN.data[6];
   ReceivedFrameUnion.byte[7] = ReceivedFrameCAN.data[7];
 
+  constexpr double kImuSamplePeriodSec = 0.05;
+
   switch (ReceivedFrameCAN.id) {
-    case 1536:                     //0x600
+    case 1536:                     // 0x600
       {
-        IMU_Accel_X = ((int16_t)ReceivedFrameUnion.word[0]) * 3.91 * 0.001 * 9.80665;                           // 0.038344002; //*3.91 = mG, then conversion to m/s^2
-        IMU_Accel_Y = ((int16_t)ReceivedFrameUnion.word[1]) * 3.91 * 0.001 * 9.80665;                           //
-        IMU_Accel_Z = ((int16_t)ReceivedFrameUnion.word[2]) * 3.91 * 0.001 * 9.80665;                           //
+        IMU_Accel_X = ((int16_t)ReceivedFrameUnion.word[0]) * 3.91 * 0.001 * 9.80665;
+        // 0.038344002;
+        // *3.91 = mG, then conversion to m/s^2
+        IMU_Accel_Y = ((int16_t)ReceivedFrameUnion.word[1]) * 3.91 * 0.001 * 9.80665;
+        IMU_Accel_Z = ((int16_t)ReceivedFrameUnion.word[2]) * 3.91 * 0.001 * 9.80665;
 
         break;
       }
-    case 1552:                     //0x610
+    case 1552:                     // 0x610
       {
         float_bits_converter IMU_Rate_X_fbc;
         float_bits_converter IMU_Rate_Y_fbc;
@@ -159,22 +159,22 @@ void ParseRxCANDataPEAKCan(
         IMU_Rate_X = IMU_Rate_X_fbc.float_can;
         IMU_Rate_Y = IMU_Rate_Y_fbc.float_can;
 
-        IMU_Angle_X += IMU_Rate_X * 0.05;                               //Angle achieved by integrating rate over time (50 ms rate)
-        IMU_Angle_Y += IMU_Rate_Y * 0.05;                               //Angle achieved by integrating rate over time (50 ms rate)
+        IMU_Angle_X += IMU_Rate_X * kImuSamplePeriodSec;
+        IMU_Angle_Y += IMU_Rate_Y * kImuSamplePeriodSec;
 
         break;
       }
-    case 1553:                     //0x611
+    case 1553:                     // 0x611
       {
         float_bits_converter IMU_Rate_Z_fbc;
 
         IMU_Rate_Z_fbc.integer_can = ReceivedFrameUnion.dword[0];
         IMU_Rate_Z = IMU_Rate_Z_fbc.float_can;
-        IMU_Angle_Z += IMU_Rate_Z * 0.05;                               //Angle achieved by integrating rate over time (50 ms rate)
+        IMU_Angle_Z += IMU_Rate_Z * kImuSamplePeriodSec;
         break;
       }
 
-    case 1569:                      //0x621
+    case 1569:                      // 0x621
       {
         float_bits_converter CurrentLinearVelocity_Mps_fbc;
         float_bits_converter Course_Deg_fbc;
@@ -183,32 +183,31 @@ void ParseRxCANDataPEAKCan(
         CurrentLinearVelocity_Mps = CurrentLinearVelocity_Mps_fbc.float_can * KPH_to_MPS;
 
         Course_Deg_fbc.integer_can = ReceivedFrameUnion.dword[0];
-        IMU_Angle_Z = Course_Deg_fbc.float_can;                                 //This is a better measurement than integrated rate over time.
-
+        IMU_Angle_Z = Course_Deg_fbc.float_can;
 
         break;
       }
-    case 1571:                     //0x623
+    case 1571:                     // 0x623
       {
         float_bits_converter GPS_Latitude_Minutes_fbc;
         GPS_Latitude_Minutes_fbc.integer_can = ReceivedFrameUnion.dword[0];
 
         GPS_latitude = (GPS_Latitude_Minutes_fbc.float_can / 60) + ReceivedFrameUnion.word[2];
 
-        //As per PEAK CAN GPS .dbc, 83 represents south.
+        // As per PEAK CAN GPS .dbc, 83 represents south.
         if (ReceivedFrameUnion.byte[6] == 83) {
           GPS_latitude *= -1;
         }
         break;
       }
-    case 1570:                     //0x623
+    case 1570:                     // 0x623
       {
         float_bits_converter GPS_Longitude_Minutes_fbc;
         GPS_Longitude_Minutes_fbc.integer_can = ReceivedFrameUnion.dword[0];
 
         GPS_longitude = (GPS_Longitude_Minutes_fbc.float_can / 60) + ReceivedFrameUnion.word[2];
 
-        //As per PEAK CAN GPS .dbc, 87 represents west.
+        // As per PEAK CAN GPS .dbc, 87 represents west.
         if (ReceivedFrameUnion.byte[6] == 87) {
           GPS_longitude *= -1;
         }
@@ -216,7 +215,6 @@ void ParseRxCANDataPEAKCan(
       }
   }
 }
-
 
 void PackImuMessage(
   bool IMUVarianceKnown_B, sensor_msgs::msg::Imu & current_IMU,
@@ -230,7 +228,7 @@ void PackImuMessage(
 
   Quaternion ConvertedQuaternion = ToQuaternion(
     IMU_Angle_X * DEG_to_RAD, IMU_Angle_Y * DEG_to_RAD,
-    IMU_Angle_Z * DEG_to_RAD);                                                                                                         //Covert angles to quaternion, uses rad/s
+    IMU_Angle_Z * DEG_to_RAD);
   Orientation_Quaternion.x = ConvertedQuaternion.x;
   Orientation_Quaternion.y = ConvertedQuaternion.y;
   Orientation_Quaternion.z = ConvertedQuaternion.z;
@@ -245,7 +243,6 @@ void PackImuMessage(
   LinearAccel3D.z = IMU_Accel_Z;
 
   if (IMUVarianceKnown_B) {
-
     current_IMU.orientation = Orientation_Quaternion;
     current_IMU.orientation_covariance = {Orientation_X_Variance, 0.0, 0.0,
       0.0, Orientation_Y_Variance, 0.0,
@@ -261,8 +258,6 @@ void PackImuMessage(
       0.0, Accel_Y_Variance, 0.0,
       0.0, 0.0, Accel_X_Variance};
   } else {
-
-
     current_IMU.orientation = Orientation_Quaternion;
     current_IMU.orientation_covariance = {Variance_Unkown, 0.0, 0.0,
       0.0, Variance_Unkown, 0.0,
@@ -278,7 +273,5 @@ void PackImuMessage(
       0.0, Variance_Unkown, 0.0,
       0.0, 0.0, Variance_Unkown};
   }
-
 }
-
-}
+}  // namespace sd

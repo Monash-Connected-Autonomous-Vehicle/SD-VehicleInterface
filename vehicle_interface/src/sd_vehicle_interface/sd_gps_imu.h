@@ -1,44 +1,49 @@
-/*
- * Copyright (C) 2020 StreetDrone Limited - All rights reserved
- *
- * Author: Fionán O'Sullivan
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of the copyright holder nor the names of its
- *     contributors may be used to endorse or promote products derived from
- *     this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+// Copyright (c) 2020 StreetDrone Limited
+//
+//
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the StreetDrone Limited nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
+// Author: Fionán O'Sullivan
+// Based on original work of: Efimia Panagiotaki
+
+#ifndef SD_VEHICLE_INTERFACE__SD_GPS_IMU_H_
+#define SD_VEHICLE_INTERFACE__SD_GPS_IMU_H_
 
 #include "can_msgs/msg/frame.hpp"
-#include "sd_typedefs.h"
-#include "sensor_msgs/msg/nav_sat_fix.hpp"
-#include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
+#include "sd_typedefs.h"  // NOLINT(build/include_subdir)
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
 
-//Constants
+// Constants
 
-//Variances calcualted from standard deviation in OXTS Manual
+// Variances calcualted from standard deviation in OXTS Manual
 #define Orientation_X_Variance (2.74155703e-7)
 #define Orientation_Y_Variance (2.74155703e-7)
 #define Orientation_Z_Variance (0.00000304617)
@@ -48,26 +53,22 @@
 #define Accel_X_Variance (2.4059025e-10)
 #define Accel_Y_Variance (2.4059025e-10)
 #define Accel_Z_Variance (2.4059025e-10)
-#define Variance_Unkown (0) //Variance for PEAK not currently known
+#define Variance_Unkown (0)  // Variance for PEAK not currently known
 
-#define  DEG_to_RAD  (0.0174533)                //Conversion constant from deg to rad
-
-
-using namespace std;
+#define  DEG_to_RAD  (0.0174533)                // Conversion constant from deg to rad
 
 namespace sd {
-  //Structs
-  //Used for storing Quaternion
-  struct Quaternion
+  // Structs
+  // Used for storing Quaternion
+  struct Quaternion  // NOLINT(runtime/indentation_namespace)
   {
     double w, x, y, z;
   };
 
-  //Functions
+  // Functions
 
-  //Converts from Euler to Quaternion format.
+  // Converts from Euler to Quaternion format.
   Quaternion ToQuaternion(double, double, double);       // yaw (Z), pitch (Y), roll (X)
-
 
   void ParseRxCANDataOXTSCan(
     can_msgs::msg::Frame &,
@@ -77,7 +78,6 @@ namespace sd {
     double &, double &, double &,
     double &, double &, double &);
 
-
   void ParseRxCANDataPEAKCan(
     can_msgs::msg::Frame &,
     double &,
@@ -86,10 +86,9 @@ namespace sd {
     double &, double &, double &,
     double &, double &, double &);
 
-
   void PackImuMessage(
     bool, sensor_msgs::msg::Imu &, double, double, double, double, double, double,
     double, double, double);
+}  // namespace sd
 
-
-}
+#endif  // SD_VEHICLE_INTERFACE__SD_GPS_IMU_H_

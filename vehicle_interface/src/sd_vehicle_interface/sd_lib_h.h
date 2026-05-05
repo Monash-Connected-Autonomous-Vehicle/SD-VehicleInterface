@@ -1,42 +1,45 @@
-/*
- * Copyright (C) 2020 StreetDrone Limited - All rights reserved
- *
- * Author: Fionán O'Sullivan
- *
- * Based on original work of: Efimia Panagiotaki
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of the copyright holder nor the names of its
- *     contributors may be used to endorse or promote products derived from
- *     this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+// Copyright (c) 2020 StreetDrone Limited
+//
+//
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the StreetDrone Limited nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
 
+// Author: Fionán O'Sullivan
+// Based on original work of: Efimia Panagiotaki
+
+#ifndef SD_VEHICLE_INTERFACE__SD_LIB_H_H_
+#define SD_VEHICLE_INTERFACE__SD_LIB_H_H_
 
 #include <can_msgs/msg/frame.h>
 
 namespace sd {
   //**************************************************
-  /*				SD RX FUNCTIONS				*/
+  /*        SD RX FUNCTIONS        */
   //**************************************************
-
 
   /*ParseRxCanDataSDCan
   This function parses an input can frame, checks it's ID and updates appropriate variables with freshest data*/
@@ -48,7 +51,7 @@ namespace sd {
   bool& AutomationArmed_B  This function shall set this variable to TRIE if the latest received CAN data confirms that the vehicle is armed for autonomous mode*/
 
   //**************************************************
-  /*				SD TX FUNCTIONS				*/
+  /*        SD TX FUNCTIONS        */
   //**************************************************
 
   /*
@@ -62,15 +65,15 @@ namespace sd {
   /*Inputs
   can_msgs::msg::Frame& CustomerControlCANTx/CustomerFeedbackCANTx to be initialised*/
 
-  //Request Autonomous Control of the Vehicle
+  // Request autonomous control of the vehicle
   void RequestAutonomousControl(can_msgs::msg::Frame &, uint8_t);
   /*inputs
   can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
   uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //ResetControlCanData
-  //This function resets all but the alive counter to 0
-  //This will handback control to the safety driver
+  // ResetControlCanData
+  // This function resets all but the alive counter to 0
+  // This will hand back control to the safety driver
   void ResetControlCanData(can_msgs::msg::Frame &, uint8_t);
   void UpdateControlAlive(can_msgs::msg::Frame &, uint8_t);
 
@@ -78,8 +81,8 @@ namespace sd {
   can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
   uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //PopControlCANData
-  //Populates the Control Tx message to the vehicle
+  // PopControlCANData
+  // Populates the control Tx message to the vehicle
   void PopControlCANData(can_msgs::msg::Frame &, int8_t, int8_t, uint8_t);
   /*Inputs
   can_msgs::msg::Frame& CustomerControlCANTx  The SD Interface Control Message after initialisation
@@ -87,7 +90,7 @@ namespace sd {
   int8_t FinalDBWSteerRequest_Pc: The Steer Percentage requested of the vehicle
   uint8_t AliveCounter_Z  : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //Populates the Feedback CAN message (Optional)
+  // Populates the feedback CAN message (optional)
   void PopFeedbackCANData(can_msgs::msg::Frame &, int, int, int, int, double, double);
   /*Inputs
   void can_msgs::msg::Frame& ControllerFeedbackCANTx
@@ -97,5 +100,6 @@ namespace sd {
   int FF_Contribution_Pc :The Contribution to final torque by Feedorward control
   double TargetLinearVelocity_Mps :The Target speed (feedback only)
   double TargetAngularVelocity_Degps: The Target Angular velocity (Feedback Only)*/
+}  // namespace sd
 
-}
+#endif  // SD_VEHICLE_INTERFACE__SD_LIB_H_H_

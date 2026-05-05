@@ -137,12 +137,7 @@ lcov --capture --directory build/sd_vehicle_interface --output-file coverage.inf
 lcov --list coverage.info
 ```
 
-Current CI lint policy (temporary)
-----------------------------------
-To prioritize compile + unit/integration test confidence while modernizing this legacy codebase, some `ament_lint_auto` checks are currently skipped in `CMakeLists.txt` (`copyright`, `cpplint`).
-
-Planned re-enable checklist:
-1. Fix `lint_cmake` warnings in package CMake files
-2. Apply `uncrustify` formatting and resolve `cpplint` style issues
-3. Add/standardize license and copyright headers
-4. Remove skip flags and re-enable each linter in CI
+Current CI lint policy
+----------------------
+`ament_lint_auto` checks are now enforced in CI for this repository (`copyright`,
+`cpplint`, `uncrustify`, `lint_cmake`, `cppcheck`, and `xmllint`).

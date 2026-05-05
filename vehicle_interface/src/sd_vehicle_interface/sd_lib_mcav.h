@@ -1,33 +1,38 @@
-/*
- * Copyright (C) 2020 StreetDrone Limited - All rights reserved
- *
- * Author: Fionán O'Sullivan
- *
- * Based on original work of: Efimia Panagiotaki
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *   * Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of the copyright holder nor the names of its
- *     contributors may be used to endorse or promote products derived from
- *     this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+// Copyright (c) 2020 StreetDrone Limited
+//
+//
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the StreetDrone Limited nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+// Author: Fionán O'Sullivan
+// Based on original work of: Efimia Panagiotaki
+
+#ifndef SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_
+#define SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_
 
 #include <stdlib.h>
 #include <can_msgs/msg/frame.hpp>
@@ -67,9 +72,9 @@ static unsigned char const crc8_data[] = {
 };
 
 namespace sd {
-  //**************************************************
-  /*				SD RX FUNCTIONS				*/
-  //**************************************************
+  // **************************************************
+  /*        SD RX FUNCTIONS        */
+  // **************************************************
   void SetCRC(can_msgs::msg::Frame & frame, uint8_t aliveCount)
   {
     // See the CRC calculation in the StreetDrone user manual
@@ -103,16 +108,17 @@ namespace sd {
   {
     // Check which kind of frame we have received and update data accordingly
     if (frame.id == 0x100) {             // StreetDrone_Control_1
-      bool steer_automation_available = frame.data[7] & 0x01;                   // bit 56 (0b0000 0001)
-      bool steer_automation_granted = frame.data[7] & 0x40;                   // bit 57 (0b0100 0000)
-      bool torque_automation_available = frame.data[7] & 0x10;                   // bit 60 (0b0001 0000)
-      bool torque_automation_granted = frame.data[7] & 0x4;                   // bit 61 (0b0000 0100)
+      bool steer_automation_available = frame.data[7] & 0x01;  // bit 56 (0b0000 0001)
+      bool steer_automation_granted = frame.data[7] & 0x40;  // bit 57 (0b0100 0000)
+      bool torque_automation_available = frame.data[7] & 0x10;  // bit 60 (0b0001 0000)
+      bool torque_automation_granted = frame.data[7] & 0x4;  // bit 61 (0b0000 0100)
       AutomationArmed_B = steer_automation_available && torque_automation_available;
       AutomationGranted_B = steer_automation_granted && torque_automation_granted;
       AutomationGranted_B = frame.data[7] & 0b00100010;
     } else if (frame.id == 0x102) {             // StreetDrone_Data_1
-      //Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit variable. The /100 divider handles the signal resolution
-      uint8_t CurrentVelocity8bit = frame.data[0];                   //Speed Actual kph low resolution
+      // Speed is 16bit, and .data is 8bit, the below processing fuses speed into a single 16bit
+      // variable. The /100 divider handles the signal resolution
+      uint8_t CurrentVelocity8bit = frame.data[0];  // Speed Actual kph low resolution
       /*
                 Steer_Actual is frame.data[2]
                 Pedal_Actual is frame.data[4]
@@ -121,12 +127,15 @@ namespace sd {
 
       uint8_t speed_HR_B1 = frame.data[6];
       uint8_t speed_HR_B2 = frame.data[7];
-      uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;                   ////Speed Actual kph high resolution
+      uint16_t CurrentVelocity16bit = (speed_HR_B1 << 8) + speed_HR_B2;  // // Speed Actual kph high
+      // resolution
 
-      //To support older versions of XCU firmware which do not output high resolution speed. If high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
+      // To support older versions of XCU firmware which do not output high resolution speed. If
+      // high resolution speed == 0 (either standstill or does not exist) use low resolution speed.
       if (CurrentVelocity16bit == 0) {
         CurrentLinearVelocity_Mps = (CurrentVelocity8bit * KPH_TO_MPS) / 100.0;
-        // MCAV note: not sure why the speeds are scaled by 1/100. This is also missing the scaling factor of 0.5 present in CAN definition.
+        // MCAV note: not sure why the speeds are scaled by 1/100. This is also missing the scaling
+        // factor of 0.5 present in CAN definition.
         // Actual meters per second speed would be ((double)frame.data[0])*0.5*KPH_TO_MPS
       } else {
         CurrentLinearVelocity_Mps = (CurrentVelocity16bit * KPH_TO_MPS);
@@ -139,9 +148,9 @@ namespace sd {
   bool& AutomationGranted_B,  This function shall set this variable to TRUE if the latest received can data condirms vehicle is in Automated Mode
   bool& AutomationArmed_B  This function shall set this variable to TRIE if the latest received CAN data confirms that the vehicle is armed for autonomous mode*/
 
-  //**************************************************
-  /*				SD TX FUNCTIONS				*/
-  //**************************************************
+  // **************************************************
+  /*        SD TX FUNCTIONS        */
+  // **************************************************
 
   /*
   InitSDInterfaceControl & InitSDInterfaceFeedback
@@ -162,21 +171,26 @@ namespace sd {
   /*Inputs
   can_msgs::msg::Frame& CustomerControlCANTx/CustomerFeedbackCANTx to be initialised*/
 
-  //Request Autonomous Control of the Vehicle
+  // Request Autonomous Control of the Vehicle
   void RequestAutonomousControl(can_msgs::msg::Frame & frame, uint8_t aliveCount)
   {
     frame.dlc = 8;             // length of data in bytes
     frame.id = 0x101;             // CustomerControl frame id: 0x101
-    frame.data[0] = 0;             // Customer_Control_1_CRC (byte 0) (8-bit unsigned integer, calculation in SetCRC)
-    frame.data[1] = 0;             // Customer_Control_1_Alive (byte 1) (8-bit unsigned integer, increments by 1 every message)
-    frame.data[2] = 0;             // Steer_Request (byte 2) (8-bit signed integer, units %, min value -100 decimal == 0x9C, max value 100 decimal == 0x64)
+    frame.data[0] = 0;  // Customer_Control_1_CRC (byte 0) (8-bit unsigned integer, calculation in
+    // SetCRC)
+    frame.data[1] = 0;  // Customer_Control_1_Alive (byte 1) (8-bit unsigned integer, increments by
+    // 1 every message)
+    frame.data[2] = 0;  // Steer_Request (byte 2) (8-bit signed integer, units %, min value -100
+    // decimal == 0x9C, max value 100 decimal == 0x64)
     frame.data[3] = 0;             // Torque_Request (byte 3) (as for Steer_Request)
     frame.data[4] = 0;             // Reserved (byte 4)
     frame.data[5] = 0;             // Reserved (byte 5)
     frame.data[6] = 0;             // Reserved (byte 6)
-    frame.data[7] = 0x11;             // sets SteerAutomationRequest and TorqueAutomationRequest to 1.
-    // (byte 7 contains two bit flags that set SteerAutomationRequest and TorqueAutomationRequest to true or false)
-    // 0x11 in binary is 0b00010001, so it sets bit 56 and bit 60 from the start of the CAN frame (seems to read right to left?)
+    frame.data[7] = 0x11;  // sets SteerAutomationRequest and TorqueAutomationRequest to 1.
+    // (byte 7 contains two bit flags that set SteerAutomationRequest and TorqueAutomationRequest to
+    // true or false)
+    // 0x11 in binary is 0b00010001, so it sets bit 56 and bit 60 from the start of the CAN frame
+    // (seems to read right to left?)
 
     sd::SetCRC(frame, aliveCount);             //
   }
@@ -184,9 +198,9 @@ namespace sd {
   can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
   uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //ResetControlCanData
-  //This function resets all but the alive counter to 0
-  //This will handback control to the safety driver
+  // ResetControlCanData
+  // This function resets all but the alive counter to 0
+  // This will handback control to the safety driver
   void ResetControlCanData(can_msgs::msg::Frame & frame, uint8_t aliveCount)
   {
     frame.data[0] = 0;
@@ -212,13 +226,14 @@ namespace sd {
   can_msgs::msg::Frame& CustomerControlCANTx :The SD Interface Control Message after initialisation
   uint8_t AliveCounter_Z : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //PopControlCANData
-  //Populates the Control Tx message to the vehicle
+  // PopControlCANData
+  // Populates the Control Tx message to the vehicle
   void PopControlCANData(
     can_msgs::msg::Frame & frame, int8_t torque_request_pc,
     int8_t steer_request_pc, uint8_t aliveCount)
   {
-    frame.data[2] = steer_request_pc;             // Steer_Request (byte 2) (8-bit signed integer, units %, min value -100 decimal == 0x9C, max value 100 decimal == 0x64)
+    frame.data[2] = steer_request_pc;  // Steer_Request (byte 2) (8-bit signed integer, units %, min
+    // value -100 decimal == 0x9C, max value 100 decimal == 0x64)
     frame.data[3] = torque_request_pc;             // Torque_Request (byte 3) (as for Steer_Request)
     SetCRC(frame, aliveCount);
   }
@@ -228,7 +243,7 @@ namespace sd {
   int8_t FinalDBWSteerRequest_Pc: The Steer Percentage requested of the vehicle
   uint8_t AliveCounter_Z  : An Alive counter. Increment this variable by 1 each loop. Loop must run at minimum 200Hz. Protects again stale CAN data*/
 
-  //Populates the Feedback CAN message (Optional)
+  // Populates the Feedback CAN message (Optional)
   void PopFeedbackCANData(can_msgs::msg::Frame &, int, int, int, int, double, double);
   // This hasn't been re-implemented since it is not required for customers in general operation
   // and there wasn't much info available.
@@ -241,5 +256,6 @@ namespace sd {
   int FF_Contribution_Pc :The Contribution to final torque by Feedorward control
   double TargetLinearVelocity_Mps :The Target speed (feedback only)
   double TargetAngularVelocity_Degps: The Target Angular velocity (Feedback Only)*/
+}  // namespace sd
 
-}
+#endif  // SD_VEHICLE_INTERFACE__SD_LIB_MCAV_H_
