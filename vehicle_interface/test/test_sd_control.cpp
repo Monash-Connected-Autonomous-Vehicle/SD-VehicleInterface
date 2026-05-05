@@ -134,6 +134,36 @@ TEST_F(TestCalculateTorqueRequestTwizy, InitialState) {
   EXPECT_GT(p_contrib, 0);
 }
 
+// Test: Twizy - Standstill should use brake hold torque
+TEST_F(TestCalculateTorqueRequestTwizy, StandstillUsesBrakeHoldTorque) {
+  int p_contrib = 123, i_contrib = 456, d_contrib = 789, ff_contrib = -1;
+
+  int8_t result = CalculateTorqueRequestTwizy(
+    0.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(result, BRAKE_HOLD_TORQUE_TWIZY);
+  EXPECT_EQ(p_contrib, 0);
+  EXPECT_EQ(i_contrib, 0);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, BRAKE_HOLD_TORQUE_TWIZY);
+}
+
+// Test: Twizy - Negative targets should clamp to standstill
+TEST_F(TestCalculateTorqueRequestTwizy, NegativeTargetWhileStationaryClampsToStandstill) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestTwizy(
+    -2.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(result, BRAKE_HOLD_TORQUE_TWIZY);
+  EXPECT_EQ(p_contrib, 0);
+  EXPECT_EQ(i_contrib, 0);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, BRAKE_HOLD_TORQUE_TWIZY);
+}
+
 // Test: Twizy - Stationary to acceleration transition
 TEST_F(TestCalculateTorqueRequestTwizy, StationaryToAcceleration) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
@@ -153,6 +183,34 @@ TEST_F(TestCalculateTorqueRequestTwizy, StationaryToAcceleration) {
   EXPECT_LE(result2, MAX_TORQUE_TWIZY);
 }
 
+// Test: Twizy - Known acceleration path should produce stable controller terms
+TEST_F(TestCalculateTorqueRequestTwizy, AccelerationCombinesProportionalAndFeedforwardTerms) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestTwizy(
+    3.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(p_contrib, 69);
+  EXPECT_EQ(i_contrib, 0);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, 27);
+  EXPECT_EQ(result, 96);
+}
+
+// Test: Twizy - Large requests should saturate at max torque
+TEST_F(TestCalculateTorqueRequestTwizy, HighAccelerationDemandSaturatesAtMaxTorque) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestTwizy(
+    20.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_GT(p_contrib, 0);
+  EXPECT_GT(ff_contrib, 0);
+  EXPECT_EQ(result, MAX_TORQUE_TWIZY);
+}
+
 // Test: Twizy - Deceleration to stop
 TEST_F(TestCalculateTorqueRequestTwizy, DecelerationToStop) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
@@ -167,6 +225,20 @@ TEST_F(TestCalculateTorqueRequestTwizy, DecelerationToStop) {
   EXPECT_GE(result, MIN_TORQUE_TWIZY);
 }
 
+// Test: Twizy - Full stop request while moving should apply braking gains
+TEST_F(TestCalculateTorqueRequestTwizy, StopRequestWhileMovingAppliesBrakingTorque) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestTwizy(
+    0.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(p_contrib, -325);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, 0);
+  EXPECT_EQ(result, MIN_TORQUE_TWIZY);
+}
+
 // Test: Twizy - Overspeed condition
 TEST_F(TestCalculateTorqueRequestTwizy, OverspeedCondition) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
@@ -179,6 +251,19 @@ TEST_F(TestCalculateTorqueRequestTwizy, OverspeedCondition) {
   // Should return negative torque (reducing speed)
   EXPECT_LE(result, 0);
   EXPECT_GE(result, MIN_TORQUE_TWIZY);
+}
+
+// Test: Twizy - Overspeed should use retardation gains
+TEST_F(TestCalculateTorqueRequestTwizy, OverspeedUsesRetardationGains) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestTwizy(
+    3.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(p_contrib, -80);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_LT(result, 0);
 }
 
 // Test: Twizy - Return value range validation
@@ -233,6 +318,36 @@ TEST_F(TestCalculateTorqueRequestEnv200, InitialState) {
   EXPECT_LE(result, MAX_TORQUE_ENV200);
 }
 
+// Test: Env200 - Standstill should use brake hold torque
+TEST_F(TestCalculateTorqueRequestEnv200, StandstillUsesBrakeHoldTorque) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestEnv200(
+    0.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(result, BRAKE_HOLD_TORQUE_ENV200);
+  EXPECT_EQ(p_contrib, 0);
+  EXPECT_EQ(i_contrib, 0);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, BRAKE_HOLD_TORQUE_ENV200);
+}
+
+// Test: Env200 - Negative targets should clamp to standstill
+TEST_F(TestCalculateTorqueRequestEnv200, NegativeTargetWhileStationaryClampsToStandstill) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestEnv200(
+    -1.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(result, BRAKE_HOLD_TORQUE_ENV200);
+  EXPECT_EQ(p_contrib, 0);
+  EXPECT_EQ(i_contrib, 0);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, BRAKE_HOLD_TORQUE_ENV200);
+}
+
 // Test: Env200 - Stationary to acceleration transition
 TEST_F(TestCalculateTorqueRequestEnv200, StationaryToAcceleration) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
@@ -252,6 +367,34 @@ TEST_F(TestCalculateTorqueRequestEnv200, StationaryToAcceleration) {
   EXPECT_LE(result2, MAX_TORQUE_ENV200);
 }
 
+// Test: Env200 - Known acceleration path should produce stable controller terms
+TEST_F(TestCalculateTorqueRequestEnv200, AccelerationCombinesProportionalAndFeedforwardTerms) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestEnv200(
+    3.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(p_contrib, 21);
+  EXPECT_EQ(i_contrib, 0);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, 6);
+  EXPECT_EQ(result, 27);
+}
+
+// Test: Env200 - Large requests should saturate at max torque
+TEST_F(TestCalculateTorqueRequestEnv200, HighAccelerationDemandSaturatesAtMaxTorque) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestEnv200(
+    20.0, 0.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_GT(p_contrib, 0);
+  EXPECT_GT(ff_contrib, 0);
+  EXPECT_EQ(result, MAX_TORQUE_ENV200);
+}
+
 // Test: Env200 - Deceleration to stop
 TEST_F(TestCalculateTorqueRequestEnv200, DecelerationToStop) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
@@ -266,6 +409,20 @@ TEST_F(TestCalculateTorqueRequestEnv200, DecelerationToStop) {
   EXPECT_GE(result, MIN_TORQUE_ENV200);
 }
 
+// Test: Env200 - Full stop request while moving should apply braking gains
+TEST_F(TestCalculateTorqueRequestEnv200, StopRequestWhileMovingAppliesBrakingTorque) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestEnv200(
+    0.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(p_contrib, -100);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_EQ(ff_contrib, 0);
+  EXPECT_EQ(result, MIN_TORQUE_ENV200);
+}
+
 // Test: Env200 - Overspeed condition
 TEST_F(TestCalculateTorqueRequestEnv200, OverspeedCondition) {
   int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
@@ -278,6 +435,19 @@ TEST_F(TestCalculateTorqueRequestEnv200, OverspeedCondition) {
   // Should return negative torque (reducing speed)
   EXPECT_LE(result, 0);
   EXPECT_GE(result, MIN_TORQUE_ENV200);
+}
+
+// Test: Env200 - Overspeed should use retardation gains
+TEST_F(TestCalculateTorqueRequestEnv200, OverspeedUsesRetardationGains) {
+  int p_contrib = 0, i_contrib = 0, d_contrib = 0, ff_contrib = 0;
+
+  int8_t result = CalculateTorqueRequestEnv200(
+    3.0, 5.0, p_contrib, i_contrib, d_contrib,
+    ff_contrib);
+
+  EXPECT_EQ(p_contrib, -30);
+  EXPECT_EQ(d_contrib, 0);
+  EXPECT_LT(result, 0);
 }
 
 // Test: Env200 - Return value range validation
