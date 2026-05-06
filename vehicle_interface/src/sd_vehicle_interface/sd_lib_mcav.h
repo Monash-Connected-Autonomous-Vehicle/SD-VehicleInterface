@@ -99,10 +99,10 @@ namespace sd{
     void ParseRxCANDataSDCan(can_msgs::msg::Frame& frame, double& CurrentLinearVelocity_Mps, bool& AutomationArmed_B, bool& AutomationGranted_B) {
 		// Check which kind of frame we have received and update data accordingly
 		if (frame.id == 0x100) { // StreetDrone_Control_1
-			bool steer_automation_available = frame.data[7] & 0b00000001; // bit 56 (0b0000 0001)
-			bool steer_automation_granted = frame.data[7] & 0b00000010; // bit 57 (0b0000 0010)
-			bool torque_automation_available = frame.data[7] & 0b00010000; // bit 60 (0b0001 0000)
-			bool torque_automation_granted = frame.data[7] & 0b00100000; // bit 61 (0b0010 0000)
+			bool steer_automation_available = frame.data[7] & 0b0000'0001; // bit 56
+			bool steer_automation_granted = frame.data[7] & 0b0000'0010; // bit 57
+			bool torque_automation_available = frame.data[7] & 0b0001'0000; // bit 60
+			bool torque_automation_granted = frame.data[7] & 0b0010'0000; // bit 61
 			AutomationArmed_B = steer_automation_available && torque_automation_available;
 			AutomationGranted_B = steer_automation_granted && torque_automation_granted;
 		} else if (frame.id == 0x102) { // StreetDrone_Data_1
