@@ -143,6 +143,7 @@ namespace sd{
 			case 1536: //0x600
 				{				
 					IMU_Accel_X = ((int16_t)ReceivedFrameUnion.word[0])*3.91*0.001*9.80665; // 0.038344002; //*3.91 = mG, then conversion to m/s^2
+					IMU_Accel_X -= 0.0369; //Remove positive bias of IMU Acceleration. 
 					IMU_Accel_Y = ((int16_t)ReceivedFrameUnion.word[1])*3.91*0.001*9.80665; //
 					IMU_Accel_Z = ((int16_t)ReceivedFrameUnion.word[2])*3.91*0.001*9.80665; //
 
