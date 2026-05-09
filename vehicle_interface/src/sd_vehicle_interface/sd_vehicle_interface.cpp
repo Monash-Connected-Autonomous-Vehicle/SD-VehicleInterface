@@ -53,6 +53,7 @@ using namespace std;
 #include "sd_gps_imu.h"
 #include "sd_control.h"
 #include "sd_logger.h"
+#include "sd_velocity_report.h"
 
 
 //Callback Functions
