@@ -31,23 +31,27 @@
 using namespace std;
 
 
+#include <iostream>
+#include <iomanip>
+#include <string>
+
 #include "rclcpp/rclcpp.hpp"
 #include "sd_msgs/msg/sd_control.hpp"
-#include "autoware_control_msgs/msg/control.hpp"
 #include "sensor_msgs/msg/nav_sat_fix.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/vector3.hpp"
-#include <can_msgs/msg/frame.hpp>
-#include <iostream>
-#include <iomanip>
-#include <string>
+#include "can_msgs/msg/frame.hpp"
+#include "rcl_interfaces/msg/set_parameters_result.hpp"
+
+#include "autoware_control_msgs/msg/control.hpp"
+#include "autoware_vehicle_msgs/msg/velocity_report.hpp"
+
 #include "sd_vehicle_interface.h"
 #include "sd_lib_mcav.h"
 #include "sd_gps_imu.h"
 #include "sd_control.h"
-#include "rcl_interfaces/msg/set_parameters_result.hpp"
 #include "sd_logger.h"
 
 
@@ -162,7 +166,10 @@ int main(int argc, char **argv)
     auto current_GPS_pub = node->create_publisher<sensor_msgs::msg::NavSatFix>("sd_current_GPS", 100);
 	auto current_IMU_pub = node->create_publisher<sensor_msgs::msg::Imu>("sd_imu_raw",100);
     auto sd_control_pub = node->create_publisher<sd_msgs::msg::SDControl>("sd_control", 1); // in the original ROS1 interface from StreetDrone, this topic was latched.
-
+	
+	// Autoware-specific publishers and message stores
+	autoware_vehicle_msgs::msg::VelocityReport current_velocity_status;
+	auto velocity_status_pub = node->create_publisher<autoware_vehicle_msgs::msg::VelocityReport>("vehicle/status/velocity_status", 10);
 
     rclcpp::Rate loop_rate(ROS_LOOP);
 	rclcpp::Time autonomous_entry(0, 0, RCL_ROS_TIME);
