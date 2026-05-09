@@ -175,8 +175,20 @@ int main(int argc, char **argv)
     rclcpp::Rate loop_rate(ROS_LOOP);
 	rclcpp::Time autonomous_entry(0, 0, RCL_ROS_TIME);
 
-	auto main_loop = [&node, &autonomous_entry, &sent_msgs_pub, &current_twist_pub, &current_GPS_pub, &current_IMU_pub, &sd_control_pub,
-					  &current_Twist, &current_GPS, &current_IMU, &SD_Current_Control]() -> void
+	auto main_loop = [&node, &autonomous_entry, 
+
+					  &sent_msgs_pub, 
+					  &current_twist_pub, 
+					  &current_GPS_pub, 
+					  &current_IMU_pub, 
+					  &sd_control_pub,
+					  &velocity_status_pub,
+
+					  &current_Twist, 
+					  &current_GPS, 
+					  &current_IMU, 
+					  &SD_Current_Control, 
+					  &current_velocity_status]() -> void
 	{
 		//Choose the vehicle speed source as specified at launch
 		if(ndt_speed_string==_sd_speed_source){
@@ -217,6 +229,9 @@ int main(int argc, char **argv)
 			}
 		}
 
+		// Calculate Longitudinal Velocity through IMU
+		ComputeLongitudinalVelocity(current_velocity_status.longitudinal_velocity, IMU_Accel_X);
+
 		if (AutomationGranted_B || _sd_simulation_mode){
 
 			if (0 ==(AliveCounter_Z % CONTROL_LOOP) && ((node->now() - autonomous_entry) >= rclcpp::Duration::from_seconds(0.1)) ){ //We only run as per calibrated frequency, with additional delay
@@ -245,24 +260,24 @@ int main(int argc, char **argv)
 								<< " D " << setw(2) << D_Contribution_Pc
 								<< " FF " << setw(2) << FF_Contribution_Pc);
 
-						// Logging function implementation.
-						WARN_COND_THROTTLE(
-							node,
-							1000,
-							TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR < 0,
-							"Target velocity is negative!");
+				// Logging function implementation.
+				WARN_COND_THROTTLE(
+					node,
+					1000,
+					TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR < 0,
+					"Target velocity is negative!");
 
-						// Logging function implementation.
-						WARN_COND_THROTTLE(
-							node,
-							1000,
-							(TargeTireAngle_Rad > MAX_STEER_ANG) || (TargeTireAngle_Rad < MIN_STEER_ANG),
-							"Target steering angle out of range MAX +-40°");
+				// Logging function implementation.
+				WARN_COND_THROTTLE(
+					node,
+					1000,
+					(TargeTireAngle_Rad > MAX_STEER_ANG) || (TargeTireAngle_Rad < MIN_STEER_ANG),
+					"Target steering angle out of range MAX +-40°");
 
 
-						SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
-						SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
-						sd_control_pub->publish(SD_Current_Control);
+				SD_Current_Control.steer = FinalDBWSteerRequest_Pc;
+				SD_Current_Control.torque = FinalDBWTorqueRequest_Pc;
+				sd_control_pub->publish(SD_Current_Control);
 
 			}
 			
@@ -284,6 +299,7 @@ int main(int argc, char **argv)
 		current_twist_pub->publish(current_Twist);
 		current_GPS_pub->publish(current_GPS);
 
+		velocity_status_pub->publish(current_velocity_status);
 
 		if(no_imu_string !=_sd_gps_imu){ //If we have specified an IMU is present, publish an IMU message
 			current_IMU_pub->publish(current_IMU);
