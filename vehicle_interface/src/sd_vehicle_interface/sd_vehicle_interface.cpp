@@ -232,6 +232,9 @@ int main(int argc, char **argv)
 		// Calculate Longitudinal Velocity through IMU
 		ComputeLongitudinalVelocity(current_velocity_status.longitudinal_velocity, IMU_Accel_X);
 
+		// Calculate Heading Rate (yaw rate) through IMU
+		ComputeHeadingRate(current_velocity_status.heading_rate, IMU_Rate_Z);
+
 		if (AutomationGranted_B || _sd_simulation_mode){
 
 			if (0 ==(AliveCounter_Z % CONTROL_LOOP) && ((node->now() - autonomous_entry) >= rclcpp::Duration::from_seconds(0.1)) ){ //We only run as per calibrated frequency, with additional delay
