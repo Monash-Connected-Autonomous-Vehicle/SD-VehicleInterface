@@ -229,8 +229,8 @@ int main(int argc, char **argv)
 			}
 		}
 
-		// Calculate Longitudinal Velocity through IMU
-		ComputeLongitudinalVelocity(current_velocity_status.longitudinal_velocity, IMU_Accel_X);
+		// Read Longitudinal Velocity from the vehicle CAN wheel speed
+		ComputeLongitudinalVelocity(current_velocity_status.longitudinal_velocity, CurrentTwistLinearCANSD_Mps);
 
 		// Calculate Heading Rate (yaw rate) through IMU
 		ComputeHeadingRate(current_velocity_status.heading_rate, IMU_Rate_Z);

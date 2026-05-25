@@ -1,13 +1,9 @@
 #pragma once
 
-#define MAX_LOGITUDINAL_VELOCITY 9.0
-#define MIN_LOGITUDINAL_VELOCITY 0.0
-
-void ComputeLongitudinalVelocity(float& longitudinal_velocity, double IMU_Accel_X)
+void ComputeLongitudinalVelocity(float& longitudinal_velocity, double wheel_speed_scaled_mps)
 {
-    
-    longitudinal_velocity += IMU_Accel_X * 0.05; // dt = 50ms = 0.05s as stated in IMU rate
-    
+    // Use vehicle wheel speed from CAN (frame 0x102) instead of integrating IMU
+    longitudinal_velocity = static_cast<float>(wheel_speed_scaled_mps * UNDO_STREETDRONE_SCALING_FACTOR);
 }
 
 void ComputeLateralVelocity()
