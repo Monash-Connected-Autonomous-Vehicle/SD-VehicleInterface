@@ -14,3 +14,9 @@ void ComputeLateralVelocity()
 {
     
 }
+
+void ComputeHeadingRate(float& heading_rate, double IMU_Rate_Z)
+{
+    // IMU_Rate_Z is the yaw angular rate about the vehicle's vertical (Z) axis, in deg/s.
+    heading_rate = static_cast<float>(IMU_Rate_Z * DEG_to_RAD);
+}
