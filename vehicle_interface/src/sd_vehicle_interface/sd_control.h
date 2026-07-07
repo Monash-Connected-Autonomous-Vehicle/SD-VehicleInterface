@@ -45,9 +45,9 @@ namespace speedcontroller {
 #define ANTI_FUSSINESS_TWIZY (0.00175) // (0.1)
 
 // Gains for increasing speed
-#define Kp_Speed_Twizy (23)
-#define Ki_Speed_Twizy (1)
-#define Kd_Speed_Twizy (0)
+#define Kp_Speed_Twizy (750)
+#define Ki_Speed_Twizy (50)
+#define Kd_Speed_Twizy (1000)
 
 // Gains for braking to a stop only
 #define Kp_Speed_FullStop_Braking_Twizy (65)

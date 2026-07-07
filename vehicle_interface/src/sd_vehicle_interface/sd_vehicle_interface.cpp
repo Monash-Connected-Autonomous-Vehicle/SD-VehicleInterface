@@ -40,6 +40,7 @@ using namespace std;
 #include "autoware_vehicle_msgs/msg/velocity_report.hpp"
 #include "geometry_msgs/msg/quaternion.hpp"
 #include "geometry_msgs/msg/twist_stamped.hpp"
+#include <geometry_msgs/msg/twist_with_covariance_stamped.hpp>
 #include "geometry_msgs/msg/vector3.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sd_auxiliary_controller.h"
@@ -187,7 +188,7 @@ int main(int argc, char **argv) {
       CustomerControlAuxiliaryCANTx); // Customer_Control_2
 
   // message objects (stores incoming data)
-  geometry_msgs::msg::TwistStamped current_Twist; // speed + steer
+  geometry_msgs::msg::TwistWithCovarianceStamped current_Twist; // speed + steer
   sensor_msgs::msg::NavSatFix current_GPS;    // latitude/longitude + altitude
   sensor_msgs::msg::Imu current_IMU;          // acceleration + angular rate
   sd_msgs::msg::SDControl SD_Current_Control; // vehicle control message
@@ -231,8 +232,8 @@ int main(int argc, char **argv) {
 
   // current velocity
   auto current_twist_pub =
-      node->create_publisher<geometry_msgs::msg::TwistStamped>(
-          "sd_current_twist", 100);
+      node->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(
+        "/localization/pose_twist_fusion_filter/sd_current_twist", 100);
   auto current_GPS_pub = node->create_publisher<sensor_msgs::msg::NavSatFix>(
       "sd_current_GPS", 100);
   auto current_IMU_pub =
@@ -303,9 +304,17 @@ int main(int argc, char **argv) {
     // ===== UPDATE MESSAGES =====
 
     // angular + linear velocity
-    current_Twist.twist.angular.z = IMU_Rate_Z * DEG_to_RAD;
-    current_Twist.twist.linear.x =
-        CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
+    current_Twist.twist.twist.angular.z = IMU_Rate_Z * DEG_to_RAD;
+    current_Twist.twist.twist.linear.x =
+         CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
+
+    // initialize dummy covariance
+    for (int i = 0; i < 36; ++i)
+    {
+      current_Twist.twist.covariance[i] = 100;
+    }
+    current_Twist.header.stamp = node->now();
+
     // GPS location
     current_GPS.longitude = GPS_Longitude;
     current_GPS.latitude = GPS_Latitude;
@@ -413,7 +422,7 @@ int main(int argc, char **argv) {
     indicator_status_pub->publish(current_IndicatorStatus);
 
     current_SteeringStatus.stamp = node->get_clock()->now();
-    current_SteeringStatus.steering_tire_angle = CurrentSteer_pc * MAX_STEER_ANG;
+    current_SteeringStatus.steering_tire_angle = (CurrentSteer_pc/100.0) * MAX_STEER_ANG;
     steering_status_pub->publish(current_SteeringStatus);
 
     current_VelocityStatus.header.stamp = node->get_clock()->now();
