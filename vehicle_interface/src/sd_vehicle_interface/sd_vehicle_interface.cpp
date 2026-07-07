@@ -410,11 +410,11 @@ int main(int argc, char **argv) {
     control_mode_status_pub->publish(current_ControlModeReport);
 
     current_ControlModeReport.stamp = node->get_clock()->now();
-    current_GearStatus.report = TargetHazardLightsCmd;
+    current_GearStatus.report = TargetGearCmd;
     gear_status_pub->publish(current_GearStatus);
     
     current_HazardLightsStatus.stamp = node->get_clock()->now();
-    current_HazardLightsStatus.report = TargetGearCmd;
+    current_HazardLightsStatus.report = TargetHazardLightsCmd;
     hazard_light_status_pub->publish(current_HazardLightsStatus);
     
     current_IndicatorStatus.stamp = node->get_clock()->now();
