@@ -89,6 +89,7 @@ void AckermannCommand_callback(const std::shared_ptr<autoware_control_msgs::msg:
 
 void MatlabCommand_Callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
 {
+	// std::cout << "test\n";e
 	TargeTireAngle_Rad = msg->twist.angular.z; // in radians/s (idk why in the .h it is specified as deg/s)
 	TargetTwistLinear_Mps = msg->twist.linear.x; 
 }
@@ -166,7 +167,7 @@ int main(int argc, char **argv)
     auto ReceivedFrameCANRx_sub = node->create_subscription<can_msgs::msg::Frame>("from_can_bus", 100, ReceivedFrameCANRx_callback);
     auto current_velocity_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("current_velocity", 1, CurrentVelocity_callback);
     auto ackermann_cmd_sub = node->create_subscription<autoware_control_msgs::msg::Control>("/control/command/control_cmd", 100, AckermannCommand_callback);
-	auto matlab_cmd_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("/cmd_vel_stamped", 100, MatlabCommand_Callback);
+	auto matlab_cmd_sub = node->create_subscription<geometry_msgs::msg::TwistStamped>("/cmd_vel_stamped", 500, MatlabCommand_Callback);
 
     //publisher
 	auto sent_msgs_pub = node->create_publisher<can_msgs::msg::Frame>("to_can_bus", 100);

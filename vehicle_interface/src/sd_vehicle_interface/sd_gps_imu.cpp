@@ -148,21 +148,21 @@ namespace sd{
 		switch (ReceivedFrameCAN.id){
 			case 1536: //0x600
 				{				
-					IMU_Accel_X = ((int16_t)ReceivedFrameUnion.word[0])*3.91*0.001*9.80665; // 0.038344002; //*3.91 = mG, then conversion to m/s^2
-					IMU_Accel_X -= 0.0369; //Remove positive bias of IMU Acceleration.
-					// Moving Average
-					moving_average_imu_accel_x[moving_average_index] = IMU_Accel_X;
-					moving_average_index = (moving_average_index+1) % MAX_MOVING_AVERAGE_NUM;
-					moving_average_num = min(MAX_MOVING_AVERAGE_NUM, moving_average_num+1);
+					// IMU_Accel_X = ((int16_t)ReceivedFrameUnion.word[0])*3.91*0.001*9.80665; // 0.038344002; //*3.91 = mG, then conversion to m/s^2
+					// IMU_Accel_X -= 0.0369; //Remove positive bias of IMU Acceleration.
+					// // Moving Average
+					// moving_average_imu_accel_x[moving_average_index] = IMU_Accel_X;
+					// moving_average_index = (moving_average_index+1) % MAX_MOVING_AVERAGE_NUM;
+					// moving_average_num = min(MAX_MOVING_AVERAGE_NUM, moving_average_num+1);
 
-					double moving_sum = 0;
-					for(auto prev_accel_x : moving_average_imu_accel_x)
-					{
-						moving_sum += prev_accel_x;
-					}
-					IMU_Accel_X = moving_sum / ((double)moving_average_num);
-					
-					IMU_Accel_Y = ((int16_t)ReceivedFrameUnion.word[1])*3.91*0.001*9.80665; //
+					// double moving_sum = 0;
+					// for(auto prev_accel_x : moving_average_imu_accel_x)
+					// {
+					// 	moving_sum += prev_accel_x;
+					// }
+					// IMU_Accel_X = moving_sum / ((double)moving_average_num);
+					IMU_Accel_X = (((int16_t)ReceivedFrameUnion.word[0])*3.91*0.001*9.80665) + 0.609670; //
+					IMU_Accel_Y = (((int16_t)ReceivedFrameUnion.word[1])*3.91*0.001*9.80665) + 0.789120; //
 					IMU_Accel_Z = ((int16_t)ReceivedFrameUnion.word[2])*3.91*0.001*9.80665; //
 
 					break;
