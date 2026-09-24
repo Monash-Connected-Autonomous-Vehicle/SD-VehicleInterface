@@ -42,9 +42,10 @@ namespace speedcontroller{
 	//It is possible to set different gains for occasions where the vehicle is braking to a stop, braking and accellerating
 
 	//*****TWIZY CALIBRATIONS*****
+	//Conservative starting gains for real m/s units. Previous values (Kp 23, Ki 1, Retd Kp 40, FullStop Kp 65) were set against speeds scaled by 1/50
 	//Gains for increasing speed
-	#define Kp_Speed_Twizy                    (23)
-	#define Ki_Speed_Twizy                    (1)
+	#define Kp_Speed_Twizy                    (5)
+	#define Ki_Speed_Twizy                    (0.2)
 	#define Kd_Speed_Twizy                    (0)
 
 	//Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
@@ -52,12 +53,12 @@ namespace speedcontroller{
 	#define ANTI_FUSSINESS_TWIZY (0.00175)
 
 	//Gains for braking to a stop only
-	#define Kp_Speed_FullStop_Braking_Twizy            (65)
+	#define Kp_Speed_FullStop_Braking_Twizy            (15)
 	#define Ki_Speed_FullStop_Braking_Twizy             (0)
 	#define Kd_Speed_FullStop_Braking_Twizy            (0)
 
 	//Gains for reducing speed, not to a stop
-	#define Kp_Speed_Retd_Twizy          (40)
+	#define Kp_Speed_Retd_Twizy          (10)
 	#define Ki_Speed_Retd_Twizy           (1)
 	#define Kd_Speed_Retd_Twizy          (0)
 
