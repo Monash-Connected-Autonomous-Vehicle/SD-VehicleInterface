@@ -79,7 +79,7 @@ void AckermannCommand_callback(const std::shared_ptr<autoware_control_msgs::msg:
 {
 	//Populate a twist angular and twist linear message with the received message from Ros topic and convert to deg/s
     TargeTireAngle_Rad= msg->lateral.steering_tire_angle; //Radians
-    TargetTwistLinear_Mps = msg->longitudinal.velocity / UNDO_STREETDRONE_SCALING_FACTOR; //still Mps
+    TargetTwistLinear_Mps = msg->longitudinal.velocity; //Mps
 }
 
 void CurrentVelocity_callback(const std::shared_ptr<geometry_msgs::msg::TwistStamped> msg)
@@ -184,7 +184,7 @@ int main(int argc, char **argv)
 		}
 
 		current_Twist.twist.angular.z = IMU_Rate_Z*DEG_to_RAD;
-		current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final * UNDO_STREETDRONE_SCALING_FACTOR;
+		current_Twist.twist.linear.x = CurrentTwistLinearSD_Mps_Final;
 		//Prepare the GPS message with latest data
 		current_GPS.longitude = GPS_Longitude;
 		current_GPS.latitude = GPS_Latitude;
@@ -229,8 +229,8 @@ int main(int argc, char **argv)
 
 				// Logging function implementation.
 				INFO(node, 1000,
-								_sd_vehicle << " TwistLinear " << setw(8) << TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR
-								<< " Current_V " << setw(4) << CurrentTwistLinearCANSD_Mps * UNDO_STREETDRONE_SCALING_FACTOR
+								_sd_vehicle << " TwistLinear " << setw(8) << TargetTwistLinear_Mps
+								<< " Current_V " << setw(4) << CurrentTwistLinearCANSD_Mps
 								<< " Torque " << setw(2) << (int)FinalDBWTorqueRequest_Pc
 								<< " P " << setw(2) << P_Contribution_Pc
 								<< " I " << setw(2) << I_Contribution_Pc
@@ -241,7 +241,7 @@ int main(int argc, char **argv)
 						WARN_COND_THROTTLE(
 							node,
 							1000,
-							TargetTwistLinear_Mps * UNDO_STREETDRONE_SCALING_FACTOR < 0,
+							TargetTwistLinear_Mps < 0,
 							"Target velocity is negative!");
 
 						// Logging function implementation.
