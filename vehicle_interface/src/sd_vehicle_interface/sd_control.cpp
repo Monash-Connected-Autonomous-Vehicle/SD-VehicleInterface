@@ -87,7 +87,12 @@ namespace speedcontroller{
 		static double LinearVelocityError_Mps;
 		static double LinearVelocityIntegratedError;
 		static double LinearVelocityDerivativeError;
-		int FinalDBWTorqueRequest_Pc; //Variable for final torque value
+		//Contributions are kept as doubles so small terms are not truncated to 0. P, I and D are static as they hold their last value inside the anti-fussiness band
+		static double P_Pc = 0;
+		static double I_Pc = 0;
+		static double D_Pc = 0;
+		double FF_Pc = 0;
+		double FinalDBWTorqueRequest_Pc; //Variable for final torque value
 		
 		//Speed index and remainder used to interpolate between different speed values of the steer table
 		int speed_index = floor(TargetLinearVelocity_Mps);
@@ -101,11 +106,11 @@ namespace speedcontroller{
 		//Reverse currently not suppported. If a negative speed request is received, we clamp it to 0 (standstill)
 		if (TargetLinearVelocity_Mps <= 0) {
 			TargetLinearVelocity_Mps = 0;
-			FF_Contribution_Pc = 0;
+			FF_Pc = 0;
 		}else{
 			//Calculate Feedforward contribution
 			//FF_Contribution_Pc  = (1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] + speed_index_remainder*feedforward_torque_map_twizy[speed_index+1];
-			FF_Contribution_Pc  = 0.8 * ((1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] + speed_index_remainder*feedforward_torque_map_twizy[speed_index+1]);
+			FF_Pc  = 0.8 * ((1-speed_index_remainder)*feedforward_torque_map_twizy[speed_index] + speed_index_remainder*feedforward_torque_map_twizy[speed_index+1]);
 		}
 					
 		LinearVelocityError_Mps = TargetLinearVelocity_Mps - CurrentLinearVelocity_Mps; 				//The error between current speed and target speed
@@ -114,10 +119,10 @@ namespace speedcontroller{
 		
 		if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps == 0)){
 				
-			P_Contribution_Pc = 0;
-			I_Contribution_Pc = 0;
-			D_Contribution_Pc =0;
-			FF_Contribution_Pc = BRAKE_HOLD_TORQUE_TWIZY; //If we currently have  a speed target of 0 (standstill), and are not moving, lightly hold the vehicle still by gently braking
+			P_Pc = 0;
+			I_Pc = 0;
+			D_Pc =0;
+			FF_Pc = BRAKE_HOLD_TORQUE_TWIZY; //If we currently have  a speed target of 0 (standstill), and are not moving, lightly hold the vehicle still by gently braking
 			
 		}  else if (abs(LinearVelocityError_Mps) < ANTI_FUSSINESS_TWIZY){
 			
@@ -127,45 +132,45 @@ namespace speedcontroller{
 			// //P, D and FF fails maintain last value
 
 			LinearVelocityIntegratedError = 0.975 * LinearVelocityIntegratedError;
-			I_Contribution_Pc = 0.975 * I_Contribution_Pc;
+			I_Pc = 0.975 * I_Pc;
 			
 		} else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)){ //Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop). 
 		   
-			P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Twizy;
-			I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Twizy;
-			D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
+			P_Pc = LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Twizy;
+			I_Pc = LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Twizy;
+			D_Pc = LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
 			
 		}else if (LinearVelocityError_Mps < - ANTI_FUSSINESS_TWIZY){ //When we are going too fast, we reduce speed with a different set of gains. (this allows us to account for vehicle overrun/coasting)
 			
-			P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
-			I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
-			D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
+			P_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
+			I_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
+			D_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
 			
 		} else { //else use the calculated errors
 		
-			P_Contribution_Pc = LinearVelocityError_Mps * Kp_Speed_Twizy;
-			I_Contribution_Pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
-			D_Contribution_Pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
+			P_Pc = LinearVelocityError_Mps * Kp_Speed_Twizy;
+			I_Pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
+			D_Pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
 		}
 				
 		//I gain Anti windup Strategy
-		if (I_Contribution_Pc > MAX_ABS_I_CONTRIBUTION_TWIZY){  //I Gain saturation
-			I_Contribution_Pc = MAX_ABS_I_CONTRIBUTION_TWIZY;
-		} else if (I_Contribution_Pc < -MAX_ABS_I_CONTRIBUTION_TWIZY){
-			I_Contribution_Pc = - MAX_ABS_I_CONTRIBUTION_TWIZY;
+		if (I_Pc > MAX_ABS_I_CONTRIBUTION_TWIZY){  //I Gain saturation
+			I_Pc = MAX_ABS_I_CONTRIBUTION_TWIZY;
+		} else if (I_Pc < -MAX_ABS_I_CONTRIBUTION_TWIZY){
+			I_Pc = - MAX_ABS_I_CONTRIBUTION_TWIZY;
 		}
 		
 		if(CurrentLinearVelocity_Mps < ANTI_FUSSINESS_TWIZY){ //Prevents I gain winding up when sitting still with handbrake on
-		I_Contribution_Pc = 0;
+		I_Pc = 0;
 		}
 		
 		if(abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_TWIZY){ //I Gain should only influence the system in a band about the setpoint. 
 			LinearVelocityIntegratedError = 0;
-			I_Contribution_Pc = 0;
+			I_Pc = 0;
 		}
 		
 		
-		FinalDBWTorqueRequest_Pc = P_Contribution_Pc + I_Contribution_Pc + D_Contribution_Pc + FF_Contribution_Pc;
+		FinalDBWTorqueRequest_Pc = P_Pc + I_Pc + D_Pc + FF_Pc;
 
 			
 		//Impose limits on the torque if greater than or less than maximum and minimum values
@@ -178,7 +183,13 @@ namespace speedcontroller{
 		//Remember previous variables for next cycle
 		PreviousLinearVelocityError_Mps = LinearVelocityError_Mps;
 		
-		return (int8_t)FinalDBWTorqueRequest_Pc;
+		//Report rounded contributions for user feedback
+		P_Contribution_Pc = lround(P_Pc);
+		I_Contribution_Pc = lround(I_Pc);
+		D_Contribution_Pc = lround(D_Pc);
+		FF_Contribution_Pc = lround(FF_Pc);
+		
+		return (int8_t)lround(FinalDBWTorqueRequest_Pc);
 
     }
 	
