@@ -85,9 +85,9 @@ namespace speedcontroller{
         
 		//Calculate PID Errors
 		static double LinearVelocityError_Mps;
-		static double LinearVelocityIntegratedError;
 		static double LinearVelocityDerivativeError;
-		//Contributions are kept as doubles so small terms are not truncated to 0. P, I and D are static as they hold their last value inside the anti-fussiness band
+		//Contributions are kept as doubles so small terms are not truncated to 0. P, I and D are static as they hold their last value inside the anti-fussiness band.
+		//I_Pc is the integrator itself: each cycle adds Ki * error, so switching between gain sets cannot make the I term jump
 		static double P_Pc = 0;
 		static double I_Pc = 0;
 		static double D_Pc = 0;
@@ -115,7 +115,6 @@ namespace speedcontroller{
 					
 		LinearVelocityError_Mps = TargetLinearVelocity_Mps - CurrentLinearVelocity_Mps; 				//The error between current speed and target speed
 		LinearVelocityDerivativeError = LinearVelocityError_Mps - PreviousLinearVelocityError_Mps; 	//The difference between current error and error on last cycle
-		LinearVelocityIntegratedError = LinearVelocityIntegratedError + LinearVelocityError_Mps; 			//The accumulated error over time
 		
 		if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps == 0)){
 				
@@ -131,25 +130,24 @@ namespace speedcontroller{
 			// I_Contribution_Pc = 0;
 			// //P, D and FF fails maintain last value
 
-			LinearVelocityIntegratedError = 0.975 * LinearVelocityIntegratedError;
 			I_Pc = 0.975 * I_Pc;
 			
 		} else if ((TargetLinearVelocity_Mps == 0 && CurrentLinearVelocity_Mps > 0)){ //Use braking gains if we wish to slow down to a standstill (Emergency stop or final stop). 
 		   
 			P_Pc = LinearVelocityError_Mps * Kp_Speed_FullStop_Braking_Twizy;
-			I_Pc = LinearVelocityIntegratedError * Ki_Speed_FullStop_Braking_Twizy;
+			I_Pc = 0; //Integral is dropped when braking to a stop (Ki_Speed_FullStop_Braking_Twizy is 0) so leftover drive torque cannot fight the brakes
 			D_Pc = LinearVelocityDerivativeError * Kd_Speed_FullStop_Braking_Twizy;
 			
 		}else if (LinearVelocityError_Mps < - ANTI_FUSSINESS_TWIZY){ //When we are going too fast, we reduce speed with a different set of gains. (this allows us to account for vehicle overrun/coasting)
 			
 			P_Pc = LinearVelocityError_Mps * Kp_Speed_Retd_Twizy;
-			I_Pc = LinearVelocityIntegratedError * Ki_Speed_Retd_Twizy;
+			I_Pc += LinearVelocityError_Mps * Ki_Speed_Retd_Twizy;
 			D_Pc = LinearVelocityDerivativeError * Kd_Speed_Retd_Twizy;
 			
 		} else { //else use the calculated errors
 		
 			P_Pc = LinearVelocityError_Mps * Kp_Speed_Twizy;
-			I_Pc = LinearVelocityIntegratedError * Ki_Speed_Twizy;
+			I_Pc += LinearVelocityError_Mps * Ki_Speed_Twizy;
 			D_Pc = LinearVelocityDerivativeError * Kd_Speed_Twizy;
 		}
 				
@@ -160,12 +158,11 @@ namespace speedcontroller{
 			I_Pc = - MAX_ABS_I_CONTRIBUTION_TWIZY;
 		}
 		
-		if(CurrentLinearVelocity_Mps < ANTI_FUSSINESS_TWIZY){ //Prevents I gain winding up when sitting still with handbrake on
+		if(CurrentLinearVelocity_Mps < ANTI_FUSSINESS_TWIZY){ //Prevents I gain winding up when sitting still with handbrake on. As I_Pc is the integrator, this also clears the accumulated error
 		I_Pc = 0;
 		}
 		
 		if(abs(LinearVelocityError_Mps) > I_GAIN_ERROR_BAND_TWIZY){ //I Gain should only influence the system in a band about the setpoint. 
-			LinearVelocityIntegratedError = 0;
 			I_Pc = 0;
 		}
 		
