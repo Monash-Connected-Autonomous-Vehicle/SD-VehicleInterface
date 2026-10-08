@@ -16,6 +16,8 @@
   </node>
 
   <group unless="$(var sd_simulation_mode)">
-    <include file="$(find-pkg-share ros2_socketcan)/launch/socket_can_bridge.launch.xml"/>
+    <include file="$(find-pkg-share ros2_socketcan)/launch/socket_can_bridge.launch.xml">
+  	<arg name="interface" value="can1"/>
+    </include>
   </group>
 </launch>
