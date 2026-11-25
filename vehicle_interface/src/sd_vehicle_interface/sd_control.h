@@ -42,23 +42,26 @@ namespace speedcontroller{
 	//It is possible to set different gains for occasions where the vehicle is braking to a stop, braking and accellerating
 
 	//*****TWIZY CALIBRATIONS*****
+	//Speeds reach this controller divided by UNDO_STREETDRONE_SCALING_FACTOR (50), so gains here are real-m/s gains x50 and speed bands are real m/s /50 (real values in the comments).
+	//Set from the lifted-wheel bench runs (2026-09-18 and 09-24) using a model of them that runs this branch's sd_control.cpp. Expect to raise the gains for driving on the ground.
+	//Keep Ki_Speed_Retd_Twizy equal to Ki_Speed_Twizy: both multiply the same error sum, so any difference makes I jump when the speed crosses the target.
+	//Original values: Kp 23, Ki 1, Retd Kp 40, Retd Ki 1, FullStop Kp 65, ANTI_FUSSINESS 0.00175, I_GAIN_ERROR_BAND 2. The gains and I band were never rescaled for the /50, so they acted 50x too weak.
 	//Gains for increasing speed
-	#define Kp_Speed_Twizy                    (23)
-	#define Ki_Speed_Twizy                    (1)
+	#define Kp_Speed_Twizy                    (250) //5 %/(m/s)
+	#define Ki_Speed_Twizy                    (7.5) //0.15 %/(m/s) per 10 Hz cycle
 	#define Kd_Speed_Twizy                    (0)
 
 	//Speed Control Anti-fusinees Band (+/- band of target where we maintain torque)
-	//#define ANTI_FUSSINESS_TWIZY (0.1)
-	#define ANTI_FUSSINESS_TWIZY (0.00175)
+	#define ANTI_FUSSINESS_TWIZY (0.002) //0.1 m/s
 
 	//Gains for braking to a stop only
-	#define Kp_Speed_FullStop_Braking_Twizy            (65)
+	#define Kp_Speed_FullStop_Braking_Twizy            (750) //15 %/(m/s)
 	#define Ki_Speed_FullStop_Braking_Twizy             (0)
 	#define Kd_Speed_FullStop_Braking_Twizy            (0)
 
 	//Gains for reducing speed, not to a stop
-	#define Kp_Speed_Retd_Twizy          (40)
-	#define Ki_Speed_Retd_Twizy           (1)
+	#define Kp_Speed_Retd_Twizy          (1000) //20 %/(m/s)
+	#define Ki_Speed_Retd_Twizy           (7.5) //0.15, same as Ki_Speed_Twizy
 	#define Kd_Speed_Retd_Twizy          (0)
 
 
@@ -66,7 +69,7 @@ namespace speedcontroller{
 	#define MAX_TORQUE_TWIZY  (100)
 	#define MIN_TORQUE_TWIZY    (-100)
 	#define MAX_ABS_I_CONTRIBUTION_TWIZY  (15)
-	#define I_GAIN_ERROR_BAND_TWIZY (2) //The absolute error about a setpoint where I gain is allowed to accumulate. 
+	#define I_GAIN_ERROR_BAND_TWIZY (0.04) //2 m/s. The absolute error about a setpoint where I gain is allowed to accumulate. 
 
 
 	//Other control calibratables
